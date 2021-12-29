@@ -1,10 +1,10 @@
 ﻿syntax = "proto3"; 
 
 option csharp_namespace = "BlazorGrpcWebApp.Shared"; 
-package unit; 
+package UnitGrpc; 
 
 service UnitServiceGrpc { 
-	rpc GetUnit (UnitRequest) returns (UnitResponse); 
+	rpc GetUnits (UnitRequest) returns (stream UnitResponse); 
 } 
 
 message UnitRequest {
