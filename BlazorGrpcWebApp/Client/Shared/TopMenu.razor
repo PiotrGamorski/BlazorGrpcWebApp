@@ -1,0 +1,37 @@
+﻿@inject IBananaService BananaService
+@implements IDisposable
+
+<AuthorizeView>
+    <Authorized>
+    <div class="top-menu">
+        <img src = "icons/banana.png"/>
+        <span class="popover-header">
+            @BananaService.Bananas
+        </span>
+        <AddBananas/>
+    </div>
+    </Authorized>
+    <NotAuthorized>
+        <div>
+            <NavLink href="login">Login</NavLink> |
+            <NavLink href="register" style="margin-left: 0">Register</NavLink>
+        </div>
+    </NotAuthorized>
+
+</AuthorizeView>
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        // subscribe to the event
+        // This needs to be added, as other component executes a function effecting Bananas amount
+        BananaService.OnChange += StateHasChanged;
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        // unsubscribe to the event
+        BananaService.OnChange -= StateHasChanged;
+    }
+}

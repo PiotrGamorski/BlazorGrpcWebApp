@@ -1,0 +1,11 @@
+﻿@page "/"
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Hi, @context.User.Identity.Name. Welcome back!</h1>
+        Let's admire your <a href="army">army</a>.
+    </Authorized>
+    <NotAuthorized>
+        <h1>Welcome to Blazor Battles!</h1>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,0 +1,42 @@
+﻿@page "/fetchdata" 
+@using BlazorGrpcWebApp.Shared 
+@inject WeatherForecasts.WeatherForecastsClient WeatherForecastsClient 
+
+<h1>Weather forecast</h1> 
+<p>This component demonstrates fetching data from the server.</p> 
+
+@if (forecastsProto == null) 
+{ 
+	<p><em>Loading...</em></p> 
+} 
+else 
+{ 
+	<table class="table"> 
+	<thead> 
+	<tr> 
+	<th>Date</th> 
+	<th>Temp. (C)</th> 
+	<th>Summary</th> 
+	</tr> 
+	</thead> 
+	<tbody> 
+	@foreach (var forecast in forecastsProto) 
+	{ 
+		<tr>  
+		<td>@forecast.DateTimeStampProto.ToDateTime()</td>		
+		<td>@forecast.TemperatureProto</td> 
+		<td>@forecast.SummaryProto</td> 
+		</tr> 
+	} 
+	</tbody> 
+	</table> 
+} 
+
+@code 
+{
+	private IList<WeatherForecastRequest> forecastsProto = new List<WeatherForecastRequest>(); 
+	protected override async Task OnInitializedAsync() 
+	{ 
+		forecastsProto = (await WeatherForecastsClient.GetWeatherAsync(new WeatherForecastRequest())).ForecastsProto;
+	} 
+}

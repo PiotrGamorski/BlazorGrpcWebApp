@@ -1,0 +1,20 @@
+﻿<CascadingAuthenticationState>
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                <h2>Whoops!</h2>
+                It seems you're not logged in. Please <span><a href="login">log</a></span> in to see this page.
+                @*<BlazorGrpcWebApp.Client.Pages.Login></BlazorGrpcWebApp.Client.Pages.Login>*@
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+</CascadingAuthenticationState>

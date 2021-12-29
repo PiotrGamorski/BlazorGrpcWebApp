@@ -1,0 +1,69 @@
+﻿@page "/build"
+@inject IBananaService BananaService
+@inject IUnitService UnitService
+@inject IToastService ToastService
+@attribute [Authorize]
+@using Blazorise.Snackbar
+
+<h3>Build</h3>
+<Field>
+    <select @bind="selectedUnitId" class="form-control">
+        @foreach (var unit in UnitService.Units)
+        {
+            <option value="@unit.Id">@unit.Title // @unit.BananaCost Bananas</option>
+        }
+    </select>
+</Field>
+<br />
+<button class="btn btn-primary" @onclick="BuildUnit">Build</button>
+
+<Snackbar Style="border-radius:5px solid #FFFFFF" @ref="SnackbarRef" Location="SnackbarLocation.Right" Color="SnackbarColor.Dark" Interval="SnackBarRefInterval">
+    <SnackbarBody>
+        <div style="padding-top:5px">@SnackBarRefMessage</div>
+    </SnackbarBody>
+</Snackbar>
+
+
+@code {
+    public int selectedUnitId { get; set; } = 1;
+    private bool needMoreBananas = false;
+    private int SnackBarRefInterval { get; set; } = 5000;
+    private string? SnackBarRefMessage { get; set; }
+    private Snackbar SnackbarRef;
+
+    public async Task BuildUnit()
+    {
+        var selectedUnit = UnitService.Units.FirstOrDefault(u => u.Id == selectedUnitId);
+        if (selectedUnit != null)
+        {
+            if (BananaService.Bananas < selectedUnit.BananaCost)
+            {
+                needMoreBananas = true;
+                ToastService.ShowError("Not enough bananas!", ":(");
+                return;
+            }
+            needMoreBananas = false;
+
+            await BananaService.EatBananas(selectedUnit.BananaCost);
+            try
+            {
+                await UnitService.AddUnit(selectedUnitId);
+                //await ShowSnackBar(5000, $"Your {selectedUnit.Title} has been built!");
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        else throw new InvalidOperationException("Cannot build Unit");
+    }
+
+    private Task ShowSnackBar(int interval, string message)
+    {
+        SnackBarRefInterval = interval;
+        SnackBarRefMessage = message;
+        SnackbarRef.Show();
+
+        return Task.CompletedTask;
+    }
+}

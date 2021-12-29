@@ -1,0 +1,25 @@
+﻿@page "/login"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject ILogoutService LogoutService
+
+ Please log in below or <a href="register">register</a> for a new account.
+ 
+ <Div style="display:flex">
+        <EditForm Model=@userLogin OnValidSubmit="HandleLogin">
+            <Field>
+                <FieldLabel>Username</FieldLabel>
+                <InputText @bind-Value="userLogin.Username" class="form-control"></InputText>
+            </Field>
+            <Field>
+                <FieldLabel>Password</FieldLabel>
+                <InputText @bind-Value="userLogin.Password" class="form-control" type="password"></InputText>
+            </Field>
+            <br />
+            <input type="submit" class="btn btn-primary" value="Login">
+        </EditForm>
+    </Div>       
+
+@code {
+
+}
