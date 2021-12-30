@@ -1,10 +1,10 @@
 ﻿syntax = "proto3"; 
 
-option csharp_namespace = "BlazorGrpcWebApp.Shared"; 
-package UnitGrpc; 
+option csharp_namespace = "BlazorGrpcWebApp.Shared";
+package UnitServiceGrpc; 
 
 service UnitServiceGrpc { 
-	rpc GetUnits (UnitRequest) returns (stream UnitResponse); 
+	rpc GetUnits (UnitRequest) returns (stream UnitResponse) {}
 } 
 
 message UnitRequest {
@@ -16,5 +16,9 @@ message UnitRequest {
 }
 
 message UnitResponse {
-	repeated UnitRequest unit = 1; 
+	int32 id = 1;
+	string title = 2;
+	int32 attack = 3;
+	int32 defense = 4;
+	int32 bananaCost = 5;
 }

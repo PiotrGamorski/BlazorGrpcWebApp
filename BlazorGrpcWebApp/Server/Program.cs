@@ -1,3 +1,4 @@
+using BlazorGrpcWebApp.Shared;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,7 @@ app.UseEndpoints(endpoints =>
 {
 	// map to and register the gRPC service
 	endpoints.MapGrpcService<WeatherService>().EnableGrpcWeb();
+	endpoints.MapGrpcService<UnitServiceGrpcImpl>().EnableGrpcWeb();
 	endpoints.MapRazorPages();
 	endpoints.MapControllers();
 	endpoints.MapFallbackToFile("index.html");
