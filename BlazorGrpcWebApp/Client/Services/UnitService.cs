@@ -33,7 +33,7 @@ namespace BlazorGrpcWebApp.Client.Services
             return Task.CompletedTask;
         }
 
-        public async Task LoadUnitAsync()
+        public async Task LoadUnitsAsync()
         {
             if (Units.Count == 0)
             {

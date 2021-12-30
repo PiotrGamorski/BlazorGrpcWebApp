@@ -5,6 +5,8 @@
 <h3>My Army</h3>
 <br />
 
+@if (UnitService.Units.Count > 0)
+{ 
 <Table Bordered>
     <TableBody>
         @foreach(var userUnit in UnitService.MyUnits)
@@ -27,8 +29,16 @@
             </TableRow>
         }
     </TableBody>
-</Table>
+    </Table>
+}
+else
+{
+    <Span>Loading...</Span>    
+}
 
 @code {
-
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+    }
 }

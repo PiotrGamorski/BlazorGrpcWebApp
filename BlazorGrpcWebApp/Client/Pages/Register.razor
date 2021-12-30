@@ -2,6 +2,7 @@
 @inject IUnitService UnitService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject UnitServiceGrpc.UnitServiceGrpcClient UnitServiceGrpcClient
 
 <h3>Register</h3>
 
@@ -35,7 +36,7 @@
     <div class="form-group">
         <label for="startUnit">Start Unit</label>
         <InputSelect id="startUnit" @bind-Value="userRegister.StartUnitId" class="form-control">
-            @foreach(var unit in UnitService.Units)
+            @foreach(var unit in UnitsByGrpc)
             {
                 <option value="@unit.Id">@unit.Title</option>
             }
@@ -63,11 +64,31 @@
 
 @code {
     private UserRegister userRegister = new UserRegister();
+    private IList<UnitResponse> UnitsByGrpc = new List<UnitResponse>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+        UnitsByGrpc = await DoGetUnits();
+
+    }
 
     private Task HandleRegistration()
     {
         JSRuntime.InvokeVoidAsync("console.log", userRegister);
         NavigationManager.NavigateTo("login");
         return Task.CompletedTask;
+    }
+
+    private async Task<IList<UnitResponse>> DoGetUnits()
+    {
+        var units = new List<UnitResponse>();
+        var unitResponse = UnitServiceGrpcClient.GetUnits(new UnitRequest() { });
+        while (await unitResponse.ResponseStream.MoveNext(new CancellationToken()))
+        {
+            units.Add(unitResponse.ResponseStream.Current);
+        }
+
+        return await Task.FromResult(units);
     }
 }

@@ -1,10 +1,14 @@
+using BlazorGrpcWebApp.Server.Data;
 using BlazorGrpcWebApp.Shared;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddDbContext<DataContext>(options =>
+	 options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
 builder.Services.AddGrpc();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

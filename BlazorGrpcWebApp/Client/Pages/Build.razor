@@ -25,11 +25,16 @@
 
 
 @code {
-    public int selectedUnitId { get; set; } = 1;
+    private int selectedUnitId { get; set; } = 1;
     private bool needMoreBananas = false;
     private int SnackBarRefInterval { get; set; } = 5000;
     private string? SnackBarRefMessage { get; set; }
     private Snackbar SnackbarRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UnitService.LoadUnitsAsync();
+    }
 
     public async Task BuildUnit()
     {
