@@ -1,8 +1,5 @@
 using BlazorGrpcWebApp.Server.Data;
-using BlazorGrpcWebApp.Shared;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
