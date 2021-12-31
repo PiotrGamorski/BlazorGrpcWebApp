@@ -1,4 +1,5 @@
-using BlazorGrpcWebApp.Server.Data;
+//using BlazorGrpcWebApp.Server.Data;
+using BlazorGrpcWebApp.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
