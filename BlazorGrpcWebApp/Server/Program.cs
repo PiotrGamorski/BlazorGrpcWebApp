@@ -1,4 +1,3 @@
-//using BlazorGrpcWebApp.Server.Data;
 using BlazorGrpcWebApp.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 

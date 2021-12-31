@@ -34,8 +34,4 @@
     <Protobuf Update="Protos\unit.proto" GrpcServices="Both" />
     <Protobuf Update="Protos\weather.proto" GrpcServices="Both" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
 </Project>
