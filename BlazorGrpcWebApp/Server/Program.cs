@@ -1,6 +1,5 @@
 using BlazorGrpcWebApp.Shared.Data;
 using Microsoft.EntityFrameworkCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = new ConfigurationBuilder()
