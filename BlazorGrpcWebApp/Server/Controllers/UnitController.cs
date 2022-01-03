@@ -12,7 +12,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
 
         public UnitController(DataContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         [HttpGet]

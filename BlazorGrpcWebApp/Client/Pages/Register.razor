@@ -1,4 +1,5 @@
 ﻿@page "/register"
+@using Grpc.Core
 @inject IUnitService UnitService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -68,8 +69,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await UnitService.LoadUnitsAsync();
-        UnitsByGrpc = await DoGetUnits();
+        //await UnitService.LoadUnitsAsync();
+        UnitsByGrpc = await DoGetUnits(2000);
 
     }
 
@@ -80,15 +81,25 @@
         return Task.CompletedTask;
     }
 
-    private async Task<IList<UnitResponse>> DoGetUnits()
+    private async Task<IList<UnitResponse>> DoGetUnits(int deadline)
     {
         var units = new List<UnitResponse>();
-        var unitResponse = UnitServiceGrpcClient.GetUnits(new UnitRequest() { });
-        while (await unitResponse.ResponseStream.MoveNext(new CancellationToken()))
+        try
         {
-            units.Add(unitResponse.ResponseStream.Current);
+            var unitResponse = UnitServiceGrpcClient.GetUnits(new UnitRequest() {}, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
+            while (await unitResponse.ResponseStream.MoveNext(new CancellationToken()))
+            {
+                units.Add(unitResponse.ResponseStream.Current);
+            }
+            return await Task.FromResult(units);
         }
-
-        return await Task.FromResult(units);
+        catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
+        {
+            throw new RpcException(e.Status);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 }
