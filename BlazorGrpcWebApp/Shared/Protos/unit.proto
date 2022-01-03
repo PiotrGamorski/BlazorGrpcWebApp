@@ -5,7 +5,17 @@ package UnitServiceGrpc;
 
 service UnitServiceGrpc { 
 	rpc GetUnits (UnitRequest) returns (stream UnitResponse) {}
+	rpc CreateUnit (UnitRequest) returns (stream UnitResponse) {}
 } 
+
+message UnitGrpc {
+	int32 id = 1;
+	string title = 2;
+	int32 attack = 3;
+	int32 defense = 4;
+	int32 bananaCost = 5;
+	int32 hitPoints = 6;
+}
 
 message UnitRequest {
 	int32 id = 1;
@@ -13,6 +23,7 @@ message UnitRequest {
 	int32 attack = 3;
 	int32 defense = 4;
 	int32 bananaCost = 5;
+	int32 hitPoints = 6;
 }
 
 message UnitResponse {
@@ -21,4 +32,5 @@ message UnitResponse {
 	int32 attack = 3;
 	int32 defense = 4;
 	int32 bananaCost = 5;
+	int32 hitPoints = 6;
 }

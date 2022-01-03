@@ -67,6 +67,10 @@ namespace BlazorGrpcWebApp.Client.Services
             {
                 throw new RpcException(e.Status);
             }
+            catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled)
+            { 
+                throw new RpcException(e.Status);
+            }
             catch (Exception e)
             {
                 throw new Exception(e.Message);

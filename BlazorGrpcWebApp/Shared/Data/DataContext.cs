@@ -12,5 +12,6 @@ namespace BlazorGrpcWebApp.Shared.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options) {}
 
         public DbSet<Unit> Units { get; set; }
+        public DbSet<UnitGrpc> UnitsGrpc { get; set; }
     }
 }

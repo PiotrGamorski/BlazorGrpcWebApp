@@ -5,7 +5,7 @@
 <h3>My Army</h3>
 <br />
 
-@if (UnitService.Units.Count > 0)
+@if (UnitService.UnitResponses.Count > 0)
 { 
 <Table Bordered>
     <TableBody>
@@ -39,6 +39,7 @@ else
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await UnitService.LoadUnitsAsync();
+        //await UnitService.LoadUnitsAsync();
+        await UnitService.DoGetUnits(2000);
     }
 }

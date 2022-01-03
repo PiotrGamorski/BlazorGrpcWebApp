@@ -34,6 +34,7 @@
     protected override async Task OnInitializedAsync()
     {
         await UnitService.LoadUnitsAsync();
+        //await UnitService.DoGetUnits(2000);
     }
 
     public async Task BuildUnit()
