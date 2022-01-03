@@ -3,17 +3,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
 
+// Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<DataContext>(options =>
-     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), 
+                                           options => options.MigrationsAssembly("BlazorGrpcWebApp.Server")));
 
 var app = builder.Build();
 

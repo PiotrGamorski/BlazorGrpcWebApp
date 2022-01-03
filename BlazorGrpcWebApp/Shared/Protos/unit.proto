@@ -8,7 +8,7 @@ service UnitServiceGrpc {
 	rpc CreateUnit (UnitRequest) returns (stream UnitResponse) {}
 } 
 
-message UnitGrpc {
+message GrpcUnit {
 	int32 id = 1;
 	string title = 2;
 	int32 attack = 3;

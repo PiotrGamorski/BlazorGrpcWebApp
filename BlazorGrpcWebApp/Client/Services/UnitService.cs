@@ -54,14 +54,15 @@ namespace BlazorGrpcWebApp.Client.Services
         #region gRPC Calls
         public async Task<IList<UnitResponse>> DoGetUnits(int deadline)
         {
+            var units = new List<UnitResponse>();
             try
             {
                 var unitResponse = _unitServiceGrpcClient.GetUnits(new UnitRequest() { }, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
                 while (await unitResponse.ResponseStream.MoveNext(new CancellationToken()))
                 {
-                    UnitResponses.Add(unitResponse.ResponseStream.Current);
+                    units.Add(unitResponse.ResponseStream.Current);
                 }
-                return await Task.FromResult(UnitResponses);
+                return await Task.FromResult(units);
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
             {
