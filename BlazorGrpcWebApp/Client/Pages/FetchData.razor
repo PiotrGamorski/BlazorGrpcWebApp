@@ -2,7 +2,7 @@
 @using BlazorGrpcWebApp.Shared 
 @using Grpc.Net.Client;
 @inject WeatherForecasts.WeatherForecastsClient WeatherForecastsClient
-@inject UnitServiceGrpc.UnitServiceGrpcClient UnitServiceGrpcClient
+@inject IUnitService UnitService
 
 <h1>Weather forecast</h1> 
 <p>This component demonstrates fetching data from the server.</p> 
@@ -33,29 +33,20 @@ else
 	</tbody> 
 	</table>
 
-	@foreach (var unit in units)
+	@foreach (var grpcUnit in grpcUnits)
 	{
-		<div>@unit.Title</div>
+		<div>@grpcUnit.Title</div>
 	}
 } 
 
 @code 
 {
 	private IList<WeatherForecastRequest> forecastsProto = new List<WeatherForecastRequest>();
-	private IList<UnitResponse> units = new List<UnitResponse>();
+	private IList<GrpcUnit> grpcUnits = new List<GrpcUnit>();
 
 	protected override async Task OnInitializedAsync() 
 	{ 
 		forecastsProto = (await WeatherForecastsClient.GetWeatherAsync(new WeatherForecastRequest())).ForecastsProto;
-		await DoGetUnits();
+		grpcUnits = await UnitService.DoGetGrpcUnits(2000);
 	} 
-
-	private async Task DoGetUnits()
-	{
-		var unitResponse = UnitServiceGrpcClient.GetUnits(new UnitRequest() { });
-		while (await unitResponse.ResponseStream.MoveNext(new CancellationToken()))
-		{
-			units.Add(unitResponse.ResponseStream.Current);
-		}
-	}
 }

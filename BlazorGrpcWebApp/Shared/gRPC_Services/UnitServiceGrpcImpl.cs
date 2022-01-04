@@ -11,61 +11,58 @@ public class UnitServiceGrpcImpl : UnitServiceGrpc.UnitServiceGrpcBase
         _dataContext = dataContext;
     }
 
-    public override async Task GetUnits(UnitRequest request, IServerStreamWriter<UnitResponse> responseStream, ServerCallContext context)
+    public override async Task GetGrpcUnits(GrpcUnit request, IServerStreamWriter<GrpcUnit> responseStream, ServerCallContext context)
     {
-        var units = _dataContext.Units;
-
-        if (units != null)
+        var grpcUnits = _dataContext.GrpcUnits;
+        if (grpcUnits != null)
         {
-            foreach (var unit in units)
+            foreach (var grpcUnit in grpcUnits)
             {
-                await responseStream.WriteAsync(new UnitResponse()
-                {
-                    Id = unit.Id,
-                    Title = unit.Title,
-                    Attack = unit.Attack,
-                    Defense = unit.Defense,
-                    BananaCost = unit.BananaCost,
-                    HitPoints = unit.HitPoints,
-                });
+                await responseStream.WriteAsync(grpcUnit);
             }
         }
         else
             throw new RpcException(Status.DefaultCancelled);
-        
     }
 
-    public override async Task CreateUnit(UnitRequest request, IServerStreamWriter<UnitResponse> responseStream, ServerCallContext context)
+    public override async Task CreateGrpcUnit(GrpcUnitRequest request, IServerStreamWriter<GrpcUnitResponse> responseStream, ServerCallContext context)
     {
-        await _dataContext.AddAsync(new Unit() 
+        await _dataContext.AddAsync(new GrpcUnit()
         {
-            Title = request.Title,
-            Attack = request.Attack,
-            Defense = request.Defense,
-            BananaCost = request.BananaCost,
-            HitPoints = request.HitPoints,
+            Title = request.GrpcUnit.Title,
+            Attack = request.GrpcUnit.Attack,
+            Defense = request.GrpcUnit.Defense,
+            BananaCost = request.GrpcUnit.BananaCost,
+            HitPoints = request.GrpcUnit.HitPoints,
         });
-
         await _dataContext.SaveChangesAsync();
-        //return await Task.FromResult(new UnitResponse() { });   // - if one wants to send created Unit instead of the whole list
 
-        var units = _dataContext.Units;
-        if (units != null)
+        var grpcUnits = _dataContext.GrpcUnits;
+        if (grpcUnits != null)
         {
-            foreach (var unit in units)
+            foreach (var grpcUnit in grpcUnits)
             {
-                await responseStream.WriteAsync(new UnitResponse()
-                {
-                    Id = unit.Id,
-                    Title = unit.Title,
-                    Attack = unit.Attack,
-                    Defense = unit.Defense,
-                    BananaCost = unit.BananaCost,
-                    HitPoints = unit.HitPoints,
-                });
+                await responseStream.WriteAsync(new GrpcUnitResponse() { GrpcUnit = grpcUnit });
             }
         }
         else
             throw new RpcException(Status.DefaultCancelled);
+    }
+
+    public override async Task<GrpcUnitResponse> UpdateGrpcUnit(GrpcUnitRequest request, ServerCallContext context)
+    {
+        var dbGrpcUnit = _dataContext.GrpcUnits.FirstOrDefault(unit => unit.Id == request.GrpcUnit.Id);
+        if (dbGrpcUnit != null)
+        { 
+            dbGrpcUnit.Title = request.GrpcUnit.Title;
+            dbGrpcUnit.Attack = request.GrpcUnit.Attack;
+            dbGrpcUnit.Defense = request.GrpcUnit.Defense;
+            dbGrpcUnit.BananaCost = request.GrpcUnit.BananaCost;
+            dbGrpcUnit.HitPoints = request.GrpcUnit.HitPoints;
+
+            await _dataContext.SaveChangesAsync();
+            return new GrpcUnitResponse() { GrpcUnit = dbGrpcUnit};
+        }
+        else throw new RpcException(Status.DefaultCancelled);
     }
 }

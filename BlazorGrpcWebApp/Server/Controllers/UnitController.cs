@@ -44,7 +44,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             dbUnit.Defense = unit.Defense;
             dbUnit.BananaCost = unit.BananaCost;
             dbUnit.HitPoints = unit.HitPoints;
-
+            
             await _context.SaveChangesAsync();
             return Ok(dbUnit);
         }

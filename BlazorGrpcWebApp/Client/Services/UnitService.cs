@@ -25,7 +25,6 @@ namespace BlazorGrpcWebApp.Client.Services
         
         public IList<Unit> Units { get; set; } = new List<Unit>();
         public IList<UserUnit> MyUnits { get; set; } = new List<UserUnit>();
-        public IList<UnitResponse> UnitResponses { get; set; } = new List<UnitResponse>();
 
         public Task AddUnit(int unitId)
         {
@@ -52,30 +51,51 @@ namespace BlazorGrpcWebApp.Client.Services
         #endregion
 
         #region gRPC Calls
-        public async Task<IList<UnitResponse>> DoGetUnits(int deadline)
+        public async Task<IList<GrpcUnit>> DoGetGrpcUnits(int deadline)
         {
-            var units = new List<UnitResponse>();
+            var grpcUnits = new List<GrpcUnit>();
             try
             {
-                var unitResponse = _unitServiceGrpcClient.GetUnits(new UnitRequest() { }, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
-                while (await unitResponse.ResponseStream.MoveNext(new CancellationToken()))
+                var response = _unitServiceGrpcClient.GetGrpcUnits(new GrpcUnit() {}, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
+                while (await response.ResponseStream.MoveNext(new CancellationToken()))
                 {
-                    units.Add(unitResponse.ResponseStream.Current);
+                    grpcUnits.Add(response.ResponseStream.Current);
                 }
-                return await Task.FromResult(units);
+                return await Task.FromResult(grpcUnits);
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
             {
                 throw new RpcException(e.Status);
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled)
-            { 
+            {
                 throw new RpcException(e.Status);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<GrpcUnitResponse> DoUpdateGrpcUnit(GrpcUnitRequest grpcUnitRequest, int deadline)
+        {
+            try
+            {
+                return await _unitServiceGrpcClient.UpdateGrpcUnitAsync(grpcUnitRequest, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            
         }
         #endregion
     }

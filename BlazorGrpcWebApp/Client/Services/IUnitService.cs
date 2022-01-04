@@ -6,9 +6,9 @@ namespace BlazorGrpcWebApp.Client.Services
     {
         IList<Unit> Units { get; set; }
         IList<UserUnit> MyUnits { get; set;}
-        IList<UnitResponse> UnitResponses { get; set; }
         Task AddUnit(int unitId);
         Task LoadUnitsAsync();
-        Task<IList<UnitResponse>> DoGetUnits(int deadline);
+        Task<IList<GrpcUnit>> DoGetGrpcUnits(int deadline);
+        Task<GrpcUnitResponse> DoUpdateGrpcUnit(GrpcUnitRequest grpcUnitRequest, int deadline);
     }
 }
