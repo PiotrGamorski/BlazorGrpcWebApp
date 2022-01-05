@@ -1,9 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BlazorGrpcWebApp.Shared.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorGrpcWebApp.Shared.Data
 {
@@ -15,5 +11,6 @@ namespace BlazorGrpcWebApp.Shared.Data
 
         public DbSet<Unit> Units { get; set; }
         public DbSet<GrpcUnit> GrpcUnits { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

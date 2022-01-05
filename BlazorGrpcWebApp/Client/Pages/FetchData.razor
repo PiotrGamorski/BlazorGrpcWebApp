@@ -33,20 +33,20 @@ else
 	</tbody> 
 	</table>
 
-	@foreach (var grpcUnit in grpcUnits)
+	@foreach (var grpcUnitResponse in grpcUnitsResponses)
 	{
-		<div>@grpcUnit.Title</div>
+		<div>@grpcUnitResponse.GrpcUnit.Title</div>
 	}
 } 
 
 @code 
 {
 	private IList<WeatherForecastRequest> forecastsProto = new List<WeatherForecastRequest>();
-	private IList<GrpcUnit> grpcUnits = new List<GrpcUnit>();
+	private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
 
 	protected override async Task OnInitializedAsync() 
 	{ 
 		forecastsProto = (await WeatherForecastsClient.GetWeatherAsync(new WeatherForecastRequest())).ForecastsProto;
-		grpcUnits = await UnitService.DoGetGrpcUnits(2000);
+		grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
 	} 
 }

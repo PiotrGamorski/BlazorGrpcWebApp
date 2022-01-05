@@ -22,7 +22,8 @@ namespace BlazorGrpcWebApp.Client.Services
             _channel = GrpcChannel.ForAddress("https://localhost:7039", new GrpcChannelOptions { HttpClient = httpClientGrpc });
             _unitServiceGrpcClient = new UnitServiceGrpc.UnitServiceGrpcClient(_channel);
         }
-        
+
+        public int deadline { get; set; } = 2000;
         public IList<Unit> Units { get; set; } = new List<Unit>();
         public IList<UserUnit> MyUnits { get; set; } = new List<UserUnit>();
 
@@ -45,29 +46,47 @@ namespace BlazorGrpcWebApp.Client.Services
         {
             if (Units.Count == 0)
             {
+#pragma warning disable CS8601 // Possible null reference assignment.
                 Units = await _httpClient.GetFromJsonAsync<IList<Unit>>("api/Unit");
+#pragma warning restore CS8601 // Possible null reference assignment.
             }
         }
         #endregion
 
         #region gRPC Calls
-        public async Task<IList<GrpcUnit>> DoGetGrpcUnits(int deadline)
+        public async Task<IList<GrpcUnitResponse>> DoGetGrpcUnits(int deadline)
         {
-            var grpcUnits = new List<GrpcUnit>();
+            var grpcUnitsResponses = new List<GrpcUnitResponse>();
             try
             {
-                var response = _unitServiceGrpcClient.GetGrpcUnits(new GrpcUnit() {}, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
+                var response = _unitServiceGrpcClient.GetGrpcUnits(new GrpcUnitRequest() {}, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
                 while (await response.ResponseStream.MoveNext(new CancellationToken()))
                 {
-                    grpcUnits.Add(response.ResponseStream.Current);
+                    grpcUnitsResponses.Add(response.ResponseStream.Current);
                 }
-                return await Task.FromResult(grpcUnits);
+                return await Task.FromResult(grpcUnitsResponses);
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
             {
                 throw new RpcException(e.Status);
             }
-            catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled)
+            catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<GrpcUnitResponse> DoCreateGrpcUnit(GrpcUnitRequest grpcUnitRequest, int deadline)
+        {
+            try
+            {
+                return  await _unitServiceGrpcClient.CreateGrpcUnitAsync(grpcUnitRequest, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.Internal)
             {
                 throw new RpcException(e.Status);
             }
@@ -87,7 +106,7 @@ namespace BlazorGrpcWebApp.Client.Services
             {
                 throw new RpcException(e.Status);
             }
-            catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled)
+            catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
             {
                 throw new RpcException(e.Status);
             }
@@ -95,7 +114,30 @@ namespace BlazorGrpcWebApp.Client.Services
             {
                 throw new Exception(e.Message);
             }
-            
+        }
+
+        public async Task<GrpcUnitDeleteResponse> DoDeleteGrpcUnit(GrpcUnitDeleteRequest grpcUnitDeleteRequest, int deadline)
+        {
+            try
+            {
+                return await _unitServiceGrpcClient.DeleteGrpcUnitAsync(grpcUnitDeleteRequest, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.Internal)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
         #endregion
     }

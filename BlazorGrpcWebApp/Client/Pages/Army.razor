@@ -5,7 +5,7 @@
 <h3>My Army</h3>
 <br />
 
-@if (grpcUnitResponses.Count > 0)
+@if (grpcUnitsResponses.Count > 0)
 { 
 <Table Bordered>
     <TableBody>
@@ -37,12 +37,12 @@ else
 }
 
 @code {
-    private IList<GrpcUnit> grpcUnitResponses = new List<GrpcUnit>();
+    private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
 
     protected override async Task OnInitializedAsync()
     {
         //await UnitService.LoadUnitsAsync();
-        grpcUnitResponses = await UnitService.DoGetGrpcUnits(2000);
+        grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
 
     }
 }

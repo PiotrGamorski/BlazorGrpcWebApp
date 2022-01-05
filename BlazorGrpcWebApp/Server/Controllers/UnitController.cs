@@ -50,7 +50,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUnit(int id, Unit unit)
+        public async Task<IActionResult> DeleteUnit(int id)
         {
             var dbUnit = await _context.Units.FirstOrDefaultAsync(u => u.Id == id);
             if (dbUnit == null)

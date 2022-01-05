@@ -36,9 +36,9 @@
     <div class="form-group">
         <label for="startUnit">Start Unit</label>
         <InputSelect id="startUnit" @bind-Value="userRegister.StartUnitId" class="form-control">
-            @foreach(var unit in grpcUnits)
+            @foreach(var unit in grpcUnitsResponses)
             {
-                <option value="@unit.Id">@unit.Title</option>
+                <option value="@unit.GrpcUnit.Id">@unit.GrpcUnit.Title</option>
             }
         </InputSelect>
     </div>
@@ -63,15 +63,13 @@
 </Div>
 
 @code {
-    private int deadline = 2000;
     private UserRegister userRegister = new UserRegister();
-    private IList<GrpcUnit> grpcUnits = new List<GrpcUnit>();
-    private GrpcUnitResponse grpcUnitResponse = new GrpcUnitResponse();
+    private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
 
     protected override async Task OnInitializedAsync()
     {
         // await UnitService.LoadUnitsAsync();
-        grpcUnits = await UnitService.DoGetGrpcUnits(deadline);
+        grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
     }
 
     private Task HandleRegistration()

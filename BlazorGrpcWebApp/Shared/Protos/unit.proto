@@ -4,9 +4,10 @@ option csharp_namespace = "BlazorGrpcWebApp.Shared";
 package UnitServiceGrpc; 
 
 service UnitServiceGrpc { 
-	rpc GetGrpcUnits (GrpcUnit) returns (stream GrpcUnit) {}
-	rpc CreateGrpcUnit (GrpcUnitRequest) returns (stream GrpcUnitResponse) {}
+	rpc GetGrpcUnits (GrpcUnitRequest) returns (stream GrpcUnitResponse) {}
+	rpc CreateGrpcUnit (GrpcUnitRequest) returns (GrpcUnitResponse) {}
 	rpc UpdateGrpcUnit (GrpcUnitRequest) returns (GrpcUnitResponse) {}
+	rpc DeleteGrpcUnit (GrpcUnitDeleteRequest) returns (GrpcUnitDeleteResponse) {}
 } 
 
 message GrpcUnit {
@@ -24,4 +25,12 @@ message GrpcUnitRequest {
 
 message GrpcUnitResponse {
 	GrpcUnit grpcUnit = 1;
+}
+
+message GrpcUnitDeleteRequest {
+	int32 unit_id = 1;
+}
+
+message GrpcUnitDeleteResponse {
+	int32 unit_id = 1;
 }
