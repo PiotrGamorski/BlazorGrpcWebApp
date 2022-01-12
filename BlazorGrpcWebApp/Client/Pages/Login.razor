@@ -2,14 +2,17 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject ILogoutService LogoutService
+@inject IAuthService AuthService
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
 
  Please log in below or <a href="register">register</a> for a new account.
  
  <Div style="display:flex">
         <EditForm Model=@userLogin OnValidSubmit="HandleLogin">
             <Field>
-                <FieldLabel>Username</FieldLabel>
-                <InputText @bind-Value="userLogin.Username" class="form-control"></InputText>
+                <FieldLabel>Email</FieldLabel>
+                <InputText @bind-Value="userLogin.Email" class="form-control"></InputText>
             </Field>
             <Field>
                 <FieldLabel>Password</FieldLabel>

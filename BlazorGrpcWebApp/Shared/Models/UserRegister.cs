@@ -11,9 +11,9 @@ namespace BlazorGrpcWebApp.Shared
     {
         [Required, EmailAddress]
         public string Email { get; set; }
-        [StringLength(16, ErrorMessage = "Your username is too long (16 characters max).")]
+        [Required, StringLength(16, ErrorMessage = "Your username is too long (16 characters max).")]
         public string Username { get; set; }
-        public string Bio { get; set; }
+        public string? Bio { get; set; }
         [Required, StringLength(100, MinimumLength = 6, ErrorMessage = "Password needs to be at least 6 characters long.")]
         public string Password { get; set; }
         [Compare("Password", ErrorMessage = "The passwords do not match.")]

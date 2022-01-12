@@ -1,7 +1,8 @@
 ﻿@page "/register"
 @using Grpc.Core
 @inject IUnitService UnitService
-@inject IJSRuntime JSRuntime
+@inject IAuthService AuthService
+@inject IToastService ToastService
 @inject NavigationManager NavigationManager
 
 <h3>Register</h3>
@@ -72,10 +73,14 @@
         grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
     }
 
-    private Task HandleRegistration()
+    private async Task HandleRegistration()
     {
-        JSRuntime.InvokeVoidAsync("console.log", userRegister);
-        NavigationManager.NavigateTo("login");
-        return Task.CompletedTask;
+        var result = await AuthService.Register(userRegister);
+        if (result.Success)
+        {
+            ToastService.ShowSuccess(result.Message);
+            NavigationManager.NavigateTo("/");
+        }
+        else ToastService.ShowError(result.Message);            
     }
 }

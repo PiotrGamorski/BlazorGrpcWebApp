@@ -1,5 +1,8 @@
 using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Server;
 using Microsoft.EntityFrameworkCore;
+using BlazorGrpcWebApp.Server.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = new ConfigurationBuilder()
@@ -11,7 +14,8 @@ var configuration = new ConfigurationBuilder()
 builder.Services.AddGrpc();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), 
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                                            options => options.MigrationsAssembly("BlazorGrpcWebApp.Server")));
 
 var app = builder.Build();

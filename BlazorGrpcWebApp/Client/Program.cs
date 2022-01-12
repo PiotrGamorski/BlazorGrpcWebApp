@@ -37,6 +37,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<IBananaService, BananaService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ILogoutService, LogoutService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();

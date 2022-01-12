@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorGrpcWebApp.Server.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(DataContextForMigrations))]
     [Migration("20211230124624_Initial")]
     partial class Initial
     {

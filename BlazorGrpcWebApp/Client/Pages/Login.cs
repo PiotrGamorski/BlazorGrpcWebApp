@@ -9,14 +9,24 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task HandleLogin()
         {
-            if (userLogin.Username != null && userLogin.Username.Length > 0 && 
+            if (userLogin.Email != null && userLogin.Email.Length > 0 && 
                 userLogin.Password != null && userLogin.Password.Length > 0)
             {
                 try
                 {
-                    await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(userLogin.Username);
-                    await sessionStorage.SetItemAsync("username", userLogin.Username);
-                    await LogoutService.Authenticated();
+                    var result = await AuthService.Login(userLogin);
+                    if (result.Success)
+                    {
+                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(userLogin.Email);
+                        await sessionStorage.SetItemAsync("username", userLogin.Email);
+                        await LogoutService.Authenticated();
+                        NavigationManager.NavigateTo("/");
+                    }
+                    else
+                    {
+                        ToastService.ShowError(result.Message);
+                    }
+                    
                 }
                 catch (Exception e)
                 {
