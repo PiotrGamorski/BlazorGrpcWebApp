@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Components;
 using BlazorGrpcWebApp.Client.Services;
 using BlazorGrpcWebApp.Shared;
 using Blazored.Toast;
-using Blazorise;
-using Blazorise.Bootstrap;
-using Blazorise.Icons.FontAwesome;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.SessionStorage;
+using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -25,22 +23,16 @@ builder.Services.AddSingleton(services =>
 });
 
 builder.Services.AddBlazoredToast();
-builder.Services
-      .AddBlazorise(options =>
-      {
-          options.ChangeTextOnKeyPress = true;
-      })
-      .AddBootstrapProviders()
-      .AddFontAwesomeIcons();
-
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<IBananaService, BananaService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ILogoutService, LogoutService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGrpcUserService, GrpcUserService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

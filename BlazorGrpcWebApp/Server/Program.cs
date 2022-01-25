@@ -45,6 +45,7 @@ app.UseEndpoints(endpoints =>
 	// map to and register the gRPC service
 	endpoints.MapGrpcService<WeatherService>().EnableGrpcWeb();
 	endpoints.MapGrpcService<UnitServiceGrpcImpl>().EnableGrpcWeb();
+    endpoints.MapGrpcService<UserServiceGrpcImpl>().EnableGrpcWeb();
 	endpoints.MapRazorPages();
 	endpoints.MapControllers();
 	endpoints.MapFallbackToFile("index.html");

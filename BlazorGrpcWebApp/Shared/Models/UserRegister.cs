@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BlazorGrpcWebApp.Shared
 {
@@ -14,7 +9,7 @@ namespace BlazorGrpcWebApp.Shared
         [Required, StringLength(16, ErrorMessage = "Your username is too long (16 characters max).")]
         public string Username { get; set; }
         public string? Bio { get; set; }
-        [Required, StringLength(100, MinimumLength = 6, ErrorMessage = "Password needs to be at least 6 characters long.")]
+        [Required, StringLength(100, MinimumLength = 8, ErrorMessage = "Password needs to be at least 8 characters long.")]
         public string Password { get; set; }
         [Compare("Password", ErrorMessage = "The passwords do not match.")]
         public string ConfirmPassword { get; set; }

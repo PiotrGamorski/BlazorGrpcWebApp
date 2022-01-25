@@ -1,0 +1,54 @@
+﻿syntax = "proto3"; 
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "BlazorGrpcWebApp.Shared";
+package UserServiceGrpc; 
+
+service UserServiceGrpc {
+	rpc GrpcUserExists (GrpcUserExistsRequest) returns (GrpcUserExistsResponse);
+	rpc GrpcUserRegister (RegisterGrpcUserRequest) returns (RegisterGrpcUserResponse);
+	rpc GrpcUserLogin (LoginGrpcUserRequest) returns (LoginGrpcUserRespone);
+}
+
+message GrpcUser {
+	int32 id = 1;
+	string email = 2;
+	string userName = 3;
+	string passwordHash = 4;
+	string passwordSalt = 5;
+	int32 bananas = 6;
+	google.protobuf.Timestamp dateOfBirth = 7;
+	bool isConfirmed = 8;
+	bool isDeleted = 9;
+	google.protobuf.Timestamp dateCreated = 10;
+}
+
+message GrpcUserExistsRequest {
+	GrpcUser  grpcUser = 1;
+}
+
+message GrpcUserExistsResponse {
+	bool exists = 1;
+}
+
+message RegisterGrpcUserRequest {
+	GrpcUser grpcUser = 1;
+	string password = 2;
+}
+
+message RegisterGrpcUserResponse {
+	int32 data = 1;
+	bool success = 2;
+	string message = 3;
+}
+
+message LoginGrpcUserRequest {
+	GrpcUser grpcUser = 1;
+	string password = 2;
+}
+
+message LoginGrpcUserRespone {
+	string data = 1;
+	bool success = 2;
+	string message = 3;
+}

@@ -6,30 +6,22 @@
 @using Blazorise.Snackbar
 
 <h3>Build</h3>
-<Field>
+<div>
     <select @bind="selectedUnitId" class="form-control">
         @foreach (var unit in UnitService.Units)
         {
             <option value="@unit.Id">@unit.Title // @unit.BananaCost Bananas</option>
         }
     </select>
-</Field>
+</div>
 <br />
 <button class="btn btn-primary" @onclick="BuildUnit">Build</button>
-
-<Snackbar Style="border-radius:5px solid #FFFFFF" @ref="SnackbarRef" Location="SnackbarLocation.Right" Color="SnackbarColor.Dark" Interval="SnackBarRefInterval">
-    <SnackbarBody>
-        <div style="padding-top:5px">@SnackBarRefMessage</div>
-    </SnackbarBody>
-</Snackbar>
-
 
 @code {
     private int selectedUnitId { get; set; } = 1;
     private bool needMoreBananas = false;
     private int SnackBarRefInterval { get; set; } = 5000;
     private string? SnackBarRefMessage { get; set; }
-    private Snackbar SnackbarRef;
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,7 +46,6 @@
             try
             {
                 await UnitService.AddUnit(selectedUnitId);
-                //await ShowSnackBar(5000, $"Your {selectedUnit.Title} has been built!");
             }
             catch (Exception e)
             {
@@ -62,14 +53,5 @@
             }
         }
         else throw new InvalidOperationException("Cannot build Unit");
-    }
-
-    private Task ShowSnackBar(int interval, string message)
-    {
-        SnackBarRefInterval = interval;
-        SnackBarRefMessage = message;
-        SnackbarRef.Show();
-
-        return Task.CompletedTask;
     }
 }

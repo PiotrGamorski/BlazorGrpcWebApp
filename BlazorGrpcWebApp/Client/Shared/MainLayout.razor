@@ -1,7 +1,38 @@
 ﻿@inherits LayoutComponentBase
 @using Blazored.Toast.Configuration
 
-<div class="page">
+<MudThemeProvider Theme="MyMudBlazorTheme" />
+<MudDialogProvider MaxWidth="MaxWidth.Large" CloseButton="true"/>
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Dense="true">
+        @*<MudIconButton Icon="@Icons.Material.Filled.Dehaze" Color="Color.Primary" Edge="Edge.Start" OnClick="ToggleDrawer"/>*@
+        <MudSpacer />
+        <TopMenu/>
+    </MudAppBar> 
+
+    <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini">
+        <NavMenu DrawerOpen="DrawerOpen">
+        @if (DrawerOpen)
+        {
+            <MudElement Style="margin-top:10px; margin-left:15px" HtmlTag="img" class="img-fluid"/>
+        }
+        else
+        {
+            <MudElement Style="margin-top:10px; margin-left:15px" HtmlTag="img" class="img-fluid"/>
+        }
+        </NavMenu>
+    </MudDrawer>
+
+    <MudMainContent Class="pt-16">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@*<div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
@@ -15,6 +46,78 @@
             @Body
         </article>
     </main>
-</div>
+</div>*@
 
 <BlazoredToasts Position="ToastPosition.BottomRight"/>
+
+@code 
+{
+    bool DrawerOpen { get; set; } = true;
+
+    void ToggleDrawer()
+    {
+        DrawerOpen = !DrawerOpen;
+    }
+
+    MudTheme MyMudBlazorTheme = new MudTheme()
+    {
+        Palette = new Palette()
+        {
+            // Box Lines + Font
+            Primary = "#ffff",
+            Secondary = "#a80000ff",
+            Tertiary = "#444f",
+            // Main Background
+            Background = "#333f",
+            // Paper Background
+            //Surface = "#222f",
+            Surface = "#222222",
+            // Drawer Background
+            DrawerBackground = "#222f",
+            Success = "#32CD32ff",
+            TextPrimary = "#eeef",
+            TextSecondary = "#eeef",
+            DrawerText = "#eeee",
+            DrawerIcon = "rgba(255,255,255, 1)",
+            AppbarBackground = "#222222",
+            TableHover = "#aaaf",
+            ActionDefault = "fff7",
+            ActionDisabled = "#fff7",
+            Warning = "#bb8800ff",
+            Error = "#a80000ff",
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DrawerWidthLeft = "200px",
+            DrawerMiniWidthLeft = "65px",
+        },
+        
+        Typography = new Typography()
+        {
+            Body1 = new()
+            {
+                FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
+                FontSize = "18px",
+                FontWeight = 1,
+                LetterSpacing = String.Empty,
+                LineHeight = 0
+            },
+            Body2 = new()
+            {
+                FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
+                FontSize = "14px",
+                FontWeight = 1,
+                LetterSpacing = String.Empty,
+                LineHeight = 0
+            },
+            H6 = new()
+            {
+                FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
+                FontSize = "20px",
+                FontWeight = 1,
+                LetterSpacing = String.Empty,
+                LineHeight = 0
+            }
+        }
+    };
+}

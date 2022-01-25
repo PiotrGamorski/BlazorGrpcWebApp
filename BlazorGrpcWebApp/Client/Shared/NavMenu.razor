@@ -3,15 +3,8 @@
 @inject NavigationManager NavigationManager
 @inject ILogoutService LogoutService
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href=""><img src="/icons/axe.png"> Blazor Battles</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
+<MudNavMenu>
+@ChildContent
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
@@ -61,8 +54,13 @@
         </AuthorizeView>
     </nav>
 </div>
+</MudNavMenu>
 
 @code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public bool DrawerOpen { get; set; }
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

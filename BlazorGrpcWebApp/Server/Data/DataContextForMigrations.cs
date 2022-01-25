@@ -1,6 +1,8 @@
 ﻿using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Google.Protobuf.WellKnownTypes;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorGrpcWebApp.Server
 {
@@ -13,5 +15,6 @@ namespace BlazorGrpcWebApp.Server
         public DbSet<Unit> Units { get; set; }
         public DbSet<GrpcUnit> GrpcUnits { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<GrpcUser> GrpcUsers { get; set; }
     }
 }

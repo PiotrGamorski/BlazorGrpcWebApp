@@ -23,7 +23,7 @@ namespace BlazorGrpcWebApp.Client.Services
             _unitServiceGrpcClient = new UnitServiceGrpc.UnitServiceGrpcClient(_channel);
         }
 
-        public int deadline { get; set; } = 2000;
+        public int deadline { get; set; } = 3000;
         public IList<Unit> Units { get; set; } = new List<Unit>();
         public IList<UserUnit> MyUnits { get; set; } = new List<UserUnit>();
 

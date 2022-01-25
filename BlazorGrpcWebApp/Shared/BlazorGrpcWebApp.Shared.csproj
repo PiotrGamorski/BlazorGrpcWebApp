@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <None Remove="Protos\unit.proto" />
+    <None Remove="Protos\user.proto" />
   </ItemGroup>
 
   <ItemGroup>
