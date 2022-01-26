@@ -1,4 +1,5 @@
 ﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject ILogoutService LogoutService
@@ -9,17 +10,49 @@
 
  Please log in below or <a href="register">register</a> for a new account.
  
- <Div style="display:flex">
-        <EditForm Model=@userLogin OnValidSubmit="HandleLoginGrpc">
-            <div>
-                <label>Email</label>
-                <InputText @bind-Value="userLogin.Email" class="form-control"></InputText>
-            </div>
-            <div>
-                <label>Password</label>
-                <InputText @bind-Value="userLogin.Password" class="form-control" type="password"></InputText>
-            </div>
-            <br />
-            <input type="submit" class="btn btn-primary" value="Login">
-        </EditForm>
-    </Div>       
+ <MudGrid>
+     <MudItem xs="12" sm="5">
+         <MudPaper Class="pa-4">
+             <MudForm Model="@userLogin"
+                      @bind-IsValid="@success">
+                 <MudTextField T="string" 
+                              Label="Email"
+                              InputType="InputType.Email"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Email is required!"
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
+                              @bind-Value="userLogin.Email"/>
+                <br/>
+                <MudTextField T="string"
+                              Label="Password"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              Required="true" 
+                              RequiredError="Password is required!"
+                              @bind-Value="userLogin.Password"/>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Info" 
+                               Class="ml-auto"
+                               Disabled="@(!success)"
+                               OnClick="async () => await HandleLoginGrpc()">
+                               Login
+                    </MudButton>
+                </MudCardActions>
+             </MudForm>
+         </MudPaper>
+     </MudItem>
+ </MudGrid>
+    
+@code {
+    private bool success = false;
+
+    //Validation Methods
+    private IEnumerable<string> ValidateEmail(string email)
+    {
+        var emailValidator = new EmailAddressAttribute();
+        if (!emailValidator.IsValid(email))
+            yield return "Email adress in invalid!";
+    }
+}

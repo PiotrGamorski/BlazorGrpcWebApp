@@ -10,26 +10,30 @@
 
 <h3>Register</h3>
 <MudGrid>
-    <MudItem xs="12" sm="3">
+    <MudItem xs="12" sm="5">
         <MudPaper Class="pa-4">
             <MudForm @bind-IsValid="@success" @bind-Errors="@errors">
                 <MudTextField T="string" 
                               Label="Email"
+                              InputType="InputType.Email"
+                              Variant="Variant.Outlined"
                               Required="true"
-                              Variant="Variant.Text"
                               RequiredError="Email is required!"
                               Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
                               @bind-Value="userRegister.Email"/>
                 <br/>              
                 <MudTextField T="string"
                               Label="Username"
-                              Required="true" 
+                              InputType="InputType.Text"
+                              Variant="Variant.Outlined"
+                              Required="true"
                               RequiredError="Username is required!"
                               Validation="@(new Func<string, IEnumerable<string>>(ValidateUsername))"
                               @bind-Value="userRegister.Username"/>
                 <br/>
                 <MudTextField T="string"
                               Label="Password"
+                              Variant="Variant.Outlined"
                               InputType="InputType.Password"
                               Required="true" 
                               RequiredError="Password is required!"
@@ -38,6 +42,7 @@
                 <br/>
                 <MudTextField T="string"
                               Label="Confirm Password"
+                              Variant="Variant.Outlined"
                               InputType="InputType.Password"
                               Required="true" 
                               RequiredError="Password confirmation is required!"
@@ -46,17 +51,19 @@
                 <br/>
                 <MudTextField T="string"
                               Label="Bio"
+                              InputType="InputType.Text"
+                              Variant="Variant.Outlined"
                               @bind-Value="userRegister.Bio"/>
                 <br/>
                 <MudSelect Label="Start Unit"
                            AnchorOrigin="Origin.BottomCenter"
-                           Variant="Variant.Text"
+                           Variant="Variant.Outlined"
                            @bind-Value="userRegister.StartUnitId"
                            ToStringFunc="@(new Func<int, string>(ConvertToTitle))">
                     @foreach(var unit in grpcUnitsResponses)
                     {
                         <MudSelectItem Value="@unit.GrpcUnit.Id">
-                            <span style="font-family: Sans-Serif; font-size:smaller">@unit.GrpcUnit.Title</span>
+                            <span style="font-family: Sans-Serif; font-size:initial">@unit.GrpcUnit.Title</span>
                         </MudSelectItem>
                     }
                 </MudSelect>
@@ -64,10 +71,12 @@
                 <MudTextField T="int"
                               Label="Bananas"
                               InputType="InputType.Number"
+                              Variant="Variant.Outlined"
                               Validation="@(new Func<int, IEnumerable<string>>(ValidateBananasNumber))"
                               @bind-Value="userRegister.Bananas"/>
                 <br/>
                 <MudDatePicker Label="Select your Date of Birth"
+                               Variant="Variant.Outlined"
                                Editable="true"
                                Rounded="true"
                                PickerVariant="PickerVariant.Inline"
@@ -87,7 +96,9 @@
                     <MudButton OnClick="async () => await HandleRegistrationGrpc()" 
                                Variant="Variant.Filled" 
                                Color="Color.Info" 
-                               Class="ml-auto">Register
+                               Disabled="@(!success)"
+                               Class="ml-auto">
+                               Register
                     </MudButton>
                 </MudCardActions>
             </MudForm>
@@ -184,7 +195,7 @@
     private IEnumerable<string> ValidateBananasNumber(int number)
     {
         if (number < 1 || number > 1000)
-            yield return "Please choose a number between 0 and 1000.";
+            yield return "Please choose a number between 1 and 1000.";
     }
 
     private string ConvertToTitle(int id)
