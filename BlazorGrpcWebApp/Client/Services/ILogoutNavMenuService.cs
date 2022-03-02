@@ -1,6 +1,6 @@
 ﻿namespace BlazorGrpcWebApp.Client.Services
 {
-    public interface ILogoutService
+    public interface ILogoutNavMenuService
     {
         event Action OnChange;
         bool isAuthenticated { get; set; }

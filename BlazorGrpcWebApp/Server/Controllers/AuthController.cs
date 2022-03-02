@@ -1,7 +1,6 @@
 ﻿using BlazorGrpcWebApp.Server.Repositories;
 using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorGrpcWebApp.Server.Controllers

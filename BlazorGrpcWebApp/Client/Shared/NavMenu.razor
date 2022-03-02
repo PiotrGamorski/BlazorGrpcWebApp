@@ -1,7 +1,7 @@
 ﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@inject ILogoutService LogoutService
+@inject ILogoutNavMenuService LogoutNavMenuService
 
 <MudNavMenu>
 @ChildContent
@@ -36,16 +36,16 @@
         </AuthorizeView>
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3" style="@(LogoutService.isAuthenticated == true ? "opacity: 100%" : "opacity: 50%");
-                                              @(LogoutService.isAuthenticated == true ? "pointer-events: auto" : "pointer-events: none");">
+                <div class="nav-item px-3" style="@(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "opacity: 100%" : "opacity: 50%");
+                                                  @(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "pointer-events: auto" : "pointer-events: none");">
                     <a class="nav-link" @onclick="Logout" style="cursor: pointer">
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
                     </a>
             </div>
             </Authorized>
             <NotAuthorized>
-                <div class="nav-item px-3" style="@(LogoutService.isAuthenticated == true ? "opacity: 100%" : "opacity: 50%");
-                                                  @(LogoutService.isAuthenticated == true ? "pointer-events: auto" : "pointer-events: none");">
+                <div class="nav-item px-3" style="@(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "opacity: 100%" : "opacity: 50%");
+                                                  @(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "pointer-events: auto" : "pointer-events: none");">
                     <a class="nav-link" @onclick="Logout" style="cursor: pointer">
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
                     </a>
@@ -58,21 +58,24 @@
 
 @code {
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
     [Parameter]
     public bool DrawerOpen { get; set; }
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private bool DisableLogout { get; set; } = true;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        LogoutService.OnChange += StateHasChanged;
-        return Task.CompletedTask;
+        var authenticationState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+        DisableLogout = authenticationState.User.Identity!.AuthenticationType == "jwt" ? false : true;
+
+        LogoutNavMenuService.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-        LogoutService.OnChange -= StateHasChanged;
+        LogoutNavMenuService.OnChange -= StateHasChanged;
     }
 
     private void ToggleNavMenu()
@@ -83,7 +86,8 @@
     private async Task Logout()
     {
         await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
-        await LogoutService.NotAuthenticated();
+        DisableLogout = true;
+        await LogoutNavMenuService.NotAuthenticated();
         NavigationManager.NavigateTo("/");
     }
 }

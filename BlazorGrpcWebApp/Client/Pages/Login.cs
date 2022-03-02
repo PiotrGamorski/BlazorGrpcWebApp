@@ -10,16 +10,15 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task HandleLoginRestApi()
         {
-            if (userLogin.Email != null && userLogin.Email.Length > 0 && 
-                userLogin.Password != null && userLogin.Password.Length > 0)
+            if (!string.IsNullOrEmpty(userLogin.Email) && !string.IsNullOrEmpty(userLogin.Password))
             {
                 try
                 {
                     var result = await AuthService.Login(userLogin);
                     if (result.Success)
                     {
-                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(userLogin.Email);
-                        await sessionStorage.SetItemAsync("username", userLogin.Email);
+                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                        await sessionStorage.SetItemAsync("authToken", result.Data);
                         await LogoutService.Authenticated();
                         NavigationManager.NavigateTo("/");
                     }
@@ -38,8 +37,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task HandleLoginGrpc()
         {
-            if (userLogin.Email != null && userLogin.Email.Length > 0 &&
-                userLogin.Password != null && userLogin.Password.Length > 0)
+            if (!string.IsNullOrEmpty(userLogin.Email) && !string.IsNullOrEmpty(userLogin.Password))
             {
                 try
                 {
@@ -50,8 +48,8 @@ namespace BlazorGrpcWebApp.Client.Pages
                     }, grpcLoginDeadline);
                     if (result.Success)
                     {
-                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(userLogin.Email);
-                        await sessionStorage.SetItemAsync("username", userLogin.Email);
+                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                        await sessionStorage.SetItemAsync("authToken", result.Data);
                         await LogoutService.Authenticated();
                         NavigationManager.NavigateTo("/");
                     }

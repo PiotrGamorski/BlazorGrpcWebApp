@@ -3,14 +3,20 @@ using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Models;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 {
     private readonly DataContext _dataContext;
-    public UserServiceGrpcImpl(DataContext dataContext)
+    private readonly IConfiguration _configuration;
+    public UserServiceGrpcImpl(DataContext dataContext, IConfiguration configuration)
     {
         _dataContext = dataContext;
+        _configuration = configuration;
     }
 
     public override async Task<RegisterGrpcUserResponse> GrpcUserRegister(RegisterGrpcUserRequest request, ServerCallContext context)
@@ -56,7 +62,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
             else if (user != null && !await VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 return new LoginGrpcUserRespone() { Success = false, Message = "Wrong password" };
             else
-                return new LoginGrpcUserRespone() { Data = request.GrpcUser.Id.ToString(), Success = true };
+                return new LoginGrpcUserRespone() { Data = await CreateToken(user!), Success = true };
         }
         catch (Exception e)
         {
@@ -72,16 +78,19 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
     private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
+#pragma warning disable CA1416 // Validate platform compatibility
         using (var hmac = new HMACSHA512())
         {
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
+#pragma warning restore CA1416 // Validate platform compatibility
         return Task.CompletedTask;
     }
 
     private Task<bool> VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
     {
+#pragma warning disable CA1416 // Validate platform compatibility
         using (var hmac = new HMACSHA512(passwordSalt))
         {
             var computePasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
@@ -92,6 +101,23 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
             }
             return Task.FromResult(true);
         }
+#pragma warning restore CA1416 // Validate platform compatibility
+    }
+
+    private Task<string> CreateToken(User user)
+    {
+        List<Claim> claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+            };
+
+        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: creds);
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return Task.FromResult(jwt);
     }
 }
 

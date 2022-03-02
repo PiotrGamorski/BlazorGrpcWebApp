@@ -2,6 +2,9 @@
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace BlazorGrpcWebApp.Server.Repositories
@@ -9,9 +12,11 @@ namespace BlazorGrpcWebApp.Server.Repositories
     public class AuthRepository : IAuthRepository
     {
         private readonly DataContext _dataContext;
-        public AuthRepository(DataContext dataContext)
+        private readonly IConfiguration _configuration;
+        public AuthRepository(DataContext dataContext, IConfiguration configuration)
         {
             _dataContext = dataContext;
+            _configuration = configuration;
         }
 
         public async Task<GenericAuthResponse<string>> Login(string email, string password)
@@ -30,7 +35,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
             }
             else 
             {
-                response.Data = user.Id.ToString();
+                response.Data = await CreateToken(user);
                 response.Success = true;
             }
             
@@ -88,6 +93,22 @@ namespace BlazorGrpcWebApp.Server.Repositories
                 }
                 return Task.FromResult(true);
             }
+        }
+
+        private Task<string> CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim>()
+            { 
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: creds);
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Task.FromResult(jwt);
         }
     }
 }
