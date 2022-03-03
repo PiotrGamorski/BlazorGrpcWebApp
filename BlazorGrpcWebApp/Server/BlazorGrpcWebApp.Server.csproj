@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.43.0" />
     <PackageReference Include="Grpc.AspNetCore.Web" Version="2.43.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">

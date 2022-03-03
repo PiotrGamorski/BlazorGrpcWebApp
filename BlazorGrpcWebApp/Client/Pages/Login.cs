@@ -17,7 +17,15 @@ namespace BlazorGrpcWebApp.Client.Pages
                     var result = await AuthService.Login(userLogin);
                     if (result.Success)
                     {
-                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                        try
+                        {
+                            await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                        }
+                        catch (Exception e)
+                        {
+                            ToastService.ShowError(e.Message);
+                        }
+                        
                         await sessionStorage.SetItemAsync("authToken", result.Data);
                         await LogoutService.Authenticated();
                         NavigationManager.NavigateTo("/");
@@ -48,7 +56,14 @@ namespace BlazorGrpcWebApp.Client.Pages
                     }, grpcLoginDeadline);
                     if (result.Success)
                     {
-                        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                        try
+                        {
+                            await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                        }
+                        catch (Exception e)
+                        {
+                            ToastService.ShowError(e.Message);
+                        }
                         await sessionStorage.SetItemAsync("authToken", result.Data);
                         await LogoutService.Authenticated();
                         NavigationManager.NavigateTo("/");

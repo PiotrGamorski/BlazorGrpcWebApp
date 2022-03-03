@@ -2,6 +2,8 @@ using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Server;
 using Microsoft.EntityFrameworkCore;
 using BlazorGrpcWebApp.Server.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,17 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                                            options => options.MigrationsAssembly("BlazorGrpcWebApp.Server")));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:Token").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+        };
+    });
 
 var app = builder.Build();
 
@@ -39,6 +52,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseGrpcWeb();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {

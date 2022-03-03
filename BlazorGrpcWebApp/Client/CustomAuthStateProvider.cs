@@ -1,4 +1,5 @@
 ﻿using Blazored.SessionStorage;
+using BlazorGrpcWebApp.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -10,17 +11,19 @@ namespace BlazorGrpcWebApp.Client
     {
         private readonly ISessionStorageService _sessionStorageService;
         private readonly HttpClient _httpClient;
-        public CustomAuthStateProvider(ISessionStorageService sessionStorageService, HttpClient httpClient)
+        private readonly IBananaService _bananaService;
+        public CustomAuthStateProvider(ISessionStorageService sessionStorageService, HttpClient httpClient, IBananaService bananaService)
         {
             _sessionStorageService = sessionStorageService;
             _httpClient = httpClient;
+            _bananaService = bananaService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             // it'll be null at first, but after refresh it'll have the item
             var authToken = await _sessionStorageService.GetItemAsync<string>("authToken");
-            ClaimsIdentity identity;
+            ClaimsIdentity identity = new ClaimsIdentity();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
@@ -37,27 +40,36 @@ namespace BlazorGrpcWebApp.Client
             return await Task.FromResult(state);
         }
 
-        public Task MarkUserAsAuthenticated(string authToken)
+        public async Task MarkUserAsAuthenticated(string authToken)
         {
+            ClaimsIdentity identity = new ClaimsIdentity();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
             {
-                var identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                try
+                {
+                    identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                    await _bananaService.GetBananas();
+                }
+                catch(Exception e)
+                {
+                    await _sessionStorageService.RemoveItemAsync("authToken");
+                    identity = new ClaimsIdentity();
+                    throw new Exception(e.Message);
+                }
+                
 
                 var user = new ClaimsPrincipal(identity);
                 var state = new AuthenticationState(user);
                 NotifyAuthenticationStateChanged(Task.FromResult(state));
             }
-
-            return Task.CompletedTask;
         }
 
         public Task MarkUserAsLoggedOut()
         {
             _sessionStorageService.RemoveItemAsync("authToken");
-            _httpClient.DefaultRequestHeaders.Authorization = null;
 
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
