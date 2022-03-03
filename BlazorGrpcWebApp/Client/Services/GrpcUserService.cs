@@ -79,6 +79,11 @@ namespace BlazorGrpcWebApp.Client.Services
         {
             return await _userServiceGrpcClient.GrpcUserExistsAsync(request);
         }
+
+        public async Task<GrpcUserBananasResponse> DoGrpcGetUserBananas(GrpcUserBananasRequest request)
+        {
+            return await _userServiceGrpcClient.GrpcGetUserBananasAsync(request);
+        }
         #endregion
     }
 }

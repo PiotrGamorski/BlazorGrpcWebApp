@@ -8,6 +8,7 @@ service UserServiceGrpc {
 	rpc GrpcUserExists (GrpcUserExistsRequest) returns (GrpcUserExistsResponse);
 	rpc GrpcUserRegister (RegisterGrpcUserRequest) returns (RegisterGrpcUserResponse);
 	rpc GrpcUserLogin (LoginGrpcUserRequest) returns (LoginGrpcUserRespone);
+	rpc GrpcGetUserBananas(GrpcUserBananasRequest) returns (GrpcUserBananasResponse);
 }
 
 message GrpcUser {
@@ -51,4 +52,12 @@ message LoginGrpcUserRespone {
 	string data = 1;
 	bool success = 2;
 	string message = 3;
+}
+
+message GrpcUserBananasRequest {
+	int32 userId = 1;
+}
+
+message GrpcUserBananasResponse {
+	int32 bananas = 1;
 }

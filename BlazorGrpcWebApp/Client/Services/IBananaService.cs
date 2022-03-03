@@ -7,5 +7,6 @@
         Task EatBananas(int amount);
         Task AddBananas (int amount);
         Task GetBananas();
+        Task GrpcGetBananas();
     }
 }

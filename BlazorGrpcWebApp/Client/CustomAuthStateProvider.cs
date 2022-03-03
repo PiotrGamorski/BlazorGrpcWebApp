@@ -51,7 +51,8 @@ namespace BlazorGrpcWebApp.Client
                 {
                     identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-                    await _bananaService.GetBananas();
+                    //await _bananaService.GetBananas();
+                    await _bananaService.GrpcGetBananas();
                 }
                 catch(Exception e)
                 {

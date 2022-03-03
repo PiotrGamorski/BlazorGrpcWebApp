@@ -26,5 +26,13 @@ namespace BlazorGrpcWebApp.Server.Controllers
 
             return Ok(user!.Bananas);
         }
+
+        // this api is needed for BananaService when grpcMethod is used
+        [HttpGet("getAuthUserId")]
+        public Task<int> GetAuthorisedUserId()
+        { 
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            return Task.FromResult(userId);
+        }
     }
 }
