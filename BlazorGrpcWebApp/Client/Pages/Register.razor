@@ -162,18 +162,24 @@
     private IEnumerable<string> ValidateEmail(string email)
     {
         var emailValidator = new EmailAddressAttribute();
+        if (string.IsNullOrEmpty(email))
+            yield return "Email address is required!";
         if (!emailValidator.IsValid(email))
-            yield return "Email adress in invalid!";
+            yield return "Email address in invalid!";
     }
 
     private IEnumerable<string> ValidateUsername(string username)
     {
+        if (string.IsNullOrEmpty(username))
+            yield return "Username is required!";
         if (username.Length > 16)
             yield return "Your username is too long! (16 characters max)";
     }
 
     private IEnumerable<string> ValidatePassword(string password)
     {
+        if (string.IsNullOrEmpty(password))
+            yield return "Password is required!";
         if (password.Length < 8)
             yield return "Password must be at least of length 8";
         if (password.Length > 100)
