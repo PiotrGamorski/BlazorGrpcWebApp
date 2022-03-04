@@ -1,4 +1,6 @@
-﻿using BlazorGrpcWebApp.Shared;
+﻿using BlazorGrpcWebApp.Client.Authentication;
+using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Models;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {

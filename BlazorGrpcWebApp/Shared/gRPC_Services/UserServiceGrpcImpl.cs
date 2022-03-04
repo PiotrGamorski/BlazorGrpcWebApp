@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Data;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Entities;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

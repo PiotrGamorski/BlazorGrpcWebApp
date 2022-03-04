@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BlazorGrpcWebApp.Shared
+namespace BlazorGrpcWebApp.Shared.Models
 {
     public class UserRegister
     {

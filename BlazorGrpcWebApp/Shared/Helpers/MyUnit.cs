@@ -1,4 +1,6 @@
-﻿namespace BlazorGrpcWebApp.Shared.MudTablesModels
+﻿using BlazorGrpcWebApp.Shared.Models;
+
+namespace BlazorGrpcWebApp.Shared.Helpers
 {
     public class MyUnit
     {

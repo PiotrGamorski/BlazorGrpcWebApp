@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Data;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

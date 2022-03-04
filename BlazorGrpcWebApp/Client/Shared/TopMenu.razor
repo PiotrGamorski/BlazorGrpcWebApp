@@ -1,4 +1,6 @@
-﻿@inject IBananaService BananaService
+﻿@using BlazorGrpcWebApp.Client.Authentication
+@using BlazorGrpcWebApp.Client.Interfaces
+@inject IBananaService BananaService
 @implements IDisposable
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -36,10 +38,8 @@
         areBananasLoaded = false;
         var authenticationState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
         if (authenticationState.User.Identity!.AuthenticationType == "jwt")
-        {
             await BananaService.GrpcGetBananas();
-            areBananasLoaded = true;
-        }
+        areBananasLoaded = true;
 
         // subscribe to the event
         // This needs to be added, as other component executes a function effecting Bananas amount

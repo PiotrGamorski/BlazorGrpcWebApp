@@ -1,5 +1,5 @@
 ﻿using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Entities;
 
 namespace BlazorGrpcWebApp.Server.Repositories
 {

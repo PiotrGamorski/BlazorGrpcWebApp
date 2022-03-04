@@ -1,5 +1,5 @@
 ﻿using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.MudTablesModels;
+using BlazorGrpcWebApp.Shared.Helpers;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorGrpcWebApp.Client.Pages

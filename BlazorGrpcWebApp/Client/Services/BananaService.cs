@@ -1,4 +1,5 @@
-﻿using BlazorGrpcWebApp.Shared;
+﻿using BlazorGrpcWebApp.Client.Interfaces;
+using BlazorGrpcWebApp.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Json;
 

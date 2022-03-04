@@ -1,5 +1,8 @@
 ﻿using Blazored.Toast.Services;
+using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Models;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;

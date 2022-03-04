@@ -1,4 +1,6 @@
-﻿using BlazorGrpcWebApp.Shared;
+﻿using BlazorGrpcWebApp.Client.Interfaces;
+using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Models;
 using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services

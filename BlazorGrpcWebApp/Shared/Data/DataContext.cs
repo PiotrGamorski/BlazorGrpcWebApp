@@ -1,4 +1,4 @@
-﻿using BlazorGrpcWebApp.Shared.Models;
+﻿using BlazorGrpcWebApp.Shared.Entities;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

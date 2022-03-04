@@ -1,4 +1,4 @@
-﻿namespace BlazorGrpcWebApp.Shared
+﻿namespace BlazorGrpcWebApp.Shared.Entities
 {
     public class Unit
     {

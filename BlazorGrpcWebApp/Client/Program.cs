@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Components;
-using BlazorGrpcWebApp.Client.Services;
+using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.SessionStorage;
 using MudBlazor.Services;
+using BlazorGrpcWebApp.Client.Services;
+using BlazorGrpcWebApp.Client.Authentication;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

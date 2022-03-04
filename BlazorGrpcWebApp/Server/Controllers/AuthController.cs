@@ -1,5 +1,5 @@
 ﻿using BlazorGrpcWebApp.Server.Repositories;
-using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 

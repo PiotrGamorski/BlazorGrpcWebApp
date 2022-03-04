@@ -1,5 +1,5 @@
-﻿using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Data;
+﻿using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

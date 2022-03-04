@@ -1,11 +1,11 @@
 ﻿using Blazored.SessionStorage;
-using BlazorGrpcWebApp.Client.Services;
+using BlazorGrpcWebApp.Client.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace BlazorGrpcWebApp.Client
+namespace BlazorGrpcWebApp.Client.Authentication
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {

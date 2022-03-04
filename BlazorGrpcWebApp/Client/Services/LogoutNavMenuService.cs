@@ -1,4 +1,6 @@
-﻿namespace BlazorGrpcWebApp.Client.Services
+﻿using BlazorGrpcWebApp.Client.Interfaces;
+
+namespace BlazorGrpcWebApp.Client.Services
 {
     public class LogoutNavMenuService : ILogoutNavMenuService
     {

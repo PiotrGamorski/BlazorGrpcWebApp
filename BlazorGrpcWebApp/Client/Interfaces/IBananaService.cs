@@ -1,4 +1,4 @@
-﻿namespace BlazorGrpcWebApp.Client.Services
+﻿namespace BlazorGrpcWebApp.Client.Interfaces
 {
     public interface IBananaService
     {

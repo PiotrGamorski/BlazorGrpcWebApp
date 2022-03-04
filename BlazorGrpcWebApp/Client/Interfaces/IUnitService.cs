@@ -1,6 +1,8 @@
 ﻿using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Models;
 
-namespace BlazorGrpcWebApp.Client.Services
+namespace BlazorGrpcWebApp.Client.Interfaces
 {
     public interface IUnitService
     {
