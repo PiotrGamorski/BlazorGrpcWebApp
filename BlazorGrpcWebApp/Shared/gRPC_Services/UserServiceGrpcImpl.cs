@@ -82,6 +82,15 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
         return new GrpcUserBananasResponse() { Bananas = response!.Bananas };
     }
 
+    public override async Task<GrpcUserAddBananasResponse> GrpcUserAddBananas(GrpcUserAddBananasRequest request, ServerCallContext context)
+    {
+        var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+        user!.Bananas += request.Amount;
+        await _dataContext.SaveChangesAsync();
+
+        return new GrpcUserAddBananasResponse { Bananas = user.Bananas };
+    }
+
     private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
 #pragma warning disable CA1416 // Validate platform compatibility

@@ -19,9 +19,25 @@ namespace BlazorGrpcWebApp.Client.Services
             _grpcUserService = grpcUserService;
         }
 
+        #region Simplyfing/Helper Methods
+        private async Task<int> GetAuthUserId() => await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
+        private Task BananasChanged()
+        {
+            OnChange?.Invoke();
+            return Task.CompletedTask;
+        }
+        #endregion
+
         public async Task EatBananas(int amount)
         {
             Bananas -= amount;
+            await BananasChanged();
+        }
+
+        #region REST Api calls
+        public async Task GetBananas()
+        {
+            Bananas = await _httpClient.GetFromJsonAsync<int>("api/user/getbananas");
             await BananasChanged();
         }
 
@@ -31,24 +47,27 @@ namespace BlazorGrpcWebApp.Client.Services
             Bananas = await result.Content.ReadFromJsonAsync<int>();
             await BananasChanged();
         }
+        #endregion
 
-        Task BananasChanged()
-        { 
-            OnChange?.Invoke();
-            return Task.CompletedTask;
-        }
-
-        public async Task GetBananas()
+        #region gRPC calls
+        [Authorize]
+        public async Task GrpcAddBananas(int amount)
         {
-            Bananas = await _httpClient.GetFromJsonAsync<int>("api/user/getbananas");
+            var result = await _grpcUserService.DoGrpcUserAddBananas(new GrpcUserAddBananasRequest()
+            { 
+                Amount = amount, 
+                UserId = await GetAuthUserId()
+            });
+
+            Bananas = result.Bananas;
             await BananasChanged();
         }
 
         [Authorize]
         public async Task GrpcGetBananas()
         {
-            var userId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
-            Bananas = (await _grpcUserService.DoGrpcGetUserBananas(new GrpcUserBananasRequest() { UserId = userId })).Bananas;
+            Bananas = (await _grpcUserService.DoGrpcGetUserBananas(new GrpcUserBananasRequest() { UserId = await GetAuthUserId() })).Bananas;
         }
+        #endregion
     }
 }

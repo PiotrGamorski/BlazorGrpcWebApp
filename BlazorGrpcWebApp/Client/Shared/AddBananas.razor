@@ -10,6 +10,7 @@
 @code {
     public async Task IncreaseBananaCount()
     {
-        await BananaService.AddBananas(10);
+        //await BananaService.AddBananas(10);
+        await BananaService.GrpcAddBananas(10);
     }
 }

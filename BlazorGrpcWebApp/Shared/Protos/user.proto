@@ -9,6 +9,7 @@ service UserServiceGrpc {
 	rpc GrpcUserRegister (RegisterGrpcUserRequest) returns (RegisterGrpcUserResponse);
 	rpc GrpcUserLogin (LoginGrpcUserRequest) returns (LoginGrpcUserRespone);
 	rpc GrpcGetUserBananas(GrpcUserBananasRequest) returns (GrpcUserBananasResponse);
+	rpc GrpcUserAddBananas(GrpcUserAddBananasRequest) returns (GrpcUserAddBananasResponse);
 }
 
 message GrpcUser {
@@ -59,5 +60,14 @@ message GrpcUserBananasRequest {
 }
 
 message GrpcUserBananasResponse {
+	int32 bananas = 1;
+}
+
+message GrpcUserAddBananasRequest {
+	int32 userId = 1;
+	int32 amount = 2;
+}
+
+message GrpcUserAddBananasResponse {
 	int32 bananas = 1;
 }

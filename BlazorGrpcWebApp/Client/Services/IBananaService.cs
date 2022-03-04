@@ -6,6 +6,7 @@
         int Bananas { get; set; }
         Task EatBananas(int amount);
         Task AddBananas (int amount);
+        Task GrpcAddBananas(int amount);
         Task GetBananas();
         Task GrpcGetBananas();
     }

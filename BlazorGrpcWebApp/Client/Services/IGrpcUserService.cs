@@ -9,5 +9,6 @@ namespace BlazorGrpcWebApp.Client.Services
         Task<RegisterGrpcUserResponse> Register(UserRegister request, int deadline);
         Task<LoginGrpcUserRespone> DoGrpcUserLogin(LoginGrpcUserRequest request, int deadline);
         Task<GrpcUserBananasResponse> DoGrpcGetUserBananas(GrpcUserBananasRequest request);
+        Task<GrpcUserAddBananasResponse> DoGrpcUserAddBananas(GrpcUserAddBananasRequest request);
     }
 }
