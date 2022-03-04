@@ -27,7 +27,8 @@ namespace BlazorGrpcWebApp.Client.Services
 
         public async Task AddBananas(int amount)
         {
-            Bananas += amount;
+            var result = await _httpClient.PutAsJsonAsync("api/user/addbananas", amount);
+            Bananas = await result.Content.ReadFromJsonAsync<int>();
             await BananasChanged();
         }
 

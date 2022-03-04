@@ -1,4 +1,5 @@
 ﻿using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,21 +18,33 @@ namespace BlazorGrpcWebApp.Server.Controllers
             _dataContext = dataContext;
         }
 
+        #region Simplifying Methods
+        // based on Authorize attribute, one can read currently logged in user ID
+        private int GetUserUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        private async Task<User?> GetUser() => await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserUserId());
+        #endregion
+
         [HttpGet("getbananas")]
         public async Task<IActionResult> GetBananas()
         {
-            // based on Authorize attribute, one can read currently logged in user ID
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-
+            var user = await GetUser();
             return Ok(user!.Bananas);
+        }
+
+        [HttpPut("addbananas")]
+        public async Task<IActionResult> AddBananas([FromBody] int bananas)
+        {
+            var user = await GetUser();
+            user!.Bananas += bananas;
+            await _dataContext.SaveChangesAsync();
+            return Ok(user.Bananas);
         }
 
         // this api is needed for BananaService when grpcMethod is used
         [HttpGet("getAuthUserId")]
         public Task<int> GetAuthorisedUserId()
-        { 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        {
+            var userId = GetUserUserId();
             return Task.FromResult(userId);
         }
     }
