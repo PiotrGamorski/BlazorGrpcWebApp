@@ -1,13 +1,21 @@
 ﻿@inject IBananaService BananaService
 @implements IDisposable
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView>
     <Authorized>
     <div class="top-menu">
         <img src = "icons/banana.png"/>
         <MudButton Variant="Variant.Filled" Color="Color.Default">
-            <MudText Style="font-family:'Roboto">@BananaService.Bananas</MudText>
-        </MudButton>
+                @if (areBananasLoaded)
+                {
+                    <MudText Style="font-family:'Roboto">@BananaService.Bananas</MudText>
+                }
+                else
+                {
+                    <MudProgressCircular Color="Color.Secondary" Size="Size.Medium" Indeterminate="true"/>
+                }
+            </MudButton>
         <AddBananas/>
     </div>
     </Authorized>
@@ -21,12 +29,21 @@
 </AuthorizeView>
 
 @code {
-    protected override Task OnInitializedAsync()
+    private bool areBananasLoaded { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
+        areBananasLoaded = false;
+        var authenticationState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+        if (authenticationState.User.Identity!.AuthenticationType == "jwt")
+        {
+            await BananaService.GrpcGetBananas();
+            areBananasLoaded = true;
+        }
+
         // subscribe to the event
         // This needs to be added, as other component executes a function effecting Bananas amount
         BananaService.OnChange += StateHasChanged;
-        return Task.CompletedTask;
     }
 
     public void Dispose()

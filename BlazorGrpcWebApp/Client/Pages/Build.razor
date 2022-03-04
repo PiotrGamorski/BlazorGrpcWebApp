@@ -15,7 +15,11 @@
     </select>
 </div>
 <br />
-<button class="btn btn-primary" @onclick="BuildUnit">Build</button>
+<MudButton @onclick="BuildUnit" 
+           Color="Color.Secondary" 
+           Variant="Variant.Filled">
+           Build
+</MudButton>
 
 @code {
     private int selectedUnitId { get; set; } = 1;
