@@ -2,7 +2,8 @@
 {
     public class MyUnit
     {
-        public string img { get; set; }
-        public UserUnit userUnit { get; set; }
+        public string? img { get; set; }
+        public string? title { get; set; }
+        public UserUnit? userUnit { get; set; }
     }
 }

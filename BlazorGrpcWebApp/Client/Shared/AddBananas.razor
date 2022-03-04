@@ -1,6 +1,11 @@
 ﻿@inject IBananaService BananaService
 
-<button @onclick="IncreaseBananaCount" class="btn btn-info"><span class="oi oi-plus"></span></button>
+<MudButton  @onclick="IncreaseBananaCount" 
+            Size="Size.Small"
+            Variant="Variant.Filled" 
+            Color="Color.Secondary">
+            <span class="oi oi-plus"></span>
+</MudButton>
 
 @code {
     public async Task IncreaseBananaCount()

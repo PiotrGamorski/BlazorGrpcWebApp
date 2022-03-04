@@ -7,22 +7,29 @@
    <MudItem xs="12">
        <MudCard>
            <MudCardHeader>
-                <MudIcon Icon="@Icons.Material.Filled.Info"/>My Army
+                <MudText Typo="Typo.h4">My Army</MudText>
            </MudCardHeader>
            <MudCardContent>
                 @if (grpcUnitsResponses.Count > 0)
                 {
-                    <MudTable Items="@MyUnitsToMudTable" Hover="true">
+                    <MudTable Items="@MyUnitsToMudTable" 
+                              Hover="true" 
+                              RowsPerPage="10" 
+                              Dense="true" 
+                              SortLabel="Sort By">
                         <HeaderContent>
-                            <MudTh>Unit</MudTh>
-                            <MudTh>Nr</MudTh>
+                            <MudTh></MudTh>
+                            <MudTh>Title</MudTh>
                             <MudTh>Hit Points</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="Nr">@context.img</MudTd>
-                            <MudTd DataLabel="Sign">@context.userUnit.UnitId</MudTd>
-                            <MudTd DataLabel="Hit Points">@context.userUnit.HitPoints</MudTd>
+                            <MudTd DataLabel="Img"><img src=@($"{context.img}")/></MudTd>
+                            <MudTd DataLabel="Title">@context.title</MudTd>
+                            <MudTd DataLabel="Hit Points">@context.userUnit!.HitPoints</MudTd>
                         </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager/>
+                        </PagerContent>
                     </MudTable>
                }
                else
@@ -35,22 +42,10 @@
 </MudGrid>
 
 @code {
-    private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
-    private IList<MyUnit> MyUnitsToMudTable = new List<MyUnit>();
-
     protected override async Task OnInitializedAsync()
     {
         //await UnitService.LoadUnitsAsync();
         grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
-        await PopulateUnits();
-
-    }
-
-    private async Task PopulateUnits()
-    {
-        foreach (var unit in UnitService.MyUnits)
-        {
-            MyUnitsToMudTable.Add(new MyUnit() { img = "", userUnit = unit });
-        }
+        await PopulateMyUnitsToMudTable();    
     }
 }
