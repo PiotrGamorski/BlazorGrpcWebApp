@@ -5,51 +5,51 @@
 
 <MudNavMenu>
 @ChildContent
+<MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="build">
-                        <span class="oi oi-wrench" aria-hidden="true"></span> Build
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="army">
-                        <span class="oi oi-people" aria-hidden="true"></span> My Army
-                    </NavLink>
-                </div>
+                <MudNavLink Href="build" Match="NavLinkMatch.All" Icon="@Icons.Filled.Create">Build</MudNavLink>
+                <MudNavLink Href="army" Match="NavLinkMatch.All" Icon="@Icons.Filled.Warehouse">My Army</MudNavLink>
             </Authorized>
             <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="register">
-                        <span class="oi oi-pencil" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
+                <MudNavLink Href="register" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccessibilityNew">Register</MudNavLink>
             </NotAuthorized>
         </AuthorizeView>
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3" style="@(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "opacity: 100%" : "opacity: 50%");
-                                                  @(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "pointer-events: auto" : "pointer-events: none");">
-                    <a class="nav-link" @onclick="Logout" style="cursor: pointer">
-                        <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
-                    </a>
-            </div>
+                @if(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true)
+                {
+                    <MudNavLink Icon="@Icons.Material.Filled.Logout"
+                                Match="NavLinkMatch.All"
+                                Style="opacity: 100%; pointer-events: auto;"
+                                @onclick="Logout">
+                                Logout</MudNavLink>
+                }
+                else
+                {
+                    <MudNavLink Icon="@Icons.Material.Filled.Logout"
+                                Match="NavLinkMatch.All"
+                                Style="opacity: 50%; pointer-events: none;">Logout
+                    </MudNavLink>
+                }
             </Authorized>
             <NotAuthorized>
-                <div class="nav-item px-3" style="@(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "opacity: 100%" : "opacity: 50%");
-                                                  @(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true ? "pointer-events: auto" : "pointer-events: none");">
-                    <a class="nav-link" @onclick="Logout" style="cursor: pointer">
-                        <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
-                    </a>
-            </div>
+                @if(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true)
+                {
+                        <MudNavLink Icon="@Icons.Material.Filled.Logout"
+                                    Match="NavLinkMatch.All"
+                                    Style="opacity: 100%; pointer-events: auto;"
+                                    @onclick="Logout">
+                                    Logout</MudNavLink>
+                }
+                else
+                {
+                    <MudNavLink Icon="@Icons.Material.Filled.Logout"
+                                Match="NavLinkMatch.All"
+                                Style="opacity: 50%; pointer-events: none;">Logout</MudNavLink>
+                }
             </NotAuthorized>
         </AuthorizeView>
     </nav>
