@@ -6,12 +6,10 @@
 <MudNavMenu>
 @ChildContent
 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
         <AuthorizeView>
             <Authorized>
-                <MudNavLink Href="build" Match="NavLinkMatch.All" Icon="@Icons.Filled.Create">Build</MudNavLink>
-                <MudNavLink Href="army" Match="NavLinkMatch.All" Icon="@Icons.Filled.Warehouse">My Army</MudNavLink>
+                <MudNavLink Href="build" Match="NavLinkMatch.All" Icon="@Icons.Filled.GroupAdd">Build</MudNavLink>
+                <MudNavLink Href="army" Match="NavLinkMatch.All" Icon="@Icons.Filled.Group">My Army</MudNavLink>
             </Authorized>
             <NotAuthorized>
                 <MudNavLink Href="register" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccessibilityNew">Register</MudNavLink>
@@ -52,8 +50,6 @@
                 }
             </NotAuthorized>
         </AuthorizeView>
-    </nav>
-</div>
 </MudNavMenu>
 
 @code {
@@ -61,8 +57,6 @@
     public RenderFragment? ChildContent { get; set; }
     [Parameter]
     public bool DrawerOpen { get; set; }
-    private bool collapseNavMenu = true;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private bool DisableLogout { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
@@ -73,21 +67,16 @@
         LogoutNavMenuService.OnChange += StateHasChanged;
     }
 
-    public void Dispose()
-    {
-        LogoutNavMenuService.OnChange -= StateHasChanged;
-    }
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-
     private async Task Logout()
     {
         await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
         DisableLogout = true;
         await LogoutNavMenuService.NotAuthenticated();
         NavigationManager.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {   
+        LogoutNavMenuService.OnChange -= StateHasChanged;
     }
 }
