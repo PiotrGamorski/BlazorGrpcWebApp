@@ -49,9 +49,7 @@ namespace BlazorGrpcWebApp.Client.Services
         {
             if (Units.Count == 0)
             {
-#pragma warning disable CS8601 // Possible null reference assignment.
-                Units = await _httpClient.GetFromJsonAsync<IList<Unit>>("api/Unit");
-#pragma warning restore CS8601 // Possible null reference assignment.
+                Units = (await _httpClient.GetFromJsonAsync<IList<Unit>>("api/Unit"))!;
             }
         }
         #endregion
@@ -59,15 +57,15 @@ namespace BlazorGrpcWebApp.Client.Services
         #region gRPC Calls
         public async Task<IList<GrpcUnitResponse>> DoGetGrpcUnits(int deadline)
         {
-            var grpcUnitsResponses = new List<GrpcUnitResponse>();
+            var Units = new List<GrpcUnitResponse>();
             try
             {
                 var response = _unitServiceGrpcClient.GetGrpcUnits(new GrpcUnitRequest() {}, deadline: DateTime.UtcNow.AddMilliseconds(deadline));
                 while (await response.ResponseStream.MoveNext(new CancellationToken()))
                 {
-                    grpcUnitsResponses.Add(response.ResponseStream.Current);
+                    Units.Add(response.ResponseStream.Current);
                 }
-                return await Task.FromResult(grpcUnitsResponses);
+                return await Task.FromResult(Units);
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
             {

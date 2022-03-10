@@ -20,14 +20,11 @@ namespace BlazorGrpcWebApp.Client.Services
             _grpcUserService = grpcUserService;
         }
 
-        #region Simplyfing/Helper Methods
-        private async Task<int> GetAuthUserId() => await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
         private Task BananasChanged()
         {
             OnChange?.Invoke();
             return Task.CompletedTask;
         }
-        #endregion
 
         public async Task EatBananas(int amount)
         {
@@ -48,6 +45,10 @@ namespace BlazorGrpcWebApp.Client.Services
             Bananas = await result.Content.ReadFromJsonAsync<int>();
             await BananasChanged();
         }
+        #endregion
+
+        #region Helper Methods for gRPC Calls
+        private async Task<int> GetAuthUserId() => await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
         #endregion
 
         #region gRPC calls

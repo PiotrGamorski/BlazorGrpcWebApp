@@ -15,17 +15,17 @@
                 }
                 else
                 {
-                    <MudProgressCircular Color="Color.Secondary" Size="Size.Medium" Indeterminate="true"/>
+                    <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
                 }
             </MudButton>
         <AddBananas/>
     </div>
     </Authorized>
     <NotAuthorized>
-        <div>
+        <MudCard>
             <NavLink href="login">Login</NavLink> |
             <NavLink href="register" style="margin-left: 0">Register</NavLink>
-        </div>
+        </MudCard>
     </NotAuthorized>
 
 </AuthorizeView>

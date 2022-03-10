@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using BlazorGrpcWebApp.Server.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using BlazorGrpcWebApp.Server.Interfaces;
+using BlazorGrpcWebApp.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
         };
     });
+builder.Services.AddScoped<IUtilityService, UtilityService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var app = builder.Build();
 

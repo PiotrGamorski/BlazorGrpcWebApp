@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Entities;
 
 public class UnitServiceGrpcImpl : UnitServiceGrpc.UnitServiceGrpcBase
     {
@@ -13,26 +14,55 @@ public class UnitServiceGrpcImpl : UnitServiceGrpc.UnitServiceGrpcBase
 
     public override async Task GetGrpcUnits(GrpcUnitRequest request, IServerStreamWriter<GrpcUnitResponse> responseStream, ServerCallContext context)
     {
-        var grpcUnits = _dataContext.GrpcUnits;
-        if (grpcUnits != null && grpcUnits.Any())
+        var units = _dataContext.Units;
+        if (units != null && units.Any())
         {
-            foreach (var grpcUnit in grpcUnits)
+            foreach (var unit in units)
             {
-                await responseStream.WriteAsync(new GrpcUnitResponse() { GrpcUnit = grpcUnit });
+                await responseStream.WriteAsync(new GrpcUnitResponse() 
+                { 
+                    GrpcUnit = new GrpcUnit()
+                    { 
+                        Id = unit.Id,
+                        Attack = unit.Attack,
+                        Defense = unit.Defense,
+                        HitPoints = unit.HitPoints,
+                        BananaCost = unit.BananaCost,
+                        Title = unit.Title,
+                    }
+                });
             }
         }
-        else
-            throw new RpcException(new Status(StatusCode.NotFound, "No Units found."));
+        else throw new RpcException(new Status(StatusCode.NotFound, "No Units found."));
     }
 
     public override async Task<GrpcUnitResponse> CreateGrpcUnit(GrpcUnitRequest request, ServerCallContext context)
     {
         try
         {
-            await _dataContext.AddAsync(request.GrpcUnit);
+            await _dataContext.Units.AddAsync(new Unit()
+            { 
+                Id = request.GrpcUnit.Id,
+                Attack = request.GrpcUnit.Attack,
+                Defense = request.GrpcUnit.Defense,
+                HitPoints = request.GrpcUnit.HitPoints,
+                BananaCost = request.GrpcUnit.BananaCost,
+                Title = request.GrpcUnit.Title,
+            });
             await _dataContext.SaveChangesAsync();
-            var createdGrpcUnit =_dataContext.GrpcUnits.FirstOrDefault(u => u.Id == request.GrpcUnit.Id);
-            return new GrpcUnitResponse() { GrpcUnit = createdGrpcUnit };
+            var unit =_dataContext.Units.FirstOrDefault(u => u.Id == request.GrpcUnit.Id);
+            return new GrpcUnitResponse() 
+            { 
+                GrpcUnit = new GrpcUnit() 
+                {
+                    Id = unit!.Id,
+                    Title = unit.Title,
+                    Attack = unit.Attack,
+                    Defense = unit.Defense,
+                    HitPoints = unit.HitPoints,
+                    BananaCost = unit.BananaCost,
+                }
+            };
         }
         catch(RpcException e)
         {
@@ -42,20 +72,31 @@ public class UnitServiceGrpcImpl : UnitServiceGrpc.UnitServiceGrpcBase
 
     public override async Task<GrpcUnitResponse> UpdateGrpcUnit(GrpcUnitRequest request, ServerCallContext context)
     {
-        var dbGrpcUnit = _dataContext.GrpcUnits.FirstOrDefault(unit => unit.Id == request.GrpcUnit.Id);
-        if (dbGrpcUnit != null)
+        var unit = _dataContext.Units.FirstOrDefault(unit => unit.Id == request.GrpcUnit.Id);
+        if (unit != null)
         {
             try
             {
                 // dbGrpcUnit = request.GrpcUnit;   - this might override Id
-                dbGrpcUnit.Title = request.GrpcUnit.Title;
-                dbGrpcUnit.Attack = request.GrpcUnit.Attack;
-                dbGrpcUnit.Defense = request.GrpcUnit.Defense;
-                dbGrpcUnit.BananaCost = request.GrpcUnit.BananaCost;
-                dbGrpcUnit.HitPoints = request.GrpcUnit.HitPoints;
+                unit.Title = request.GrpcUnit.Title;
+                unit.Attack = request.GrpcUnit.Attack;
+                unit.Defense = request.GrpcUnit.Defense;
+                unit.BananaCost = request.GrpcUnit.BananaCost;
+                unit.HitPoints = request.GrpcUnit.HitPoints;
 
                 await _dataContext.SaveChangesAsync();
-                return new GrpcUnitResponse() { GrpcUnit = dbGrpcUnit };
+                return new GrpcUnitResponse() 
+                { 
+                    GrpcUnit = new GrpcUnit()
+                    { 
+                        Id = request.GrpcUnit.Id,
+                        Title = unit.Title,
+                        Attack = unit.Attack,
+                        Defense = unit.Defense,
+                        BananaCost = unit.BananaCost,
+                        HitPoints = unit.HitPoints,
+                    }
+                };
             }
             catch (RpcException e)
             {
@@ -67,12 +108,12 @@ public class UnitServiceGrpcImpl : UnitServiceGrpc.UnitServiceGrpcBase
 
     public override async Task<GrpcUnitDeleteResponse> DeleteGrpcUnit(GrpcUnitDeleteRequest request, ServerCallContext context)
     {
-        var dbGrpcUnit = _dataContext.GrpcUnits.FirstOrDefault(u => u.Id == request.UnitId);
-        if (dbGrpcUnit != null)
+        var unit = _dataContext.Units.FirstOrDefault(u => u.Id == request.UnitId);
+        if (unit != null)
         {
             try
             {
-                _dataContext.GrpcUnits.Remove(dbGrpcUnit);
+                _dataContext.Units.Remove(unit);
                 await _dataContext.SaveChangesAsync();
                 return new GrpcUnitDeleteResponse() { UnitId = request.UnitId };
             }

@@ -1,9 +1,7 @@
-﻿using BlazorGrpcWebApp.Shared.Data;
-using BlazorGrpcWebApp.Shared.Entities;
+﻿using BlazorGrpcWebApp.Server.Interfaces;
+using BlazorGrpcWebApp.Shared.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace BlazorGrpcWebApp.Server.Controllers
 {
@@ -13,28 +11,24 @@ namespace BlazorGrpcWebApp.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly DataContext _dataContext;
-        public UserController(DataContext dataContext)
+        private readonly IUtilityService _utilityService;
+        public UserController(DataContext dataContext, IUtilityService utilityService)
         {
             _dataContext = dataContext;
+            _utilityService = utilityService;
         }
-
-        #region Simplifying Methods
-        // based on Authorize attribute, one can read currently logged in user ID
-        private int GetUserUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        private async Task<User?> GetUser() => await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserUserId());
-        #endregion
 
         [HttpGet("getbananas")]
         public async Task<IActionResult> GetBananas()
         {
-            var user = await GetUser();
+            var user = await _utilityService.GetUser();
             return Ok(user!.Bananas);
         }
 
         [HttpPut("addbananas")]
         public async Task<IActionResult> AddBananas([FromBody] int bananas)
         {
-            var user = await GetUser();
+            var user = await _utilityService.GetUser();
             user!.Bananas += bananas;
             await _dataContext.SaveChangesAsync();
             return Ok(user.Bananas);
@@ -44,7 +38,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
         [HttpGet("getAuthUserId")]
         public Task<int> GetAuthorisedUserId()
         {
-            var userId = GetUserUserId();
+            var userId = _utilityService.GetUserUserId();
             return Task.FromResult(userId);
         }
     }

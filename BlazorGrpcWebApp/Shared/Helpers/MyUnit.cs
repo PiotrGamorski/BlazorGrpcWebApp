@@ -1,4 +1,4 @@
-﻿using BlazorGrpcWebApp.Shared.Models;
+﻿using BlazorGrpcWebApp.Shared.Entities;
 
 namespace BlazorGrpcWebApp.Shared.Helpers
 {
