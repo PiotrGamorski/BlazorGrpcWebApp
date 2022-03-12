@@ -8,52 +8,50 @@ namespace BlazorGrpcWebApp.Client.Pages
     {
         private string? ImgPath { get; set; }
         private IList<GrpcUnitResponse> grpcUnitsResponses { get; set; } = new List<GrpcUnitResponse>();
-        private IList<MyUnit> MyUnitsToMudTable { get; set; } = new List<MyUnit>();
+        private IList<MyUnit> MyUnits { get; set; } = new List<MyUnit>();
 
-
-        public Task PopulateMyUnitsToMudTable()
+        public async Task PopulateMyArmy()
         {
-            foreach (var myUnit in GetMyUnits())
-            {
-                MyUnitsToMudTable.Add(myUnit);
-                StateHasChanged();
-            }
-
-            return Task.CompletedTask;
+            await GetMyUnits();
         }
 
-        private IEnumerable<MyUnit> GetMyUnits()
+        private async Task GetMyUnits()
         {
-            foreach (var myUnit in UnitService.MyUnits)
+            var UserUnitsResponses = (await ArmyService.RestApiGetUserUnits()).ToList();
+
+            foreach (var item in UserUnitsResponses)
             {
-                switch (myUnit.UnitId)
+                var temp = item.UnitId;
+                switch (item.UnitId)
                 {
                     case 1:
                         ImgPath = "/icons/knight.png";
-                        yield return new MyUnit()
+                        MyUnits.Add(new MyUnit()
                         {
                             img = ImgPath,
-                            title = grpcUnitsResponses.FirstOrDefault(r => r.GrpcUnit.Id == myUnit.UnitId)!.GrpcUnit.Title,
-                            userUnit = myUnit
-                        };
+                            title = "Knight",
+                            hitPoints = item.HitPoints
+                        });
                         break;
                     case 2:
                         ImgPath = "/icons/archer.png";
-                        yield return new MyUnit()
+                        MyUnits.Add(new MyUnit()
                         {
                             img = ImgPath,
-                            title = grpcUnitsResponses.FirstOrDefault(r => r.GrpcUnit.Id == myUnit.UnitId)!.GrpcUnit.Title,
-                            userUnit = myUnit
-                        };
+                            title = "Archer",
+                            hitPoints = item.HitPoints
+                        });
                         break;
                     case 3:
                         ImgPath = "/icons/mage.png";
-                        yield return new MyUnit()
+                        MyUnits.Add(new MyUnit()
                         {
                             img = ImgPath,
-                            title = grpcUnitsResponses.FirstOrDefault(r => r.GrpcUnit.Id == myUnit.UnitId)!.GrpcUnit.Title,
-                            userUnit = myUnit
-                        };
+                            title = "Mage",
+                            hitPoints = item.HitPoints
+                        });
+                        break;
+                    default:
                         break;
                 }
             }

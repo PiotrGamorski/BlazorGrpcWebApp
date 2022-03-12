@@ -21,7 +21,7 @@ namespace BlazorGrpcWebApp.Client.Pages
                     {
                         try
                         {
-                            await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data);
+                            await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(result.Data!);
                         }
                         catch (Exception e)
                         {

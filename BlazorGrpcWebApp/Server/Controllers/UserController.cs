@@ -1,5 +1,6 @@
 ﻿using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,12 +35,19 @@ namespace BlazorGrpcWebApp.Server.Controllers
             return Ok(user.Bananas);
         }
 
-        // this api is needed for BananaService when grpcMethod is used
+        // Api needed to get authorised user for gRPC services
         [HttpGet("getAuthUserId")]
         public Task<int> GetAuthorisedUserId()
         {
             var userId = _utilityService.GetUserUserId();
             return Task.FromResult(userId);
+        }
+
+        [HttpGet("getAuthUser")]
+        public async Task<User> GetAuthUser()
+        {
+            var user = await _utilityService.GetUser();
+            return user!;
         }
     }
 }

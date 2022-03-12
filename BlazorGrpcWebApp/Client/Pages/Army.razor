@@ -1,6 +1,7 @@
 ﻿@page "/army"
 @using BlazorGrpcWebApp.Shared.Helpers
 @inject IUnitService UnitService
+@inject IArmyService ArmyService
 @attribute [Authorize]
 
 <MudGrid>
@@ -12,7 +13,7 @@
            <MudCardContent>
                 @if (grpcUnitsResponses.Count > 0)
                 {
-                    <MudTable Items="@MyUnitsToMudTable" 
+                    <MudTable Items="@MyUnits" 
                               Hover="true" 
                               RowsPerPage="10" 
                               Dense="true" 
@@ -25,7 +26,7 @@
                         <RowTemplate>
                             <MudTd DataLabel="Img"><img src=@($"{context.img}")/></MudTd>
                             <MudTd DataLabel="Title">@context.title</MudTd>
-                            <MudTd DataLabel="Hit Points">@context.userUnit!.HitPoints</MudTd>
+                            <MudTd DataLabel="Hit Points">@context.hitPoints</MudTd>
                         </RowTemplate>
                         <PagerContent>
                             <MudTablePager/>
@@ -46,6 +47,7 @@
     {
         //await UnitService.LoadUnitsAsync();
         grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
-        await PopulateMyUnitsToMudTable();    
+        await PopulateMyArmy();
+        StateHasChanged();
     }
 }

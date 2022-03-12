@@ -2,7 +2,6 @@
 using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Entities;
-using BlazorGrpcWebApp.Shared.Models;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
@@ -13,13 +12,15 @@ namespace BlazorGrpcWebApp.Client.Services
     public class UnitService : IUnitService
     {
         private readonly IToastService _toastService;
+        private readonly IBananaService _bananaService;
         private readonly HttpClient _httpClient;
         private readonly GrpcChannel _channel;
         private UnitServiceGrpc.UnitServiceGrpcClient _unitServiceGrpcClient;
 
-        public UnitService(IToastService toastService, HttpClient httpClient)
+        public UnitService(IToastService toastService, IBananaService bananaService, HttpClient httpClient)
         {
             _toastService = toastService;
+            _bananaService = bananaService;
             _httpClient = httpClient;
             var httpClientGrpc = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
             _channel = GrpcChannel.ForAddress("https://localhost:7039", new GrpcChannelOptions { HttpClient = httpClientGrpc });
@@ -30,20 +31,6 @@ namespace BlazorGrpcWebApp.Client.Services
         public IList<Unit> Units { get; set; } = new List<Unit>();
         public IList<UserUnit> MyUnits { get; set; } = new List<UserUnit>();
 
-        public Task AddUnit(int unitId)
-        {
-            var unit = Units.First(u => u.Id == unitId);
-            if (unit != null)
-            {
-                MyUnits.Add(new UserUnit { UnitId = unit.Id, HitPoints = unit.HitPoints });
-                _toastService.ShowSuccess($"Your {unit.Title} has been built!", "Unit built!");
-            }
-            else
-                throw new InvalidOperationException("Cannot add Unit which does not exist!");
-
-            return Task.CompletedTask;
-        }
-
         #region Rest API calls
         public async Task LoadUnitsAsync()
         {
@@ -51,6 +38,24 @@ namespace BlazorGrpcWebApp.Client.Services
             {
                 Units = (await _httpClient.GetFromJsonAsync<IList<Unit>>("api/Unit"))!;
             }
+        }
+
+        public async Task AddUnit(int unitId)
+        {
+            var unit = Units.First(u => u.Id == unitId);
+            if (unit != null)
+            {
+                var result = await _httpClient.PostAsJsonAsync<int>("api/userunit", unitId);
+                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                    _toastService.ShowError(await result.Content.ReadAsStringAsync());
+                else
+                {
+                    await _bananaService.GetBananas();
+                    MyUnits.Add(new UserUnit { UnitId = unit.Id, HitPoints = unit.HitPoints });
+                    _toastService.ShowSuccess($"Your {unit.Title} has been built!", "Unit built!");
+                }
+            }
+            else throw new InvalidOperationException("Cannot add Unit which does not exist!");
         }
         #endregion
 
