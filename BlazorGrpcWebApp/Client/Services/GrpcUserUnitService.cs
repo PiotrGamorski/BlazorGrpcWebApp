@@ -1,5 +1,6 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -37,6 +38,33 @@ namespace BlazorGrpcWebApp.Client.Services
             catch(RpcException e) when (e.StatusCode == StatusCode.Unavailable)
             {
                 return new GrpcUserUnitResponse() { Success = false, Message = e.Status.ToString() };
+            }
+        }
+
+        public async Task<List<UserUnitResponse>> DoGrpcGetUserUnitAsync()
+        {
+            var result = new List<UserUnitResponse>();
+            var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
+            try
+            {
+                var response = _userUnitServiceGrpcClient.GetUserUnits(new GrpcGetUserUnitRequest() { UserId = authUserId });
+                while (await response.ResponseStream.MoveNext())
+                {
+                    result.Add(new UserUnitResponse()
+                    {
+                        UnitId = response.ResponseStream.Current.UnitId,
+                        HitPoints = response.ResponseStream.Current.HitPoints,
+                    });
+                }
+                return await Task.FromResult(result);
+            }
+            catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
+            {
+                throw new RpcException(e.Status);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

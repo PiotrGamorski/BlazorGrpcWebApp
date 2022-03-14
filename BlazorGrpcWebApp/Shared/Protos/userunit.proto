@@ -5,6 +5,7 @@ package UserUnitServiceGrpc;
 
 service UserUnitServiceGrpc { 
 	rpc BuildUserUnit (GrpcUserUnitRequest) returns (GrpcUserUnitResponse) {}
+	rpc GetUserUnits (GrpcGetUserUnitRequest) returns (stream GrpcGetUserUnitResponse) {}
 } 
 
 message GrpcUserUnitRequest{
@@ -19,4 +20,13 @@ message GrpcUserUnitResponse {
 	int32 hitPoints = 3;
 	bool success = 4;
 	string message = 5;
+}
+
+message GrpcGetUserUnitRequest {
+	int32 userId = 1;
+}
+
+message GrpcGetUserUnitResponse {
+	int32 unitId = 1;
+	int32 hitPoints = 2;
 }

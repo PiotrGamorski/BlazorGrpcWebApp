@@ -1,5 +1,7 @@
 ﻿using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Helpers;
+using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorGrpcWebApp.Client.Pages
@@ -12,16 +14,14 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         public async Task PopulateMyArmy()
         {
-            await GetMyUnits();
+            //await GetMyUnitsRestApi();
+            await GetMyUnitsGrpc();
         }
 
-        private async Task GetMyUnits()
+        private void PopulateMyUnits(List<UserUnitResponse> UserUnitResponses)
         {
-            var UserUnitsResponses = (await ArmyService.RestApiGetUserUnits()).ToList();
-
-            foreach (var item in UserUnitsResponses)
+            foreach (var item in UserUnitResponses)
             {
-                var temp = item.UnitId;
                 switch (item.UnitId)
                 {
                     case 1:
@@ -54,6 +54,29 @@ namespace BlazorGrpcWebApp.Client.Pages
                     default:
                         break;
                 }
+            }
+        }
+
+        private async Task GetMyUnitsRestApi()
+        {
+            var UserUnitResponses = (await ArmyService.RestApiGetUserUnits()).ToList();
+            PopulateMyUnits(UserUnitResponses);
+        }
+
+        private async Task GetMyUnitsGrpc()
+        {
+            try
+            {
+                var UserUnitResponses = await GrpcUserUnitService.DoGrpcGetUserUnitAsync();
+                PopulateMyUnits(UserUnitResponses);
+            }
+            catch (RpcException e)
+            {
+                ToastService.ShowError($"{e.StatusCode}", ":(");
+            }
+            catch (Exception e)
+            {
+                ToastService.ShowError($"{e.Message}", ":(");
             }
         }
     }

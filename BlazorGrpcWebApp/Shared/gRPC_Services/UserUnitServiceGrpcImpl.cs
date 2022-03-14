@@ -40,5 +40,24 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
                 Message = $"Your {unit.Title} has been built!"
             };
         }
+
+        public override async Task GetUserUnits(GrpcGetUserUnitRequest request, IServerStreamWriter<GrpcGetUserUnitResponse> responseStream, ServerCallContext context)
+        {
+            var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+            var userUnits = await _dataContext.UserUnits.Where<UserUnit>(u => u.UserId == user!.Id).ToListAsync();
+
+            if (userUnits != null && userUnits.Any())
+            {
+                foreach (var userUnit in userUnits)
+                {
+                    await responseStream.WriteAsync(new GrpcGetUserUnitResponse()
+                    {
+                        UnitId = userUnit.UnitId,
+                        HitPoints = userUnit.HitPoints,
+                    });
+                }
+            }
+            else await responseStream.WriteAsync(new GrpcGetUserUnitResponse());
+        }
     }
 }

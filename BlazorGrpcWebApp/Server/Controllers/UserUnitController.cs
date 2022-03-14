@@ -49,7 +49,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             var user = _utilityService.GetUser();
             var userUnits = await _dataContext.UserUnits.Where<UserUnit>(u => u.UserId == user.Result!.Id).ToListAsync();
 
-            // The response represents a dto
+            // The response represents a dto - "UserUnitResponse"
             var response = userUnits.Select(
                 userUnit => new UserUnitResponse()
                 {

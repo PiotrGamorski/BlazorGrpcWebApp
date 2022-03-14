@@ -71,6 +71,6 @@
             else
                 ToastService.ShowError($"{grpcResponse.Message}", ":(");
         }
-        else throw new InvalidOperationException("Cannot build Unit");
+        else ToastService.ShowError("Cannot build Unit", ":(");
     }
 }
