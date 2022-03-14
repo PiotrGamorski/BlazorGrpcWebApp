@@ -32,6 +32,7 @@ builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ILogoutNavMenuService, LogoutNavMenuService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGrpcUserService, GrpcUserService>();
+builder.Services.AddScoped<IGrpcUserUnitService, GrpcUserUnitService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();

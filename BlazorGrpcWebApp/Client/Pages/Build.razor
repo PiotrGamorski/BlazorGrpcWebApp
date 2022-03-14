@@ -1,7 +1,9 @@
 ﻿@page "/build"
+@using Grpc.Core
 @inject IBananaService BananaService
 @inject IUnitService UnitService
 @inject IToastService ToastService
+@inject IGrpcUserUnitService GrpcUserUnitService
 @attribute [Authorize]
 
 <h3>Build</h3>
@@ -14,7 +16,7 @@
     </select>
 </div>
 <br />
-<MudButton @onclick="BuildUnit" 
+<MudButton @onclick="BuildUnitGrpc" 
            Color="Color.Secondary" 
            Variant="Variant.Filled">
            Build
@@ -22,7 +24,6 @@
 
 @code {
     private int selectedUnitId { get; set; } = 1;
-    private bool needMoreBananas = false;
     private int SnackBarRefInterval { get; set; } = 5000;
     private string? SnackBarRefMessage { get; set; }
 
@@ -32,28 +33,43 @@
         //await UnitService.DoGetUnits(2000);
     }
 
-    public async Task BuildUnit()
+    public async Task BuildUnitRestApi()
     {
         var selectedUnit = UnitService.Units.FirstOrDefault(u => u.Id == selectedUnitId);
         if (selectedUnit != null)
         {
             if (BananaService.Bananas < selectedUnit.BananaCost)
             {
-                needMoreBananas = true;
                 ToastService.ShowError("Not enough bananas!", ":(");
                 return;
             }
-            needMoreBananas = false;
 
             await BananaService.EatBananas(selectedUnit.BananaCost);
             try
             {
+                // AddUnit uses Rest Api Call
                 await UnitService.AddUnit(selectedUnitId);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
             }
+        }
+        else throw new InvalidOperationException("Cannot build Unit");
+    }
+
+    public async Task BuildUnitGrpc()
+    {
+        var selectedUnit = UnitService.Units.FirstOrDefault(u => u.Id == selectedUnitId);
+        if (selectedUnit != null)
+        {
+            var grpcResponse = await GrpcUserUnitService.DoGrpcBuildUserUnit(selectedUnitId);
+            await BananaService.EatBananas(selectedUnit.BananaCost);
+
+            if (grpcResponse.Success)
+                ToastService.ShowSuccess($"{grpcResponse.Message}", "Unit built!");
+            else
+                ToastService.ShowError($"{grpcResponse.Message}", ":(");
         }
         else throw new InvalidOperationException("Cannot build Unit");
     }

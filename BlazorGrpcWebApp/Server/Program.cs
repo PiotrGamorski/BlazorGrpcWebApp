@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Server.Services;
+using BlazorGrpcWebApp.Shared.gRPC_Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,7 @@ app.UseEndpoints(endpoints =>
 	endpoints.MapGrpcService<WeatherService>().EnableGrpcWeb();
 	endpoints.MapGrpcService<UnitServiceGrpcImpl>().EnableGrpcWeb();
     endpoints.MapGrpcService<UserServiceGrpcImpl>().EnableGrpcWeb();
+    endpoints.MapGrpcService<UserUnitServiceGrpcImpl>().EnableGrpcWeb();
 	endpoints.MapRazorPages();
 	endpoints.MapControllers();
 	endpoints.MapFallbackToFile("index.html");
