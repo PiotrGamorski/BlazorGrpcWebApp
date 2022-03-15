@@ -1,0 +1,72 @@
+﻿@page "/leaderboard"
+@inject ILeaderboardService LeaderboardService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h4">Leaderboard</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (LeaderboardService.GrpcLeaderboardResponses.Count() > 0)
+                {
+                    <MudTable Items="@LeaderboardService.GrpcLeaderboardResponses"
+                              Hover="true"
+                              RowsPerPage="10" 
+                              Dense="true" 
+                              SortLabel="Sort By">
+                        <HeaderContent>
+                            <MudTh>#</MudTh>
+                            <MudTh>User</MudTh>
+                            <MudTh>Victories</MudTh>
+                            <MudTh>Defeats</MudTh>
+                            <MudTh>Battles</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Rank" Style="@GetMyUserStyle(context.UserId)">@context.Rank</MudTd>
+                            <MudTd DataLabel="User" Style="@GetMyUserStyle(context.UserId)">@context.UserName</MudTd>
+                            <MudTd DataLabel="Victories" Style="@GetMyUserStyle(context.UserId)">@context.Victories</MudTd>
+                            <MudTd DataLabel="Defeats" Style="@GetMyUserStyle(context.UserId)">@context.Defeats</MudTd>
+                            <MudTd DataLabel="Battles" Style="@GetMyUserStyle(context.UserId)">@context.Battles</MudTd>
+                            <MudTd DataLabel="Fight">
+                                @if (context.UserId != myUserId)
+                                {
+                                    <MudButton Color="Color.Error" 
+                                               Variant="Variant.Filled">
+                                               Fight
+                                    </MudButton>
+                                }
+                            </MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager/>
+                        </PagerContent>
+                    </MudTable>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private int myUserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+        myUserId = int.Parse(authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+
+        await LeaderboardService.DoGrpcGetLeaderboard();
+        StateHasChanged();
+    }
+
+    private string GetMyUserStyle(int userId)
+    {
+        if (userId == myUserId) 
+            return "color: crimson; font-weight: 600px;";
+        else 
+            return string.Empty;
+    }
+}

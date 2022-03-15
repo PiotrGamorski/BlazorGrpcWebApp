@@ -102,15 +102,18 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
         int rank = 1;
         // Rank is computed based on upper order
-        users.Select(async u => await responseStream.WriteAsync(new GrpcUserGetLeaderboardResponse() 
+        foreach (var user in users)
         {
-            Rank = rank++,
-            UserId = u.Id,
-            UserName = u.UserName,
-            Battles = u.Battles,
-            Victories = u.Victories,
-            Defeats = u.Defeats,
-        }));
+            await responseStream.WriteAsync(new GrpcUserGetLeaderboardResponse()
+            {
+                Rank = rank++,
+                UserId = user.Id,
+                UserName = user.UserName,
+                Battles = user.Battles,
+                Victories = user.Victories,
+                Defeats = user.Defeats,
+            });
+        }
     }
 
     #region Helper Methods
