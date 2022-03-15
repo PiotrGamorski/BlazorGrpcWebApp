@@ -74,15 +74,18 @@ namespace BlazorGrpcWebApp.Client.Services
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
             {
-                throw new RpcException(e.Status);
+                _toastService.ShowError(e.Status.ToString(), ":(");
+                return new List<GrpcUnitResponse>();
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
             {
-                throw new RpcException(e.Status);
+                _toastService.ShowError(e.Status.ToString(), ":(");
+                return new List<GrpcUnitResponse>();
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                _toastService.ShowError(e.Message, ":(");
+                return new List<GrpcUnitResponse>();
             }
         }
 

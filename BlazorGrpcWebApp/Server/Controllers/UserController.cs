@@ -1,8 +1,10 @@
 ﻿using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorGrpcWebApp.Server.Controllers
 {
@@ -33,6 +35,31 @@ namespace BlazorGrpcWebApp.Server.Controllers
             user!.Bananas += bananas;
             await _dataContext.SaveChangesAsync();
             return Ok(user.Bananas);
+        }
+
+        [HttpGet("leaderboard")]
+        public async Task<IActionResult> GetLeaderboard()
+        {
+            var users = await _dataContext.Users.Where(u => !u.IsDeleted && u.IsConfirmed).ToListAsync();
+            users = users
+                .OrderByDescending(u => u.Victories)
+                .ThenBy(u => u.Defeats)
+                .ThenBy(u => u.DateCreated)
+                .ToList();
+
+            int rank = 1;
+            // Rank is computed based on upper order
+            var response = users.Select(u => new UserStatistic()
+            {
+                Rank = rank++,
+                UserId = u.Id,
+                UserName = u.UserName,
+                Battles = u.Battles,
+                Victories = u.Victories,
+                Defeats = u.Defeats,
+            });
+
+            return Ok(response);
         }
 
         // Api needed to get authorised user for gRPC services

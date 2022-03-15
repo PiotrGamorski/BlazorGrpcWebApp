@@ -12,12 +12,18 @@ namespace BlazorGrpcWebApp.Client.Pages
         private IList<GrpcUnitResponse> grpcUnitsResponses { get; set; } = new List<GrpcUnitResponse>();
         private IList<MyUnit> MyUnits { get; set; } = new List<MyUnit>();
 
-        public async Task PopulateMyArmy()
+        protected override async Task OnInitializedAsync()
         {
+            //await UnitService.LoadUnitsAsync();
+            grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
+
             //await GetMyUnitsRestApi();
             await GetMyUnitsGrpc();
+
+            StateHasChanged();
         }
 
+        #region Simplyfying Methods
         private void PopulateMyUnits(List<UserUnitResponse> UserUnitResponses)
         {
             foreach (var item in UserUnitResponses)
@@ -56,12 +62,15 @@ namespace BlazorGrpcWebApp.Client.Pages
                 }
             }
         }
+        #endregion
 
+        #region REST Api Calls
         private async Task GetMyUnitsRestApi()
         {
             var UserUnitResponses = (await ArmyService.RestApiGetUserUnits()).ToList();
             PopulateMyUnits(UserUnitResponses);
         }
+        #endregion
 
         private async Task GetMyUnitsGrpc()
         {

@@ -10,6 +10,7 @@ service UserServiceGrpc {
 	rpc GrpcUserLogin (LoginGrpcUserRequest) returns (LoginGrpcUserRespone);
 	rpc GrpcGetUserBananas(GrpcUserBananasRequest) returns (GrpcUserBananasResponse);
 	rpc GrpcUserAddBananas(GrpcUserAddBananasRequest) returns (GrpcUserAddBananasResponse);
+	rpc GrpcUserGetLeaderboard(GrpcUserGetLeaderboardRequest) returns (stream GrpcUserGetLeaderboardResponse);
 }
 
 message GrpcUser {
@@ -70,4 +71,16 @@ message GrpcUserAddBananasRequest {
 
 message GrpcUserAddBananasResponse {
 	int32 bananas = 1;
+}
+
+message GrpcUserGetLeaderboardRequest{
+}
+
+message GrpcUserGetLeaderboardResponse{
+	int32 rank = 1;
+	int32 userId = 2;
+	string userName = 3;
+	int32 battles = 4;
+	int32 victories = 5;
+	int32 defeats = 6;
 }

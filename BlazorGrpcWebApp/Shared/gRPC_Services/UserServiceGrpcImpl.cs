@@ -91,6 +91,29 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
         return new GrpcUserAddBananasResponse { Bananas = user.Bananas };
     }
 
+    public override async Task GrpcUserGetLeaderboard(GrpcUserGetLeaderboardRequest request, IServerStreamWriter<GrpcUserGetLeaderboardResponse> responseStream, ServerCallContext context)
+    {
+        var users = await _dataContext.Users.Where(u => !u.IsDeleted && u.IsConfirmed).ToListAsync();
+        users = users
+            .OrderByDescending(u => u.Victories)
+            .ThenBy(u => u.Defeats)
+            .ThenBy(u => u.DateCreated)
+            .ToList();
+
+        int rank = 1;
+        // Rank is computed based on upper order
+        users.Select(async u => await responseStream.WriteAsync(new GrpcUserGetLeaderboardResponse() 
+        {
+            Rank = rank++,
+            UserId = u.Id,
+            UserName = u.UserName,
+            Battles = u.Battles,
+            Victories = u.Victories,
+            Defeats = u.Defeats,
+        }));
+    }
+
+    #region Helper Methods
     private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
 #pragma warning disable CA1416 // Validate platform compatibility
@@ -134,5 +157,6 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
         return Task.FromResult(jwt);
     }
+    #endregion
 }
 

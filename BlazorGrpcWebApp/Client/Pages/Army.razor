@@ -43,13 +43,3 @@
         </MudCard>
    </MudItem> 
 </MudGrid>
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        //await UnitService.LoadUnitsAsync();
-        grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
-        await PopulateMyArmy();
-        StateHasChanged();
-    }
-}
