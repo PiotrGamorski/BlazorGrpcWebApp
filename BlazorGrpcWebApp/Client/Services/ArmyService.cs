@@ -18,5 +18,11 @@ namespace BlazorGrpcWebApp.Client.Services
             var result = await _httpClient.GetFromJsonAsync<List<UserUnitResponse>>("api/userunit");
             return result!;
         }
+
+        public async Task<HttpResponseMessage> RestApiReviveArmy()
+        {
+            var result = await _httpClient.PostAsJsonAsync<string>("api/battle/reviveArmy", null!);
+            return result;
+        }
     }
 }

@@ -65,10 +65,19 @@ namespace BlazorGrpcWebApp.Client.Pages
         #endregion
 
         #region REST Api Calls
-        private async Task GetMyUnitsRestApi()
+        private async Task GetMyUnits()
         {
             var UserUnitResponses = (await ArmyService.RestApiGetUserUnits()).ToList();
             PopulateMyUnits(UserUnitResponses);
+        }
+
+        private async Task ReviveArmy()
+        {
+            var result = await ArmyService.RestApiReviveArmy();
+            if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                ToastService.ShowSuccess(await result.Content.ReadAsStringAsync());
+            else
+                ToastService.ShowError(await result.Content.ReadAsStringAsync());
         }
         #endregion
 

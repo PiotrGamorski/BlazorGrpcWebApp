@@ -21,6 +21,37 @@ namespace BlazorGrpcWebApp.Server.Controllers
             _utilityService = utilityService;
         }
 
+        [HttpPost("reviveArmy")]
+        public async Task<IActionResult> ReviveArmy()
+        {
+            var user = await _utilityService.GetUser();
+            var userUnits = await _dataContext.UserUnits
+                .Where(u => u.UserId == user!.Id)
+                .Include(u => u.Unit)
+                .ToArrayAsync();
+
+            int bananasCost = 1000;
+            if (user!.Bananas < bananasCost)
+                return BadRequest($"Not enough bananas! You need {bananasCost} to revive your army.");
+
+            bool armyAlreadyAlive = true;
+            foreach (var userUnit in userUnits)
+            {
+                if (userUnit.HitPoints <= 0)
+                { 
+                    armyAlreadyAlive = false;
+                    userUnit.HitPoints = new Random().Next(0, userUnit.Unit.HitPoints);
+                }
+            }
+
+            if (armyAlreadyAlive)
+                return Ok("Your army is already alive.");
+
+            user.Bananas -= bananasCost;
+            await _dataContext.SaveChangesAsync();
+            return Ok("Army revived!");
+        }
+
         [HttpPost]
         public async Task<IActionResult> StartBattle([FromBody] int opponentId)
         {

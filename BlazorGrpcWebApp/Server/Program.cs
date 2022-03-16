@@ -68,6 +68,7 @@ app.UseEndpoints(endpoints =>
 	endpoints.MapGrpcService<UnitServiceGrpcImpl>().EnableGrpcWeb();
     endpoints.MapGrpcService<UserServiceGrpcImpl>().EnableGrpcWeb();
     endpoints.MapGrpcService<UserUnitServiceGrpcImpl>().EnableGrpcWeb();
+    endpoints.MapGrpcService<BattleServiceGrpcImpl>().EnableGrpcWeb();
 	endpoints.MapRazorPages();
 	endpoints.MapControllers();
 	endpoints.MapFallbackToFile("index.html");

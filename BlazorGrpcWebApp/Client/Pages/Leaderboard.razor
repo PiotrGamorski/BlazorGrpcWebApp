@@ -38,7 +38,7 @@
                                 {
                                     <MudButton Color="Color.Error" 
                                                Variant="Variant.Filled"
-                                               OnClick="async () => await FightOpponent(context.UserId)">
+                                               OnClick="async () => await FightOpponentGrpc(context.UserId)">
                                                Fight
                                     </MudButton>
                                 }
@@ -74,7 +74,7 @@
             return string.Empty;
     }
 
-    private async Task FightOpponent(int opponentId)
+    private async Task FightOpponentGrpc(int opponentId)
     {
         try
         {
