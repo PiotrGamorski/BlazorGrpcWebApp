@@ -1,5 +1,8 @@
 ﻿@page "/leaderboard"
+@using Grpc.Core
 @inject ILeaderboardService LeaderboardService
+@inject IGrpcBattleService GrpcBattleService
+@inject IToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <MudGrid>
@@ -34,7 +37,8 @@
                                 @if (context.UserId != myUserId)
                                 {
                                     <MudButton Color="Color.Error" 
-                                               Variant="Variant.Filled">
+                                               Variant="Variant.Filled"
+                                               OnClick="async () => await FightOpponent(context.UserId)">
                                                Fight
                                     </MudButton>
                                 }
@@ -68,5 +72,21 @@
             return "color: crimson; font-weight: 600px;";
         else 
             return string.Empty;
+    }
+
+    private async Task FightOpponent(int opponentId)
+    {
+        try
+        {
+            await GrpcBattleService.DoGrpcStartBattle(opponentId);
+        }
+        catch (RpcException e)
+        {
+            ToastService.ShowError(e.Status.ToString(), ":(");
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError(e.Message, ":(");
+        }
     }
 }

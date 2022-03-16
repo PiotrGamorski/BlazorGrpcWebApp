@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Protos\battle.proto" />
     <None Remove="Protos\unit.proto" />
     <None Remove="Protos\user.proto" />
     <None Remove="Protos\userunit.proto" />

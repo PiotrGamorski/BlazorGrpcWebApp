@@ -1,49 +1,40 @@
-﻿using BlazorGrpcWebApp.Server.Interfaces;
-using BlazorGrpcWebApp.Shared.Data;
+﻿using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlazorGrpcWebApp.Server.Controllers
+namespace BlazorGrpcWebApp.Shared.gRPC_Services
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class BattleController : ControllerBase
+    public class BattleServiceGrpcImpl : BattleServiceGrpc.BattleServiceGrpcBase
     {
         private readonly DataContext _dataContext;
-        private readonly IUtilityService _utilityService;
-        public BattleController(DataContext dataContext, IUtilityService utilityService)
+        public BattleServiceGrpcImpl(DataContext dataContext)
         {
             _dataContext = dataContext;
-            _utilityService = utilityService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> StartBattle([FromBody] int opponentId)
+        public override async Task<GrpcStartBattleResponse> GrpcStartBattle(GrpcStartBattleRequest request, ServerCallContext context)
         {
-            var attacker = await _utilityService.GetUser();
-            var opponent = await _dataContext.Users.FindAsync(opponentId);
+            var attacker = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == request.AuthUserId);
+            var opponent = await _dataContext.Users.FindAsync(request.OppenentId);
             if (opponent == null || opponent.IsDeleted)
-                return NotFound("Opponent not available");
+                throw new RpcException(new Status(StatusCode.NotFound, "Opponent not available"));
 
             var result = new BattleResult();
             await Fight(attacker!, opponent, result);
-            
-            return Ok(result);
+            return new GrpcStartBattleResponse();
         }
 
         private async Task Fight(User attacker, User opponent, BattleResult result)
         {
             var attackerArmy = await _dataContext.UserUnits
                 .Where(u => u.UserId == attacker.Id && u.HitPoints > 0)
-                .Include(u => u.Unit) 
+                .Include(u => u.Unit)
                 .ToListAsync();
-            // one can include Unit as it appears in UserUnit class
+
             var opponentArmy = await _dataContext.UserUnits
-                .Where(u => u.UserId == opponent.Id && u.HitPoints > 0)
+                .Where(u => u.UserId == opponent.Id)
                 .Include(u => u.Unit)
                 .ToListAsync();
 
@@ -51,9 +42,9 @@ namespace BlazorGrpcWebApp.Server.Controllers
             var opponentDamageSum = 0;
             var currentRound = 0;
             while (attackerArmy.Count() > 0 && opponentArmy.Count() > 0)
-            { 
+            {
                 currentRound++;
-                if (currentRound % 2 != 0)
+                if(currentRound % 2 != 0)
                     attackerDamageSum += await FightRound(attacker, opponent, attackerArmy, opponentArmy, result);
                 else
                     opponentDamageSum += await FightRound(opponent, attacker, opponentArmy, attackerArmy, result);
@@ -62,7 +53,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             result.IsVictory = opponentArmy.Count() == 0;
             result.RoundsFought = currentRound;
 
-            if (result.RoundsFought > 0)
+            if(result.RoundsFought > 0)
                 await FinishFight(attacker, opponent, result, attackerDamageSum, opponentDamageSum);
         }
 
@@ -132,7 +123,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
                 Opponent = opponent,
                 RoundsFought = result.RoundsFought,
                 WinnerDamage = result.IsVictory ? result.AttackerDamageSum : result.OpponentDamageSum,
-                Winner = result.IsVictory ? attacker : opponent, 
+                Winner = result.IsVictory ? attacker : opponent,
             };
 
             await _dataContext.Battles.AddAsync(Battle);

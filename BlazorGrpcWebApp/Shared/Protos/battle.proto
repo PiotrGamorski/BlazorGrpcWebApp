@@ -1,0 +1,16 @@
+﻿syntax = "proto3"; 
+
+option csharp_namespace = "BlazorGrpcWebApp.Shared";
+package BattleServiceGrpc; 
+
+service BattleServiceGrpc { 
+	rpc GrpcStartBattle (GrpcStartBattleRequest) returns (GrpcStartBattleResponse) {}
+} 
+
+message GrpcStartBattleRequest {
+	int32 authUserId = 1;
+	int32 oppenentId = 2;
+}
+
+message GrpcStartBattleResponse {
+}
