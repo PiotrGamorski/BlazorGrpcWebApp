@@ -1,0 +1,17 @@
+﻿syntax = "proto3"; 
+
+option csharp_namespace = "BlazorGrpcWebApp.Shared";
+package ArmyServiceGrpc; 
+
+service ArmyServiceGrpc { 
+	rpc GrpcReviveArmy (GrpcReviveArmyRequest) returns (GrpcReviveArmyResponse) {}
+} 
+
+message GrpcReviveArmyRequest {
+	int32 authUserId = 1;
+}
+
+message GrpcReviveArmyResponse {
+	bool success = 1;
+	string message = 2;
+}

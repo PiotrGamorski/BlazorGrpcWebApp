@@ -1,4 +1,6 @@
-﻿namespace BlazorGrpcWebApp.Client.Interfaces
+﻿using BlazorGrpcWebApp.Shared;
+
+namespace BlazorGrpcWebApp.Client.Interfaces
 {
     public interface IGrpcBattleService
     {

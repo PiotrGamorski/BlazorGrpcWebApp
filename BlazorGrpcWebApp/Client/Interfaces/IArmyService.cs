@@ -1,4 +1,5 @@
-﻿using BlazorGrpcWebApp.Shared.Dtos;
+﻿using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Dtos;
 
 namespace BlazorGrpcWebApp.Client.Interfaces
 {
@@ -6,5 +7,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces
     {
         Task<List<UserUnitResponse>> RestApiGetUserUnits();
         Task<HttpResponseMessage> RestApiReviveArmy();
+        Task<GrpcReviveArmyResponse> DoGrpcReviveArmy();
     }
 }
