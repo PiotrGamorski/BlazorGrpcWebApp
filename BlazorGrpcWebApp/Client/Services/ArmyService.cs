@@ -35,6 +35,19 @@ namespace BlazorGrpcWebApp.Client.Services
         }
 
         [Authorize]
+        public async Task<GrpcHealUnitResponse> DoGrpcHealUnit(int userUnitId)
+        {
+            var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
+            var result = await _armyServiceGrpcClient.GrpcHealUnitGrpcAsync(new GrpcHealUnitRequest() 
+            { 
+                AuthUserId = authUserId,
+                UserUnitId = userUnitId
+            });
+
+            return result;
+        }
+
+        [Authorize]
         public async Task<GrpcReviveArmyResponse> DoGrpcReviveArmy()
         {
             var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");

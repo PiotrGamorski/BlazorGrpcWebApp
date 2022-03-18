@@ -8,5 +8,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces
         Task<List<UserUnitResponse>> RestApiGetUserUnits();
         Task<HttpResponseMessage> RestApiReviveArmy();
         Task<GrpcReviveArmyResponse> DoGrpcReviveArmy();
+        Task<GrpcHealUnitResponse> DoGrpcHealUnit(int userUnitId);
     }
 }

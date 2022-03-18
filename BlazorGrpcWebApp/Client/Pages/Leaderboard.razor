@@ -2,6 +2,7 @@
 @using Grpc.Core
 @inject ILeaderboardService LeaderboardService
 @inject IGrpcBattleService GrpcBattleService
+@inject IBananaService BananaService
 @inject IToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -10,13 +11,21 @@
         <MudCard>
             <MudCardHeader>
                 <MudText Typo="Typo.h4">Leaderboard</MudText>
+                <MudSpacer/>
+                <MudTextField @bind-Value="LeaderboardSearchString" 
+                              Placeholder="Search" 
+                              Adornment="Adornment.Start" 
+                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                              IconSize="Size.Medium" 
+                              Class="mt-0"/>
             </MudCardHeader>
             <MudCardContent>
-                @if (LeaderboardService.GrpcLeaderboardResponses.Count() > 0)
+                @if (MyLeaderboard.Count() > 0)
                 {
-                    <MudTable Items="@LeaderboardService.GrpcLeaderboardResponses"
+                    <MudTable Items="@MyLeaderboard"
+                              Filter="new Func<GrpcUserGetLeaderboardResponse, bool>(Filter)"
                               Hover="true"
-                              RowsPerPage="10" 
+                              RowsPerPage="15" 
                               Dense="true" 
                               SortLabel="Sort By">
                         <HeaderContent>
@@ -34,14 +43,25 @@
                             <MudTd DataLabel="Defeats" Style="@GetMyUserStyle(context.UserId)">@context.Defeats</MudTd>
                             <MudTd DataLabel="Battles" Style="@GetMyUserStyle(context.UserId)">@context.Battles</MudTd>
                             <MudTd DataLabel="Fight">
-                                @if (context.UserId != myUserId)
-                                {
-                                    <MudButton Color="Color.Error" 
-                                               Variant="Variant.Filled"
-                                               OnClick="async () => await FightOpponentGrpc(context.UserId)">
-                                               Fight
-                                    </MudButton>
-                                }
+                                    @if (!buttonLoading)
+                                    {
+                                        @if (context.UserId != myUserId)
+                                        {
+                                        <MudButton Color="Color.Error" 
+                                                   Variant="Variant.Filled"
+                                                   OnClick="async () => await FightOpponentGrpc(context.UserId)">
+                                                   Fight
+                                        </MudButton>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <MudButton Color="Color.Error"
+                                                   Disabled="true"
+                                                   Variant="Variant.Filled">
+                                                   <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+                                        </MudButton>
+                                    }
                             </MudTd>
                         </RowTemplate>
                         <PagerContent>
@@ -56,6 +76,10 @@
 
 @code {
     private int myUserId;
+    private bool fightCompleted { get; set; }
+    private bool buttonLoading { get; set; } = false;
+    private string LeaderboardSearchString { get; set; } = string.Empty;
+    private IList<GrpcUserGetLeaderboardResponse> MyLeaderboard = new List<GrpcUserGetLeaderboardResponse>(); 
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,7 +87,7 @@
         myUserId = int.Parse(authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
 
         await LeaderboardService.DoGrpcGetLeaderboard();
-        StateHasChanged();
+        await PopulateMyLeaderBoard();
     }
 
     private string GetMyUserStyle(int userId)
@@ -74,11 +98,35 @@
             return string.Empty;
     }
 
+    private Task PopulateMyLeaderBoard()
+    {
+        foreach (var item in LeaderboardService.GrpcLeaderboardResponses)
+        {
+            MyLeaderboard.Add(item); 
+        }
+        return Task.CompletedTask;
+    }
+
     private async Task FightOpponentGrpc(int opponentId)
     {
+        MyLeaderboard = new List<GrpcUserGetLeaderboardResponse>();
+        buttonLoading = true;
+        fightCompleted = false;
         try
         {
             await GrpcBattleService.DoGrpcStartBattle(opponentId);
+            await LeaderboardService.DoGrpcGetLeaderboard();
+            await PopulateMyLeaderBoard();
+            //StateHasChanged();
+
+            fightCompleted = true;
+            await BananaService.GrpcGetBananas();
+            await BananaService.BananasChanged();
+            if (fightCompleted)
+            {
+                buttonLoading = false;
+                ToastService.ShowInfo("Fight Completed", "");
+            }
         }
         catch (RpcException e)
         {
@@ -88,5 +136,13 @@
         {
             ToastService.ShowError(e.Message, ":(");
         }
+    }
+
+    private bool Filter(GrpcUserGetLeaderboardResponse res) => FilterImplementation(res, LeaderboardSearchString);
+    private bool FilterImplementation(GrpcUserGetLeaderboardResponse res, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        else if (res.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        else return false;
     }
 }

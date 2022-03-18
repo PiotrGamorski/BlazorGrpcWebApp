@@ -20,7 +20,7 @@ namespace BlazorGrpcWebApp.Client.Services
             _grpcUserService = grpcUserService;
         }
 
-        private Task BananasChanged()
+        public Task BananasChanged()
         {
             OnChange?.Invoke();
             return Task.CompletedTask;

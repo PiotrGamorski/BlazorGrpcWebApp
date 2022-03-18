@@ -5,6 +5,7 @@ package ArmyServiceGrpc;
 
 service ArmyServiceGrpc { 
 	rpc GrpcReviveArmy (GrpcReviveArmyRequest) returns (GrpcReviveArmyResponse) {}
+	rpc GrpcHealUnitGrpc (GrpcHealUnitRequest) returns (GrpcHealUnitResponse) {}
 } 
 
 message GrpcReviveArmyRequest {
@@ -12,6 +13,16 @@ message GrpcReviveArmyRequest {
 }
 
 message GrpcReviveArmyResponse {
+	bool success = 1;
+	string message = 2;
+}
+
+message GrpcHealUnitRequest {
+	int32 authUserId = 1;
+	int32 userUnitId = 2;
+}
+
+message GrpcHealUnitResponse {
 	bool success = 1;
 	string message = 2;
 }

@@ -4,6 +4,7 @@
     {
         event Action OnChange;
         int Bananas { get; set; }
+        Task BananasChanged();
         Task EatBananas(int amount);
         Task AddBananas (int amount);
         Task GrpcAddBananas(int amount);

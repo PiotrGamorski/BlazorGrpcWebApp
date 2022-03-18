@@ -27,6 +27,7 @@ message GrpcGetUserUnitRequest {
 }
 
 message GrpcGetUserUnitResponse {
-	int32 unitId = 1;
-	int32 hitPoints = 2;
+	int32 userunitId = 1;
+	int32 unitId = 2;
+	int32 hitPoints = 3;
 }

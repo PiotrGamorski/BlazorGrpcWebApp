@@ -2,8 +2,9 @@
 {
     public class MyUnit
     {
-        public string? img { get; set; }
-        public int hitPoints { get; set; }
-        public string? title { get; set; }
+        public int UserUnitId { get; set; }
+        public string? Img { get; set; }
+        public int HitPoints { get; set; }
+        public string? Title { get; set; }
     }
 }

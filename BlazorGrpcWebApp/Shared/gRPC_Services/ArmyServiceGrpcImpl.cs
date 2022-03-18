@@ -12,6 +12,47 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             _dataContext = dataContext;
         }
 
+        public override async Task<GrpcHealUnitResponse> GrpcHealUnitGrpc(GrpcHealUnitRequest request, ServerCallContext context)
+        {
+            var authUser = await _dataContext.Users.FindAsync(request.AuthUserId);
+            var userUnit = await _dataContext.UserUnits.FindAsync(request.UserUnitId);
+            var unit = await _dataContext.Units.FindAsync(userUnit!.UnitId);
+
+            var bananasCost = unit!.HitPoints - userUnit!.HitPoints;
+            if (bananasCost > authUser!.Bananas)
+            {
+                return new GrpcHealUnitResponse()
+                {
+                    Success = false,
+                    Message = $"Not enough bananas! You need { bananasCost } to heal this unit."
+                };
+            }
+
+            bool unitAlreadyHealed = true;
+            if (userUnit.HitPoints < userUnit.Unit.HitPoints)
+            {
+                unitAlreadyHealed = false;
+                userUnit.HitPoints = userUnit!.Unit.HitPoints;
+            }
+
+            if (unitAlreadyHealed)
+            {
+                return new GrpcHealUnitResponse()
+                {
+                    Success = false,
+                    Message = "Unit already healed."
+                };
+            }
+
+            authUser.Bananas -= bananasCost;
+            await _dataContext.SaveChangesAsync();
+            return new GrpcHealUnitResponse()
+            {
+                Success = true,
+                Message = "Your unit has been healed.",
+            };
+        }
+
         public override async Task<GrpcReviveArmyResponse> GrpcReviveArmy(GrpcReviveArmyRequest request, ServerCallContext context)
         {
             var authUser = await _dataContext.Users.FindAsync(request.AuthUserId);
@@ -22,11 +63,13 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
 
             int bananasCost = 1000;
             if (authUser!.Bananas < bananasCost)
+            {
                 return new GrpcReviveArmyResponse()
                 {
                     Success = false,
                     Message = $"Not enough bananas! You need { bananasCost } to revive your army."
                 };
+            }
 
             bool armyAlreadyAlive = true;
             foreach (var userUnit in userUnits)
@@ -39,11 +82,13 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             }
 
             if (armyAlreadyAlive)
+            {
                 return new GrpcReviveArmyResponse()
                 {
                     Success = false,
                     Message = "Your army is already alive.",
                 };
+            }
 
             authUser.Bananas -= bananasCost;
             await _dataContext.SaveChangesAsync();

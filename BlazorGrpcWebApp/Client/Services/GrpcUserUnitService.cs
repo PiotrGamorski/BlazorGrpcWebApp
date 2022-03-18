@@ -51,7 +51,8 @@ namespace BlazorGrpcWebApp.Client.Services
                 while (await response.ResponseStream.MoveNext())
                 {
                     result.Add(new UserUnitResponse()
-                    {
+                    {   
+                        UserUnitId = response.ResponseStream.Current.UserunitId,
                         UnitId = response.ResponseStream.Current.UnitId,
                         HitPoints = response.ResponseStream.Current.HitPoints,
                     });

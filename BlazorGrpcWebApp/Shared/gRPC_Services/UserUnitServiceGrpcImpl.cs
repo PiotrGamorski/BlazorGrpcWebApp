@@ -52,6 +52,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
                 {
                     await responseStream.WriteAsync(new GrpcGetUserUnitResponse()
                     {
+                        UserunitId = userUnit.Id,
                         UnitId = userUnit.UnitId,
                         HitPoints = userUnit.HitPoints,
                     });

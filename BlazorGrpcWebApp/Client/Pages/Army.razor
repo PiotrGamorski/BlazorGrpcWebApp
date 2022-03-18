@@ -3,6 +3,7 @@
 @inject IUnitService UnitService
 @inject IArmyService ArmyService
 @inject IGrpcUserUnitService GrpcUserUnitService
+@inject IBananaService BananaService
 @inject IToastService ToastService
 @attribute [Authorize]
 
@@ -11,27 +12,54 @@
        <MudCard>
            <MudCardHeader>
                 <MudText Typo="Typo.h4">My Army</MudText>
+                <MudSpacer/>
+                <MudTextField @bind-Value="ArmySearchString" 
+                              Placeholder="Search" 
+                              Adornment="Adornment.Start" 
+                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                              IconSize="Size.Medium" 
+                              Class="mt-0"/>
            </MudCardHeader>
            <MudCardContent>
                 @if (grpcUnitsResponses.Count > 0)
                 {
-                    <MudTable Items="@MyUnits" 
+                    <MudTable Items="@MyUnits"
+                              Filter="new Func<MyUnit, bool>(Filter)"
                               Hover="true" 
-                              RowsPerPage="10" 
+                              RowsPerPage="15" 
                               Dense="true" 
                               SortLabel="Sort By">
                         <HeaderContent>
                             <MudTh></MudTh>
+                            <MudTh></MudTh>
                             <MudTh>Title</MudTh>
                             <MudTh>Hit Points</MudTh>
+                            <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="Img"><img src=@($"{context.img}")/></MudTd>
-                            <MudTd DataLabel="Title">@context.title</MudTd>
-                            <MudTd DataLabel="Hit Points">@context.hitPoints</MudTd>
+                            <MudTd></MudTd>
+                            <MudTd DataLabel="Img"><img src=@($"{context.Img}")/></MudTd>
+                            <MudTd DataLabel="Title">@context.Title</MudTd>
+                            <MudTd DataLabel="Hit Points">@context.HitPoints</MudTd>
+                            <MudTd DataLabel="Actions">
+                                <div style="display: flex; justify-content:center">
+                                    <MudButton Variant="Variant.Filled"
+                                           Color="Color.Success"
+                                           Style="margin-right: 5px"
+                                           OnClick="async () => await HealUnitGrpc(context.UserUnitId)">Heal
+                                    </MudButton>
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Error">Delete
+                                </MudButton>
+                                </div>
+                            </MudTd>
                         </RowTemplate>
                         <PagerContent>
-                            <MudTablePager/>
+                            <MudTablePager />
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Info"
+                                       OnClick="async () => await ReviveArmyGrpc()">Revive Army
+                            </MudButton>
                         </PagerContent>
                     </MudTable>
                }
@@ -43,3 +71,17 @@
         </MudCard>
    </MudItem> 
 </MudGrid>
+
+@code
+{
+    private string ArmySearchString { get; set; } = string.Empty;
+    
+    private bool Filter(MyUnit myUnit) => FilterImplementation(myUnit, ArmySearchString);
+    private bool FilterImplementation(MyUnit myUnit, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        else if (myUnit.Title!.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        else if (myUnit.HitPoints.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        else return false;
+    }
+}

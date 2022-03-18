@@ -32,11 +32,14 @@ namespace BlazorGrpcWebApp.Client.Services
 
         public async Task DoGrpcGetLeaderboard()
         {
+            GrpcLeaderboardResponses = new List<GrpcUserGetLeaderboardResponse>();
             var response = _userServiceGrpcClient.GrpcUserGetLeaderboard(new GrpcUserGetLeaderboardRequest() { });
             while (await response.ResponseStream.MoveNext(new CancellationToken()))
-            { 
-                if(!GrpcLeaderboardResponses.Contains(response.ResponseStream.Current))
+            {
+                if (!GrpcLeaderboardResponses.Contains(response.ResponseStream.Current))
+                {
                     GrpcLeaderboardResponses.Add(response.ResponseStream.Current);
+                }
             }
         }
     }
