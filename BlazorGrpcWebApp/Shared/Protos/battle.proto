@@ -13,4 +13,5 @@ message GrpcStartBattleRequest {
 }
 
 message GrpcStartBattleResponse {
+	bool battleResult = 1;
 }

@@ -4,6 +4,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces
 {
     public interface IGrpcBattleService
     {
-        Task DoGrpcStartBattle(int opponentId);
+        Task<bool> DoGrpcStartBattle(int opponentId);
     }
 }

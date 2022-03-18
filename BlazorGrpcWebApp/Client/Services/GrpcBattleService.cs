@@ -22,16 +22,17 @@ namespace BlazorGrpcWebApp.Client.Services
         }
 
         [Authorize]
-        public async Task DoGrpcStartBattle(int opponentId)
+        public async Task<bool> DoGrpcStartBattle(int opponentId)
         {
             try
             {
                 var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
-                await _battleServiceGrpcClient.GrpcStartBattleAsync(new GrpcStartBattleRequest()
+                var result = await _battleServiceGrpcClient.GrpcStartBattleAsync(new GrpcStartBattleRequest()
                 {
                     AuthUserId = authUserId,
                     OppenentId = opponentId,
                 });
+                return result.BattleResult;
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
             {

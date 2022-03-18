@@ -78,6 +78,7 @@
     private int myUserId;
     private bool fightCompleted { get; set; }
     private bool buttonLoading { get; set; } = false;
+    private bool isVictorious { get; set; }
     private string LeaderboardSearchString { get; set; } = string.Empty;
     private IList<GrpcUserGetLeaderboardResponse> MyLeaderboard = new List<GrpcUserGetLeaderboardResponse>(); 
 
@@ -114,10 +115,9 @@
         fightCompleted = false;
         try
         {
-            await GrpcBattleService.DoGrpcStartBattle(opponentId);
+            isVictorious = await GrpcBattleService.DoGrpcStartBattle(opponentId);
             await LeaderboardService.DoGrpcGetLeaderboard();
             await PopulateMyLeaderBoard();
-            //StateHasChanged();
 
             fightCompleted = true;
             await BananaService.GrpcGetBananas();
@@ -125,7 +125,9 @@
             if (fightCompleted)
             {
                 buttonLoading = false;
-                ToastService.ShowInfo("Fight Completed", "");
+                if (isVictorious)
+                    ToastService.ShowSuccess("You've won!", "Success");
+                else ToastService.ShowError("You've lost", ":(");
             }
         }
         catch (RpcException e)

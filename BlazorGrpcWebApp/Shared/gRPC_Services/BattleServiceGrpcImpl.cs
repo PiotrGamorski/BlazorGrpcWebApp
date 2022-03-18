@@ -23,7 +23,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
 
             var result = new BattleResult();
             await Fight(attacker!, opponent, result);
-            return new GrpcStartBattleResponse();
+            return new GrpcStartBattleResponse() {  BattleResult = result.IsVictory};
         }
 
         private async Task Fight(User attacker, User opponent, BattleResult result)
