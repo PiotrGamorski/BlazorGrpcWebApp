@@ -5,13 +5,17 @@
 @inject IGrpcUserUnitService GrpcUserUnitService
 @inject IBananaService BananaService
 @inject IToastService ToastService
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 <MudGrid>
    <MudItem xs="12">
        <MudCard>
-           <MudCardHeader>
-                <MudText Typo="Typo.h4">My Army</MudText>
+           <MudCardHeader Style="border-bottom-color: white">
+                <MudText Typo="Typo.h5">
+                    <MudIcon Icon="@Icons.Filled.PeopleAlt" Size="Size.Medium" Style="margin-right: 5px"/>
+                    My Army
+                </MudText>
                 <MudSpacer/>
                 <MudTextField @bind-Value="ArmySearchString" 
                               Placeholder="Search" 
@@ -25,15 +29,25 @@
                 {
                     <MudTable Items="@MyUnits"
                               Filter="new Func<MyUnit, bool>(Filter)"
-                              Hover="true" 
                               RowsPerPage="15" 
+                              Hover="true"
                               Dense="true" 
                               SortLabel="Sort By">
                         <HeaderContent>
                             <MudTh></MudTh>
                             <MudTh></MudTh>
-                            <MudTh>Title</MudTh>
-                            <MudTh>Hit Points</MudTh>
+                            <MudTh>
+                                <MudTableSortLabel InitialDirection="SortDirection.None" 
+                                                   SortBy="new Func<MyUnit, object>(x => x.Title!)">
+                                Title                 
+                                </MudTableSortLabel>
+                            </MudTh>
+                            <MudTh>
+                                <MudTableSortLabel InitialDirection="SortDirection.Descending" 
+                                                   SortBy="new Func<MyUnit, object>(x => x.HitPoints!)">
+                                Hit Points                
+                                </MudTableSortLabel>
+                            </MudTh>
                             <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
@@ -46,10 +60,19 @@
                                     <MudButton Variant="Variant.Filled"
                                            Color="Color.Success"
                                            Style="margin-right: 5px"
-                                           OnClick="async () => await HealUnitGrpc(context.UserUnitId)">Heal
+                                           OnClick="async () => await HealUnitGrpc(context.UserUnitId)">
+                                           <MudTooltip Placement="Placement.Left" Text="Heals the unit to maximum hit points.">
+                                               <MudIcon Style="margin-right: 3px;" Icon="@Icons.Filled.HealthAndSafety"/>
+                                           </MudTooltip>
+                                           Heal
                                     </MudButton>
                                 <MudButton Variant="Variant.Filled"
-                                           Color="Color.Error">Delete
+                                           Color="Color.Error"
+                                           OnClick="async () => await ShowDeleteUserUnitDialog(context.UserUnitId)">         
+                                    Delete
+                                    <MudTooltip Placement="Placement.Right" Text="Permanetly deletes the unit.">
+                                        <MudIcon Style="margin-left: 3px;" Icon="@Icons.Filled.Delete"/>
+                                    </MudTooltip> 
                                 </MudButton>
                                 </div>
                             </MudTd>
@@ -58,7 +81,10 @@
                             <MudTablePager />
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Info"
-                                       OnClick="async () => await ReviveArmyGrpc()">Revive Army
+                                       OnClick="async () => await ShowReviveArmyDialog()">
+                                 <MudIcon Icon="@Icons.Filled.LocalHospital"
+                                                Style="margin-right: 3px"/>
+                                                Revive Army          
                             </MudButton>
                         </PagerContent>
                     </MudTable>

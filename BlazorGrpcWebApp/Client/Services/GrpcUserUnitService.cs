@@ -68,5 +68,17 @@ namespace BlazorGrpcWebApp.Client.Services
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<DeleteGrpcUserUnitResponse> DoDeleteUserUnitGrpc(int userUnitId)
+        {
+            var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
+            var response = await _userUnitServiceGrpcClient.DeleteGrpcUserUnitAsync(new DeleteGrpcUserUnitRequest()
+            {
+                UserUnitId = userUnitId,
+                AuthUserId = authUserId
+            });
+
+            return await Task.FromResult(response);
+        }
     }
 }

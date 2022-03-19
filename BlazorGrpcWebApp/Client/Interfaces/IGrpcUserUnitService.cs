@@ -7,5 +7,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces
     {
         Task<GrpcUserUnitResponse> DoGrpcBuildUserUnit(int unitId);
         Task<List<UserUnitResponse>> DoGrpcGetUserUnitAsync();
+        Task<DeleteGrpcUserUnitResponse> DoDeleteUserUnitGrpc(int userUnitId);
     }
 }

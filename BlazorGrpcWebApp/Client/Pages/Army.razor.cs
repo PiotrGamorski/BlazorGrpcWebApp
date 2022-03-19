@@ -1,8 +1,10 @@
-﻿using BlazorGrpcWebApp.Shared;
+﻿using BlazorGrpcWebApp.Client.Dialogs;
+using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Helpers;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -10,7 +12,7 @@ namespace BlazorGrpcWebApp.Client.Pages
     {
         private string? ImgPath { get; set; }
         private IList<GrpcUnitResponse> grpcUnitsResponses { get; set; } = new List<GrpcUnitResponse>();
-        private IList<MyUnit> MyUnits { get; set; }
+        private IList<MyUnit>? MyUnits { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -114,7 +116,7 @@ namespace BlazorGrpcWebApp.Client.Pages
                 ToastService.ShowError(healUnitResponse.Message, ":(");
         }
 
-        private async Task ReviveArmyGrpc()
+        public async Task ReviveArmyGrpc()
         {
             var reviveArmyResponse = await ArmyService.DoGrpcReviveArmy();
             await GetMyUnitsGrpc();
@@ -125,7 +127,39 @@ namespace BlazorGrpcWebApp.Client.Pages
                 ToastService.ShowSuccess(reviveArmyResponse.Message, "Success");
             else
                 ToastService.ShowError(reviveArmyResponse.Message, ":(");
+        }
 
+        public async Task DeleteUserUnitGrpc(int userUnitId)
+        {
+            var response = await GrpcUserUnitService.DoDeleteUserUnitGrpc(userUnitId);
+            await GetMyUnitsGrpc();
+            StateHasChanged();
+            await BananaService.GrpcGetBananas();
+            await BananaService.BananasChanged();
+            if (response.Success)
+                ToastService.ShowSuccess(response.Message, "Success");
+            else ToastService.ShowError(response.Message, ":(");
+        }
+
+        private Task ShowDeleteUserUnitDialog(int userUnitId)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Color", Color.Error);
+            parameters.Add("Page", this);
+            parameters.Add("UserUnitId", userUnitId);
+            var options = new DialogOptions() { CloseButton = false };
+            DialogService.Show<DeleteUserUnitDialog>("", parameters, options);
+            return Task.CompletedTask;
+        }
+
+        private Task ShowReviveArmyDialog()
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Color", Color.Error);
+            parameters.Add("Page", this);
+            var options = new DialogOptions() { CloseButton = false };
+            DialogService.Show<ReviveArmyDialog>("", parameters, options);
+            return Task.CompletedTask;
         }
     }
 }

@@ -60,5 +60,31 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             }
             else await responseStream.WriteAsync(new GrpcGetUserUnitResponse());
         }
+
+        public override async Task<DeleteGrpcUserUnitResponse> DeleteGrpcUserUnit(DeleteGrpcUserUnitRequest request, ServerCallContext context)
+        {
+            var authUser = await _dataContext.FindAsync<User>(request.AuthUserId);
+            var userUnitToDelete = await _dataContext.UserUnits.FindAsync(request.UserUnitId);
+            int bananasReward = userUnitToDelete!.HitPoints;
+
+            if (userUnitToDelete!.UserId == request.AuthUserId)
+            {
+                _dataContext.UserUnits.Remove(userUnitToDelete!);
+                authUser!.Bananas += bananasReward;
+                await _dataContext.SaveChangesAsync();
+
+                return new DeleteGrpcUserUnitResponse()
+                {
+                    Success = true,
+                    Message = $"Unit has been deleted. You gained {bananasReward} bananas!"
+                };
+            }
+
+            return new DeleteGrpcUserUnitResponse()
+            {
+                Success = false,
+                Message = "Something went wrong..."
+            };
+        }
     }
 }

@@ -1,0 +1,40 @@
+﻿<MudDialog Style="min-width: 400px; min-height: 100px;">
+    <DialogContent>
+        <MudForm>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Style="font-family:'Roboto'; margin-bottom: 15px">Do you really want to fight @UserName? </MudText>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">Yes</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] 
+    MudDialogInstance? MudDialog { get; set; }
+    [Parameter] 
+    public Color Color { get; set; }
+    [Parameter]
+    public Pages.Leaderboard? Page { get; set; }
+    [Parameter]
+    public int OpponentId { get; set; }
+    private string UserName { get; set; }
+
+    protected override void OnInitialized()
+    {
+        UserName = Page!.MyLeaderboard.Select(g => g.UserName).First();
+    }
+
+    private async Task Submit()
+    {
+        await Page!.FightOpponentGrpc(OpponentId);
+        if(Page.BattleCompleted)
+            MudDialog!.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog!.Cancel();
+}

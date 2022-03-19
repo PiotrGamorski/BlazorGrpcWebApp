@@ -1,0 +1,33 @@
+﻿<MudDialog Style="min-width: 400px; min-height: 100px;">
+    <DialogContent>
+        <MudForm>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Style="font-family:'Roboto'; margin-bottom: 15px">Do you really want to delete this unit? </MudText>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">Yes</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] 
+    MudDialogInstance? MudDialog { get; set; }
+    [Parameter] 
+    public Color Color { get; set; }
+    [Parameter]
+    public Pages.Army? Page { get; set; }
+    [Parameter]
+    public int UserUnitId { get; set; }
+
+    private async Task Submit()
+    {
+        await Page!.DeleteUserUnitGrpc(UserUnitId);
+            MudDialog!.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog!.Cancel();
+}
