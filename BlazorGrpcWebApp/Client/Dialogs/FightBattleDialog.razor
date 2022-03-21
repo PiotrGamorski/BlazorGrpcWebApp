@@ -22,11 +22,11 @@
     public Pages.Leaderboard? Page { get; set; }
     [Parameter]
     public int OpponentId { get; set; }
-    private string UserName { get; set; }
+    private string? UserName { get; set; }
 
     protected override void OnInitialized()
     {
-        UserName = Page!.MyLeaderboard.Select(g => g.UserName).First();
+        UserName = Page!.MyLeaderboard.FirstOrDefault(l => l.UserId == OpponentId)!.UserName;
     }
 
     private async Task Submit()

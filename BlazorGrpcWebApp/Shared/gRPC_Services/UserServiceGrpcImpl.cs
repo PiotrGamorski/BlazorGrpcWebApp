@@ -35,9 +35,18 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 DateCreated = request.GrpcUser.DateCreated.ToDateTime(),
                 IsConfirmed = request.GrpcUser.IsConfirmed,
                 IsDeleted = request.GrpcUser.IsDeleted,
-            };
+            };           
 
             await _dataContext.Users.AddAsync(userToBeSaved);
+            await _dataContext.SaveChangesAsync();
+
+            var startUnit = new UserUnit()
+            {
+                UserId = _dataContext.Users.Where(u => u.Email == userToBeSaved.Email).First().Id,
+                UnitId = request.StartUnitId,
+                HitPoints = (await _dataContext.FindAsync<Unit>(request.StartUnitId))!.HitPoints,
+            };
+            await _dataContext.UserUnits.AddAsync(startUnit);
             await _dataContext.SaveChangesAsync();
 
             return new RegisterGrpcUserResponse() { Data = request.GrpcUser.Id, Success = true, Message = "Registration successfull!" };

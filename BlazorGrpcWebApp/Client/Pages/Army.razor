@@ -59,6 +59,7 @@
                                 <div style="display: flex; justify-content:center">
                                     <MudButton Variant="Variant.Filled"
                                            Color="Color.Success"
+                                           Disabled="@(context.HitPoints == 100 ? true : false)"
                                            Style="margin-right: 5px"
                                            OnClick="async () => await HealUnitGrpc(context.UserUnitId)">
                                            <MudTooltip Placement="Placement.Left" Text="Heals the unit to maximum hit points.">
@@ -66,14 +67,14 @@
                                            </MudTooltip>
                                            Heal
                                     </MudButton>
-                                <MudButton Variant="Variant.Filled"
+                                    <MudButton Variant="Variant.Filled"
                                            Color="Color.Error"
                                            OnClick="async () => await ShowDeleteUserUnitDialog(context.UserUnitId)">         
-                                    Delete
-                                    <MudTooltip Placement="Placement.Right" Text="Permanetly deletes the unit.">
-                                        <MudIcon Style="margin-left: 3px;" Icon="@Icons.Filled.Delete"/>
-                                    </MudTooltip> 
-                                </MudButton>
+                                        Delete
+                                        <MudTooltip Placement="Placement.Right" Text="Permanetly deletes the unit.">
+                                            <MudIcon Style="margin-left: 3px;" Icon="@Icons.Filled.Delete"/>
+                                        </MudTooltip> 
+                                    </MudButton>
                                 </div>
                             </MudTd>
                         </RowTemplate>
@@ -82,9 +83,11 @@
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Info"
                                        OnClick="async () => await ShowReviveArmyDialog()">
-                                 <MudIcon Icon="@Icons.Filled.LocalHospital"
-                                                Style="margin-right: 3px"/>
-                                                Revive Army          
+                                 <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
+                                    <MudIcon Icon="@Icons.Filled.LocalHospital"
+                                             Style="margin-right: 3px"/>
+                                    </MudTooltip>
+                                    Revive Army          
                             </MudButton>
                         </PagerContent>
                     </MudTable>

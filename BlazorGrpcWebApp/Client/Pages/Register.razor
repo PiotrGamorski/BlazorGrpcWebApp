@@ -64,7 +64,7 @@
                     @foreach(var unit in grpcUnitsResponses)
                     {
                         <MudSelectItem Value="@unit.GrpcUnit.Id">
-                            <span style="font-family: Sans-Serif; font-size:initial">@unit.GrpcUnit.Title</span>
+                            <span style="font-family: Roboto; font-size:initial">@unit.GrpcUnit.Title</span>
                         </MudSelectItem>
                     }
                 </MudSelect>
@@ -78,25 +78,26 @@
                 <br/>
                 <MudDatePicker Label="Select your Date of Birth"
                                Variant="Variant.Outlined"
+                               Style="font-family: Roboto;"
                                Editable="true"
                                Rounded="true"
                                PickerVariant="PickerVariant.Inline"
                                Elevation="1"
-                               Color="Color.Info"
+                               Color="Color.Error"
                                @bind-Date="date"
                                 />
                 <br/>
                 <div class="d-flex">
                 <MudSwitch @bind-Checked="userRegister.IsConfirmed" 
                            Class="mud-width-full" 
-                           Color="Color.Info">
-                    <MudText Style="font-family:sans-serif; font-size:smaller">Confirmed</MudText>
+                           Color="Color.Error">
+                    <MudText Style="font-family: Roboto; font-size:smaller">Confirmed</MudText>
                 </MudSwitch>
                 </div>
                 <MudCardActions>
-                    <MudButton OnClick="async () => await HandleRegistrationGrpc()" 
+                    <MudButton OnClick="async () => await HandleRegistrationGrpc(userRegister.StartUnitId)" 
                                Variant="Variant.Filled" 
-                               Color="Color.Info" 
+                               Color="Color.Error" 
                                Disabled="@(!success)"
                                Class="ml-auto">
                                Register
@@ -147,10 +148,10 @@
     }
 
     // uses Grpc Calls
-    private async Task HandleRegistrationGrpc()
+    private async Task HandleRegistrationGrpc(int startUnitId)
     {
         userRegister.DateOfBirth = (DateTime) date!;
-        var result = await GrpcUserService.Register(userRegister, grpcRegisterDeadline);
+        var result = await GrpcUserService.Register(userRegister, startUnitId, grpcRegisterDeadline);
         if (result.Success)
         {
             ToastService.ShowSuccess(result.Message);

@@ -7,7 +7,7 @@ namespace BlazorGrpcWebApp.Client.Interfaces
     {
         Task<GrpcUserExistsResponse> DoGrpcUserExists(GrpcUserExistsRequest request);
         Task<RegisterGrpcUserResponse> DoGrpcUserRegister(RegisterGrpcUserRequest request, int deadline);
-        Task<RegisterGrpcUserResponse> Register(UserRegister request, int deadline);
+        Task<RegisterGrpcUserResponse> Register(UserRegister request, int startUnitId, int deadline);
         Task<LoginGrpcUserRespone> DoGrpcUserLogin(LoginGrpcUserRequest request, int deadline);
         Task<GrpcUserBananasResponse> DoGrpcGetUserBananas(GrpcUserBananasRequest request);
         Task<GrpcUserAddBananasResponse> DoGrpcUserAddBananas(GrpcUserAddBananasRequest request);

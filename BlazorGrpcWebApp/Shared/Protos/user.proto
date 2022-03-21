@@ -37,6 +37,7 @@ message GrpcUserExistsResponse {
 message RegisterGrpcUserRequest {
 	GrpcUser grpcUser = 1;
 	string password = 2;
+	int32 startUnitId = 3;
 }
 
 message RegisterGrpcUserResponse {

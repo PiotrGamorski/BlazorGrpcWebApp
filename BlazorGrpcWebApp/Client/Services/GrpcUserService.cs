@@ -19,7 +19,7 @@ namespace BlazorGrpcWebApp.Client.Services
             _userServiceGrpcClient = new UserServiceGrpc.UserServiceGrpcClient(_channel);
         }
 
-        public async Task<RegisterGrpcUserResponse> Register(UserRegister request, int deadline)
+        public async Task<RegisterGrpcUserResponse> Register(UserRegister request, int startUnitId, int deadline)
         {
             return await DoGrpcUserRegister(new RegisterGrpcUserRequest()
             { 
@@ -33,6 +33,7 @@ namespace BlazorGrpcWebApp.Client.Services
                    DateCreated = Timestamp.FromDateTime(DateTime.UtcNow),
                 },
                 Password = request.Password,
+                StartUnitId = startUnitId,
             }, deadline);
         }
 
