@@ -25,5 +25,6 @@ namespace BlazorGrpcWebApp.Shared.Data
         public DbSet<User> Users { get; set; }
         public DbSet<UserUnit> UserUnits { get; set; }
         public DbSet<Battle> Battles { get; set; }
+        public DbSet<BattleLog> BattleLogs { get; set; }
     }
 }

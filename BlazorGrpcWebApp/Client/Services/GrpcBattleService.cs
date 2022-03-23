@@ -1,5 +1,6 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Models;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
@@ -13,6 +14,9 @@ namespace BlazorGrpcWebApp.Client.Services
         private readonly GrpcChannel _channel;
         private BattleServiceGrpc.BattleServiceGrpcClient _battleServiceGrpcClient;
         private readonly HttpClient _httpClient;
+
+        public List<string> LastBattleLogs { get; set; } = new List<string>();
+
         public GrpcBattleService(HttpClient httpClient)
         {
             var httpClientGrpc = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
@@ -32,6 +36,11 @@ namespace BlazorGrpcWebApp.Client.Services
                     AuthUserId = authUserId,
                     OppenentId = opponentId,
                 });
+                //var temp = result.Logs.ToList<string>();
+                //foreach (var log in temp)
+                //{ 
+                //    LastBattleLogs.Add(log);
+                //}
                 return result.BattleResult;
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)

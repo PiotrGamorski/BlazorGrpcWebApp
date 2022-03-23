@@ -14,4 +14,5 @@ message GrpcStartBattleRequest {
 
 message GrpcStartBattleResponse {
 	bool battleResult = 1;
+	repeated string logs = 2;
 }

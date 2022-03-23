@@ -23,7 +23,17 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
 
             var result = new BattleResult();
             await Fight(attacker!, opponent, result);
-            return new GrpcStartBattleResponse() {  BattleResult = result.IsVictory};
+
+            if (result.Log.Count > 0)
+            {
+                await StoreBattleLogs(attacker!, opponent, result);
+                await _dataContext.SaveChangesAsync();
+            }
+
+            var grpcStartBattleResponse = new GrpcStartBattleResponse();
+            grpcStartBattleResponse.BattleResult = result.IsVictory;
+            grpcStartBattleResponse.Logs.Add(result.Log);
+            return grpcStartBattleResponse;
         }
 
         private async Task Fight(User attacker, User opponent, BattleResult result)
@@ -128,5 +138,30 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
 
             await _dataContext.Battles.AddAsync(Battle);
         }
+
+        private async Task StoreBattleLogs(User attacker, User opponent, BattleResult result)
+        {
+            var currentBattle = await _dataContext.Battles
+                .OrderBy(b => b.Id)
+                .LastOrDefaultAsync(b => b.AttackerId == attacker.Id && b.OpponentId == opponent.Id);
+
+            var battleLogsToDelete = await _dataContext.BattleLogs
+                .Where(b => b.BattleId != currentBattle!.Id && b.AttackerId == attacker.Id && b.OpponentId == opponent.Id)
+                .ToListAsync();
+
+            _dataContext.BattleLogs.RemoveRange(battleLogsToDelete);
+            await _dataContext.SaveChangesAsync();
+
+            foreach (var log in result.Log)
+            {
+                await _dataContext.BattleLogs.AddAsync(new BattleLog() 
+                { 
+                    Battle = currentBattle!,
+                    Attacker = attacker,
+                    Opponent = opponent,
+                    Log = log
+                });
+            }
+        }
     }
-}
+}   

@@ -14,6 +14,7 @@ namespace BlazorGrpcWebApp.Client.Services
         private readonly HttpClient _httpClient;
         private readonly GrpcChannel _channel;
         private UserServiceGrpc.UserServiceGrpcClient _userServiceGrpcClient;
+
         public LeaderboardService(HttpClient httpClient)
         {
             _httpClient = httpClient;
