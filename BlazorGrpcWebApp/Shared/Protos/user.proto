@@ -84,4 +84,5 @@ message GrpcUserGetLeaderboardResponse{
 	int32 battles = 4;
 	int32 victories = 5;
 	int32 defeats = 6;
+	bool showLogs = 7;
 }

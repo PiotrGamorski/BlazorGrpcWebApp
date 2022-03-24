@@ -13,7 +13,7 @@ namespace BlazorGrpcWebApp.Client.Pages
         public bool BattleCompleted { get; set; }
         private bool IsVictorious { get; set; }
         private string LeaderboardSearchString { get; set; } = string.Empty;
-        public IList<GrpcUserGetLeaderboardResponse> MyLeaderboard = new List<GrpcUserGetLeaderboardResponse>();
+        public IList<GrpcUserGetLeaderboardResponse> MyLeaderboard { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -34,13 +34,16 @@ namespace BlazorGrpcWebApp.Client.Pages
                 return string.Empty;
         }
 
-        private Task PopulateMyLeaderBoard()
+        private async Task PopulateMyLeaderBoard()
         {
             foreach (var item in LeaderboardService.GrpcLeaderboardResponses)
             {
                 MyLeaderboard.Add(item);
             }
-            return Task.CompletedTask;
+            foreach (var item in MyLeaderboard)
+            {
+                item.ShowLogs = await LeaderboardService.DoGrpcShowBattleLogs(item.UserId);
+            }
         }
 
         private Task OpenFightBattleDialog(int opponentId)
@@ -85,6 +88,22 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
         }
 
+        public async Task<List<string>> GetBattleLogs(int opponentId)
+        { 
+            return await LeaderboardService.DoGrpcGetBattleLogs(opponentId);
+        }
+
+        private Task OpenBattleLogsDialog(int opponentId)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Color", Color.Error);
+            parameters.Add("Page", this);
+            parameters.Add("OpponentId", opponentId);
+            var options = new DialogOptions() { CloseButton = false };
+            DialogService.Show<BattleLogsDialog>("", parameters, options);
+            return Task.CompletedTask;
+        }
+
         private bool Filter(GrpcUserGetLeaderboardResponse res) => FilterImplementation(res, LeaderboardSearchString);
         private bool FilterImplementation(GrpcUserGetLeaderboardResponse res, string searchString)
         {
@@ -92,5 +111,6 @@ namespace BlazorGrpcWebApp.Client.Pages
             else if (res.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
             else return false;
         }
+
     }
 }

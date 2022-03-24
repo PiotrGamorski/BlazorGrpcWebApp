@@ -47,14 +47,39 @@
                             <MudTd DataLabel="Defeats" Style="@GetMyUserStyle(context.UserId)">@context.Defeats</MudTd>
                             <MudTd DataLabel="Battles" Style="@GetMyUserStyle(context.UserId)">@context.Battles</MudTd>
                             <MudTd DataLabel="Fight">
-                                        @if (context.UserId != myUserId)
-                                        {
-                                        <MudButton Color="Color.Error" 
-                                                   Variant="Variant.Filled"
-                                                   OnClick="async () => await OpenFightBattleDialog(context.UserId)">
-                                                   Fight
+                                @if (context.UserId != myUserId)
+                                {
+                                    <MudButton Color="Color.Error" 
+                                               Variant="Variant.Filled"
+                                               Style="margin-right: 3px;"
+                                               OnClick="async () => await OpenFightBattleDialog(context.UserId)">
+                                               <MudTooltip Placement="Placement.Left" Text=@($"Fights against {context.UserName}")>
+                                                    <MudIcon Icon="@Icons.Filled.AccountBox" Size="Size.Medium" Style="margin-right: 5px"/>
+                                               </MudTooltip>
+                                               Fight
+                                    </MudButton>
+                                    if (context.ShowLogs)
+                                    {
+                                        <MudButton Color="Color.Info" 
+                                               Variant="Variant.Filled"
+                                               OnClick="async () => await OpenBattleLogsDialog(context.UserId)">
+                                               Battle Logs
+                                               <MudTooltip Placement="Placement.Right" Text="Shows Battle Logs">
+                                                    <MudIcon Icon="@Icons.Filled.List" Size="Size.Medium" Style="margin-left: 5px"/>
+                                               </MudTooltip>
                                         </MudButton>
-                                        }
+                                    }
+                                    else
+                                    {
+                                    <MudTooltip Placement="Placement.Right" Text=@($"You haven't fought {context.UserName} yet")>
+                                        <MudButton Color="Color.Info" 
+                                                   Variant="Variant.Filled"
+                                                   Disabled="true">
+                                                   Not Yet Fought
+                                        </MudButton>
+                                    </MudTooltip>
+                                    }
+                                }            
                             </MudTd>
                         </RowTemplate>
                         <PagerContent>

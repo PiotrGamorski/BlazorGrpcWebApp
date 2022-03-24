@@ -9,5 +9,7 @@ namespace BlazorGrpcWebApp.Client.Interfaces
         IList<GrpcUserGetLeaderboardResponse> GrpcLeaderboardResponses { get; set; }
         Task GetLeaderboardRestApi();
         Task DoGrpcGetLeaderboard();
+        Task<bool> DoGrpcShowBattleLogs(int opponentId);
+        Task<List<string>> DoGrpcGetBattleLogs(int opponentId);
     }
 }

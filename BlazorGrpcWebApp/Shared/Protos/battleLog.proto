@@ -1,0 +1,27 @@
+﻿syntax = "proto3"; 
+
+option csharp_namespace = "BlazorGrpcWebApp.Shared";
+package BattleLogServiceGrpc; 
+
+service BattleLogServiceGrpc { 
+	rpc GrpcShowBattleLogs (GrpcShowBattleLogsRequest) returns (GrpcShowBattleLogsResponse) {}
+	rpc GrpcGetBattleLogs (GrpcGetBattleLogsRequest) returns (stream GrpcGetBattlelogsResponse) {}
+} 
+
+message GrpcShowBattleLogsRequest {
+	int32 authUserId = 1;
+	int32 oppenentId = 2;
+}
+
+message GrpcShowBattleLogsResponse {
+	bool show = 1;
+}
+
+message GrpcGetBattleLogsRequest {
+	int32 authUserId = 1;
+	int32 oppenentId = 2;
+}
+
+message GrpcGetBattlelogsResponse {
+	string log = 1;
+}

@@ -1,0 +1,52 @@
+﻿<MudDialog Style="min-width: 500px; max-height: 800px; overflow: auto;">
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="font-family:'Roboto';">
+            Battle Logs
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTable Items="@BattleLogs"
+                          Hover="true"
+                          RowsPerPage="15" 
+                          Dense="true" 
+                          SortLabel="Sort By">
+                    <HeaderContent>
+                        <MudTh></MudTh>
+                        <MudTh></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd></MudTd>
+                        <MudTd DataLabel="Log">@context</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel"
+                   Variant="Variant.Filled"
+                   Color="Color.Error">
+                   Close
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] 
+    MudDialogInstance? MudDialog { get; set; }
+    [Parameter] 
+    public Color Color { get; set; }
+    [Parameter]
+    public Pages.Leaderboard? Page { get; set; }
+    [Parameter]
+    public int OpponentId { get; set; }
+    private List<string> BattleLogs { get; set; } =  new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        BattleLogs = await Page!.GetBattleLogs(OpponentId);
+    }
+
+    void Cancel() => MudDialog!.Cancel();
+}

@@ -36,11 +36,7 @@ namespace BlazorGrpcWebApp.Client.Services
                     AuthUserId = authUserId,
                     OppenentId = opponentId,
                 });
-                //var temp = result.Logs.ToList<string>();
-                //foreach (var log in temp)
-                //{ 
-                //    LastBattleLogs.Add(log);
-                //}
+
                 return result.BattleResult;
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
