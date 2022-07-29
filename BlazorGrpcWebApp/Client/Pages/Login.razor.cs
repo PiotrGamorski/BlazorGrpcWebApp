@@ -7,8 +7,15 @@ namespace BlazorGrpcWebApp.Client.Pages
     public partial class Login
     {
         public bool isAuthenticated = false;
+        private int grpcLoginDeadline { get; set; } = 50000;
         private UserLogin userLogin = new UserLogin();
-        public int grpcLoginDeadline { get; set; } = 50000;
+        
+
+        protected override Task OnInitializedAsync()
+        {
+            userLogin = new UserLogin();
+            return Task.CompletedTask;
+        }
 
         private async Task HandleLogin()
         {
