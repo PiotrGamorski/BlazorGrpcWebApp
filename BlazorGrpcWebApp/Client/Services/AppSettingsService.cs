@@ -11,9 +11,14 @@ namespace BlazorGrpcWebApp.Client.Services
             _configuration = configuration;
         }
 
-        public bool GetValueBySection(string sectionFullPath)
+        public string GetValueFromPagesSec(string pageName)
         {
-            return bool.Parse(_configuration[sectionFullPath]);
+            return _configuration[$"Settings:Pages:{pageName}:gRPC"];
+        }
+
+        public string GetValueFromSharedSec(string componentName)
+        {
+            return _configuration[$"Settings:Shared:{componentName}:gRPC"];
         }
     }
 }

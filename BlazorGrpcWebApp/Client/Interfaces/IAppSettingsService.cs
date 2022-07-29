@@ -2,6 +2,7 @@
 {
     public interface IAppSettingsService
     {
-        bool GetValueBySection(string sectionFullPath);
+        string GetValueFromSharedSec(string componentName);
+        string GetValueFromPagesSec(string pageName);
     }
 }

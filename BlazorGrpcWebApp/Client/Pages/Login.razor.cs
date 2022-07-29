@@ -10,7 +10,14 @@ namespace BlazorGrpcWebApp.Client.Pages
         private UserLogin userLogin = new UserLogin();
         public int grpcLoginDeadline { get; set; } = 50000;
 
-        private async Task HandleLoginRestApi()
+        private async Task HandleLogin()
+        {
+            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Login")))
+                await HandleLoginWithGrpc();
+            else await HandleLoginWithRest();
+        }
+
+        private async Task HandleLoginWithRest()
         {
             if (!string.IsNullOrEmpty(userLogin.Email) && !string.IsNullOrEmpty(userLogin.Password))
             {
@@ -45,7 +52,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
         }
 
-        private async Task HandleLoginGrpc()
+        private async Task HandleLoginWithGrpc()
         {
             if (!string.IsNullOrEmpty(userLogin.Email) && !string.IsNullOrEmpty(userLogin.Password))
             {

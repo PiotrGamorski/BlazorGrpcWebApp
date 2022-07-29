@@ -11,7 +11,7 @@
 @code {
     public async Task IncreaseBananaCount()
     {
-        if(AppSettingsService.GetValueBySection("Settings:Shared:AddBananas:gRPC"))
+        if(bool.Parse(AppSettingsService.GetValueFromSharedSec("AddBananas")))
             await BananaService.GrpcAddBananas(10);
         else await BananaService.AddBananas(10);
     }

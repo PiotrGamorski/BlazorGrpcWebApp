@@ -1,12 +1,13 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IAppSettingsService AppSettingsService
 @inject ILogoutNavMenuService LogoutService
 @inject IAuthService AuthService
 @inject IGrpcUserService GrpcUserService
 @inject IToastService ToastService
-@inject NavigationManager NavigationManager
 
  Please log in below or <a href="register">register</a> for a new account.
  <br/>
@@ -36,7 +37,7 @@
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
-                               OnClick="async () => await HandleLoginGrpc()">
+                               OnClick="async () => await HandleLogin()">
                                Login
                     </MudButton>
                 </MudCardActions>
