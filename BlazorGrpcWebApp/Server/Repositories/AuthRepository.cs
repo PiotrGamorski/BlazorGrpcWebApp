@@ -22,7 +22,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
         public async Task<GenericAuthResponse<string>> Login(string email, string password)
         {
             var response = new GenericAuthResponse<string>();
-            var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+            var user = await _dataContext!.Users.FirstOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
             if (user == null)
             {
                 response.Success = false;
@@ -53,7 +53,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
 
-                await _dataContext.Users.AddAsync(user);
+                await _dataContext!.Users.AddAsync(user);
                 await _dataContext.SaveChangesAsync();
                 return new GenericAuthResponse<int>() { Data = user.Id, Success = true, Message = "Registration successfull!" };
             }
@@ -65,7 +65,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
 
         public async Task<bool> UserExists(string email)
         {
-            if (await _dataContext.Users.AnyAsync(user => user.Email.ToLower() == (email.ToLower())))
+            if (await _dataContext!.Users.AnyAsync(user => user.Email.ToLower() == (email.ToLower())))
                 return true;
 
             return false;

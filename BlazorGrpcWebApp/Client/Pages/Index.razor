@@ -2,10 +2,10 @@
 
 <AuthorizeView>
     <Authorized>
-        <h1>Hi, @context.User.Identity!.Name. Welcome back!</h1>
+        <MudText Typo="Typo.h3">Hi, @context.User.Identity!.Name. Welcome back!</MudText>
         Let's admire your <a href="army">army</a>.
     </Authorized>
     <NotAuthorized>
-        <h1>Welcome to Blazor Battles!</h1>
+        <MudText Typo="Typo.h3">Welcome to Blazor Battles!</MudText>
     </NotAuthorized>
 </AuthorizeView>

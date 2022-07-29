@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Server.Services;
 using BlazorGrpcWebApp.Shared.gRPC_Services;
+using BlazorGrpcWebApp.Server.EntitySeeder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,13 +16,18 @@ var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-// Add services to the container.
+if (bool.Parse(configuration.GetSection("AppSettings:DbMigrationsMode").Value))
+    builder.Services.AddDbContext<DataContextForMigrations>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+        options => options.MigrationsAssembly("BlazorGrpcWebApp.Server")));
+else
+    builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+        options => options.MigrationsAssembly("BlazorGrpcWebApp.Server")));
+
+builder.Services.AddTransient<ISeeder, EntitySeeder>();
 builder.Services.AddGrpc();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                                           options => options.MigrationsAssembly("BlazorGrpcWebApp.Server")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -37,6 +43,16 @@ builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var app = builder.Build();
+if (args.Length == 1 && args[0].ToLower() == "seeddata" && 
+    bool.Parse(configuration.GetSection("AppSettings:DbMigrationsMode").Value))
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+    using (var scope = scopedFactory!.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetService<ISeeder>();
+        service!.Seed();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

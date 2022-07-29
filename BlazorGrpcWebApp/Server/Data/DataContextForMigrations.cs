@@ -7,9 +7,7 @@ namespace BlazorGrpcWebApp.Server
     // Place context in Program.cs and change context in related services.
     public class DataContextForMigrations : DbContext
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public DataContextForMigrations(DbContextOptions<DataContextForMigrations> options) : base(options) {}
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

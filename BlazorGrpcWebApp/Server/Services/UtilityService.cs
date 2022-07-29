@@ -12,11 +12,11 @@ namespace BlazorGrpcWebApp.Server.Services
         // as this class does not inherit from ComponentBase in comparison to Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DataContext _dataContext;
-        
+
         public UtilityService(IHttpContextAccessor httpContextAccessor, DataContext dataContext)
         {
-            _dataContext = dataContext;
             _httpContextAccessor = httpContextAccessor;
+            _dataContext = dataContext;
         }
 
         public int GetUserUserId() => int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier));
