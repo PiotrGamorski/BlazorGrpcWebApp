@@ -1,5 +1,4 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces;
-using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Models;
 using System.Net.Http.Json;
 

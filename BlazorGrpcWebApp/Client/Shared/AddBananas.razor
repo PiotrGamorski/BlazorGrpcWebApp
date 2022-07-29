@@ -1,4 +1,5 @@
 ﻿@inject IBananaService BananaService
+@inject IAppSettingsService AppSettingsService
 
 <MudButton  @onclick="IncreaseBananaCount" 
             Size="Size.Small"
@@ -10,7 +11,8 @@
 @code {
     public async Task IncreaseBananaCount()
     {
-        //await BananaService.AddBananas(10);
-        await BananaService.GrpcAddBananas(10);
+        if(AppSettingsService.GetValueBySection("Settings:Shared:AddBananas:gRPC"))
+            await BananaService.GrpcAddBananas(10);
+        else await BananaService.AddBananas(10);
     }
 }

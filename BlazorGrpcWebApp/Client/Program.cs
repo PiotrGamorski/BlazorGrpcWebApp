@@ -24,8 +24,13 @@ builder.Services.AddSingleton(services =>
 	return new WeatherForecasts.WeatherForecastsClient(channel);
 });
 
-builder.Services.AddBlazoredToast();
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+var httpClient = new HttpClient() { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
+builder.Services.AddScoped(sp => httpClient);
+using var response = await httpClient.GetAsync("appsettings.json");
+using var stream = await response.Content.ReadAsStreamAsync();
+
+builder.Configuration.AddJsonStream(stream);
+builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
 builder.Services.AddScoped<IBananaService, BananaService>();
 builder.Services.AddScoped<IArmyService, ArmyService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
@@ -40,5 +45,6 @@ builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddMudServices();
+builder.Services.AddBlazoredToast();
 
 await builder.Build().RunAsync();
