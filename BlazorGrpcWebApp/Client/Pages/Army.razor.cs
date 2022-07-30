@@ -157,7 +157,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task ReviveArmyWithRest()
         {
-            var result = await ArmyRestService.ReviveArmy();
+            var result = await ArmyRestService.ReviveUserUnits();
 
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
             {

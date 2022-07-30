@@ -7,6 +7,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces.Rest
         Task<List<UserUnitDto>> GetUserUnits();
         Task<HttpResponseMessage> HealUserUnit(int userUnitId);
         Task<HttpResponseMessage> DeleteUserUnit(int userUnitId);
-        Task<HttpResponseMessage> ReviveArmy();
+        Task<HttpResponseMessage> ReviveUserUnits();
     }
 }

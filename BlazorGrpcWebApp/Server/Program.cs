@@ -41,6 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<IBattleService, BattleService>();
 
 var app = builder.Build();
 if (args.Length == 1 && args[0].ToLower() == "seeddata" && 

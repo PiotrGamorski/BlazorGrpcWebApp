@@ -25,9 +25,9 @@ namespace BlazorGrpcWebApp.Client.Services.Rest
             return result;
         }
 
-        public async Task<HttpResponseMessage> ReviveArmy()
+        public async Task<HttpResponseMessage> ReviveUserUnits()
         {
-            var result = await _httpClient.PostAsJsonAsync<string>("api/battle/reviveArmy", null!);
+            var result = await _httpClient.GetAsync("api/userunit/reviveUserUnits");
             return result;
         }
 
