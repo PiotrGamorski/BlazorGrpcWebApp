@@ -28,8 +28,8 @@ namespace BlazorGrpcWebApp.Client.Pages
             {
                 try
                 {
-                    var result = await AuthService.Login(userLogin);
-                    if (result.Success)
+                    var result = await AuthProvider.Login(userLogin);
+                    if (result!.Success)
                     {
                         try
                         {

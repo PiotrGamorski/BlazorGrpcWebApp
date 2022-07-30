@@ -1,11 +1,12 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
+@using BlazorGrpcWebApp.Client.Interfaces.Providers.Rest
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IAppSettingsService AppSettingsService
+@inject IAuthRestProvider AuthProvider
 @inject ILogoutNavMenuService LogoutService
-@inject IAuthService AuthService
 @inject IGrpcUserService GrpcUserService
 @inject IToastService ToastService
 

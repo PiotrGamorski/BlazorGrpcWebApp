@@ -1,10 +1,11 @@
 ﻿@page "/register"
 @using BlazorGrpcWebApp.Client.Interfaces
+@using BlazorGrpcWebApp.Client.Interfaces.Providers.Rest
 @using Grpc.Core
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
 @inject IUnitService UnitService
-@inject IAuthService AuthService
+@inject IAuthRestProvider AuthProvider
 @inject IGrpcUserService GrpcUserService
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
@@ -115,7 +116,7 @@
 
     private UserRegister userRegister = new UserRegister();
     private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
-    private int grpcRegisterDeadline { get; set; } = 3000;
+    private int grpcRegisterDeadline { get; set; } = 5000;
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,8 +139,8 @@
     // uses REST Api
     private async Task HandleRegistrationRestApi()
     {
-        var result = await AuthService.Register(userRegister);
-        if (result.Success)
+        var result = await AuthProvider.Register(userRegister);
+        if (result!.Success)
         {
             ToastService.ShowSuccess(result.Message);
             NavigationManager.NavigateTo("/");

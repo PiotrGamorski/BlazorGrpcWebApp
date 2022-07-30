@@ -12,6 +12,8 @@ using Blazored.SessionStorage;
 using MudBlazor.Services;
 using BlazorGrpcWebApp.Client.Services;
 using BlazorGrpcWebApp.Client.Authentication;
+using BlazorGrpcWebApp.Client.Interfaces.Providers.Rest;
+using BlazorGrpcWebApp.Client.Providers.Rest;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -30,17 +32,17 @@ using var response = await httpClient.GetAsync("appsettings.json");
 using var stream = await response.Content.ReadAsStreamAsync();
 
 builder.Configuration.AddJsonStream(stream);
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddScoped<IAuthRestProvider, AuthRestProvider>();
 builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
 builder.Services.AddScoped<IBananaService, BananaService>();
 builder.Services.AddScoped<IArmyService, ArmyService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ILogoutNavMenuService, LogoutNavMenuService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGrpcUserService, GrpcUserService>();
 builder.Services.AddScoped<IGrpcUserUnitService, GrpcUserUnitService>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddScoped<IGrpcBattleService, GrpcBattleService>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredSessionStorage();
