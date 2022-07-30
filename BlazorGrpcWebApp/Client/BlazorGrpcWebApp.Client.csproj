@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Shared\BlazorGrpcWebApp.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Grpc\" />
-  </ItemGroup>
-
 </Project>

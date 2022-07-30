@@ -1,20 +1,19 @@
-﻿using BlazorGrpcWebApp.Client.Interfaces;
+﻿using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Dtos;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Json;
 
-namespace BlazorGrpcWebApp.Client.Services
+namespace BlazorGrpcWebApp.Client.Services.Grpc
 {
-    public class ArmyService : IArmyService
+    public class ArmyGrpcService : IArmyGrpcService
     {
         private readonly GrpcChannel _channel;
         private ArmyServiceGrpc.ArmyServiceGrpcClient _armyServiceGrpcClient;
         private readonly HttpClient _httpClient;
 
-        public ArmyService(HttpClient httpClient)
+        public ArmyGrpcService(HttpClient httpClient)
         {
             var httpClientGrpc = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
             _channel = GrpcChannel.ForAddress("https://localhost:7039", new GrpcChannelOptions { HttpClient = httpClientGrpc });
@@ -23,25 +22,11 @@ namespace BlazorGrpcWebApp.Client.Services
         }
 
         [Authorize]
-        public async Task<List<UserUnitDto>> RestApiGetUserUnits()
-        {
-            var result = await _httpClient.GetFromJsonAsync<List<UserUnitDto>>("api/userunit");
-            return result!;
-        }
-
-        [Authorize]
-        public async Task<HttpResponseMessage> RestApiReviveArmy()
-        {
-            var result = await _httpClient.PostAsJsonAsync<string>("api/battle/reviveArmy", null!);
-            return result;
-        }
-
-        [Authorize]
         public async Task<GrpcHealUnitResponse> DoGrpcHealUnit(int userUnitId)
         {
             var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
-            var result = await _armyServiceGrpcClient.GrpcHealUnitGrpcAsync(new GrpcHealUnitRequest() 
-            { 
+            var result = await _armyServiceGrpcClient.GrpcHealUnitGrpcAsync(new GrpcHealUnitRequest()
+            {
                 AuthUserId = authUserId,
                 UserUnitId = userUnitId
             });

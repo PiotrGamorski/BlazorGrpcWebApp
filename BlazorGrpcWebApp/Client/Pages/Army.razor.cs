@@ -108,7 +108,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task ReviveArmy()
         {
-            var result = await ArmyService.RestApiReviveArmy();
+            var result = await ArmyRestService.ReviveArmy();
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
                 ToastService.ShowSuccess(await result.Content.ReadAsStringAsync());
             else
@@ -157,7 +157,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task HealUnitGrpc(int userUnitId)
         {
-            var healUnitResponse = await ArmyService.DoGrpcHealUnit(userUnitId);
+            var healUnitResponse = await ArmyGrpcService.DoGrpcHealUnit(userUnitId);
             await GetMyUnitsGrpc();
             await BananaService.GrpcGetBananas();
             await BananaService.BananasChanged();
@@ -170,7 +170,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         public async Task ReviveArmyGrpc()
         {
-            var reviveArmyResponse = await ArmyService.DoGrpcReviveArmy();
+            var reviveArmyResponse = await ArmyGrpcService.DoGrpcReviveArmy();
             await GetMyUnitsGrpc();
             await BananaService.GrpcGetBananas();
             await BananaService.BananasChanged();
