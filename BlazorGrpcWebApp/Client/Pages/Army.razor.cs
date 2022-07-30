@@ -13,6 +13,7 @@ namespace BlazorGrpcWebApp.Client.Pages
         private IList<UserUnitDto>? UserUnitsDtos { get; set; }
         private IList<ArmyUnit>? ArmyUnits { get; set; }
 
+
         protected override async Task OnInitializedAsync()
         {
             ArmyUnits = new List<ArmyUnit>();
@@ -138,7 +139,10 @@ namespace BlazorGrpcWebApp.Client.Pages
                     var userUnitsDtos = await GetUserUnitsWithRest();
                     PopulateArmyUnits(UserUnitsDtos);
                     StateHasChanged();
-                    // update bananas
+
+                    // TODO: use or create proper rest service
+                    await BananaService.GrpcGetBananas();
+                    await BananaService.BananasChanged();
 
                     ToastService.ShowSuccess(response.Content.ToString());
                 }
@@ -156,9 +160,18 @@ namespace BlazorGrpcWebApp.Client.Pages
             var result = await ArmyRestService.ReviveArmy();
 
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var userUnitsDtos = await GetUserUnitsWithRest();
+                PopulateArmyUnits(UserUnitsDtos);
+                StateHasChanged();
+
+                // TODO: use or create proper rest service
+                await BananaService.GrpcGetBananas();
+                await BananaService.BananasChanged();
+
                 ToastService.ShowSuccess(await result.Content.ReadAsStringAsync());
-            else
-                ToastService.ShowError(await result.Content.ReadAsStringAsync());
+            }
+            else ToastService.ShowError(await result.Content.ReadAsStringAsync());
         }
 
         private async Task DeleteUserUnitWithRest(int userUnitId)
