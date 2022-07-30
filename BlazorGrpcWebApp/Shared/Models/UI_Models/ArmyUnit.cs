@@ -1,6 +1,6 @@
-﻿namespace BlazorGrpcWebApp.Shared.Helpers
+﻿namespace BlazorGrpcWebApp.Shared.Models.UI_Models
 {
-    public class MyUnit
+    public class ArmyUnit
     {
         public int UserUnitId { get; set; }
         public string? Img { get; set; }

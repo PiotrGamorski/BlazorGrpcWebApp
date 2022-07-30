@@ -1,7 +1,7 @@
 ﻿using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

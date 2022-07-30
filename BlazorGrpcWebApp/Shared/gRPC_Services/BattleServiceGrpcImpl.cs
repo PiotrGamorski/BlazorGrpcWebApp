@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 

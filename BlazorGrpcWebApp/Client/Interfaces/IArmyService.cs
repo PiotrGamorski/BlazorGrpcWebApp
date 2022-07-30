@@ -5,7 +5,7 @@ namespace BlazorGrpcWebApp.Client.Interfaces
 {
     public interface IArmyService
     {
-        Task<List<UserUnitResponse>> RestApiGetUserUnits();
+        Task<List<UserUnitDto>> RestApiGetUserUnits();
         Task<HttpResponseMessage> RestApiReviveArmy();
         Task<GrpcReviveArmyResponse> DoGrpcReviveArmy();
         Task<GrpcHealUnitResponse> DoGrpcHealUnit(int userUnitId);

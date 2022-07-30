@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Server.Repositories;
 using BlazorGrpcWebApp.Shared.Entities;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorGrpcWebApp.Server.Controllers

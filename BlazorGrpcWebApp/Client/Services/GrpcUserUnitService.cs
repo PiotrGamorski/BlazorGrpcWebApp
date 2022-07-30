@@ -41,16 +41,16 @@ namespace BlazorGrpcWebApp.Client.Services
             }
         }
 
-        public async Task<List<UserUnitResponse>> DoGrpcGetUserUnitAsync()
+        public async Task<List<UserUnitDto>> DoGrpcGetUserUnitAsync()
         {
-            var result = new List<UserUnitResponse>();
+            var result = new List<UserUnitDto>();
             var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
             try
             {
                 var response = _userUnitServiceGrpcClient.GetUserUnits(new GrpcGetUserUnitRequest() { UserId = authUserId });
                 while (await response.ResponseStream.MoveNext())
                 {
-                    result.Add(new UserUnitResponse()
+                    result.Add(new UserUnitDto()
                     {   
                         UserUnitId = response.ResponseStream.Current.UserunitId,
                         UnitId = response.ResponseStream.Current.UnitId,

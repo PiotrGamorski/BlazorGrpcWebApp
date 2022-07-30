@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;

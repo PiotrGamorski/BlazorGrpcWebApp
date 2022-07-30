@@ -22,12 +22,14 @@ namespace BlazorGrpcWebApp.Client.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<UserUnitResponse>> RestApiGetUserUnits()
+        [Authorize]
+        public async Task<List<UserUnitDto>> RestApiGetUserUnits()
         {
-            var result = await _httpClient.GetFromJsonAsync<List<UserUnitResponse>>("api/userunit");
+            var result = await _httpClient.GetFromJsonAsync<List<UserUnitDto>>("api/userunit");
             return result!;
         }
 
+        [Authorize]
         public async Task<HttpResponseMessage> RestApiReviveArmy()
         {
             var result = await _httpClient.PostAsJsonAsync<string>("api/battle/reviveArmy", null!);

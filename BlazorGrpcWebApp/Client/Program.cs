@@ -12,8 +12,8 @@ using Blazored.SessionStorage;
 using MudBlazor.Services;
 using BlazorGrpcWebApp.Client.Services;
 using BlazorGrpcWebApp.Client.Authentication;
-using BlazorGrpcWebApp.Client.Interfaces.Providers.Rest;
-using BlazorGrpcWebApp.Client.Providers.Rest;
+using BlazorGrpcWebApp.Client.Interfaces.Rest;
+using BlazorGrpcWebApp.Client.Services.Rest;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -33,8 +33,9 @@ using var stream = await response.Content.ReadAsStreamAsync();
 
 builder.Configuration.AddJsonStream(stream);
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-builder.Services.AddScoped<IAuthRestProvider, AuthRestProvider>();
+builder.Services.AddScoped<IAuthRestService, AuthRestService>();
 builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
+builder.Services.AddScoped<IArmyRestService, ArmyRestService>();
 builder.Services.AddScoped<IBananaService, BananaService>();
 builder.Services.AddScoped<IArmyService, ArmyService>();
 builder.Services.AddScoped<IUnitService, UnitService>();

@@ -51,7 +51,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
 
             // The response represents a dto - "UserUnitResponse"
             var response = userUnits.Select(
-                userUnit => new UserUnitResponse()
+                userUnit => new UserUnitDto()
                 {
                     UnitId = userUnit.UnitId,
                     HitPoints = userUnit.HitPoints,

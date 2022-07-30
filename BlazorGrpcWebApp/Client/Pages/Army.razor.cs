@@ -1,9 +1,8 @@
-﻿using BlazorGrpcWebApp.Client.Dialogs;
-using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Dtos;
-using BlazorGrpcWebApp.Shared.Helpers;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Microsoft.AspNetCore.Components;
+using BlazorGrpcWebApp.Client.Dialogs;
+using BlazorGrpcWebApp.Shared.Dtos;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using MudBlazor;
 
 namespace BlazorGrpcWebApp.Client.Pages
@@ -11,29 +10,52 @@ namespace BlazorGrpcWebApp.Client.Pages
     public partial class Army : ComponentBase
     {
         private string? ImgPath { get; set; }
-        private IList<GrpcUnitResponse> grpcUnitsResponses { get; set; } = new List<GrpcUnitResponse>();
-        private IList<MyUnit>? MyUnits { get; set; }
+        private IList<UserUnitDto>? UserUnitsDtos { get; set; }
+        private IList<ArmyUnit>? ArmyUnits { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            //await UnitService.LoadUnitsAsync();
-            grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
+            ArmyUnits = new List<ArmyUnit>();
 
-            //await GetMyUnitsRestApi();
-            await GetMyUnitsGrpc();
+            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army")))
+                UserUnitsDtos = await GetUserUnitsWithGrpc();
+            else
+                UserUnitsDtos = await GetUserUnitsWithRest();
+
+            GetArmyUnits(UserUnitsDtos);
             StateHasChanged();
         }
 
-        #region Simplyfying Methods
-        private void PopulateMyUnits(List<UserUnitResponse> UserUnitResponses)
+        private Task ShowDeleteUserUnitDialog(int userUnitId)
         {
-            foreach (var item in UserUnitResponses)
+            var parameters = new DialogParameters();
+            parameters.Add("Color", Color.Error);
+            parameters.Add("Page", this);
+            parameters.Add("UserUnitId", userUnitId);
+            var options = new DialogOptions() { CloseButton = false };
+            DialogService.Show<DeleteUserUnitDialog>("", parameters, options);
+            return Task.CompletedTask;
+        }
+
+        private Task ShowReviveArmyDialog()
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("Color", Color.Error);
+            parameters.Add("Page", this);
+            var options = new DialogOptions() { CloseButton = false };
+            DialogService.Show<ReviveArmyDialog>("", parameters, options);
+            return Task.CompletedTask;
+        }
+
+        private void GetArmyUnits(IList<UserUnitDto>? UserUnitDtos)
+        {
+            foreach (var item in UserUnitDtos!)
             {
                 switch (item.UnitId)
                 {
                     case 1:
                         ImgPath = "/icons/knight.png";
-                        MyUnits.Add(new MyUnit()
+                        ArmyUnits!.Add(new ArmyUnit()
                         {
                             UserUnitId = item.UserUnitId,
                             Img = ImgPath,
@@ -43,7 +65,7 @@ namespace BlazorGrpcWebApp.Client.Pages
                         break;
                     case 2:
                         ImgPath = "/icons/archer.png";
-                        MyUnits.Add(new MyUnit()
+                        ArmyUnits!.Add(new ArmyUnit()
                         {
                             UserUnitId = item.UserUnitId,
                             Img = ImgPath,
@@ -53,7 +75,7 @@ namespace BlazorGrpcWebApp.Client.Pages
                         break;
                     case 3:
                         ImgPath = "/icons/mage.png";
-                        MyUnits.Add(new MyUnit()
+                        ArmyUnits!.Add(new ArmyUnit()
                         {
                             UserUnitId = item.UserUnitId,
                             Img = ImgPath,
@@ -66,13 +88,22 @@ namespace BlazorGrpcWebApp.Client.Pages
                 }
             }
         }
-        #endregion
 
-        #region REST Api Calls
-        private async Task GetMyUnits()
+        #region Rest
+        private async Task<IList<UserUnitDto>?> GetUserUnitsWithRest()
         {
-            var UserUnitResponses = (await ArmyService.RestApiGetUserUnits()).ToList();
-            PopulateMyUnits(UserUnitResponses);
+            IList<UserUnitDto>? userUnitsDtos;
+            try
+            {
+                userUnitsDtos = (await ArmyRestService.GetArmy()).ToList();
+                return userUnitsDtos;
+            }
+            catch (Exception e)
+            {
+                ToastService.ShowError($"{e.Message}", ":(");
+            }
+
+            return null;
         }
 
         private async Task ReviveArmy()
@@ -85,13 +116,34 @@ namespace BlazorGrpcWebApp.Client.Pages
         }
         #endregion
 
-        private async Task GetMyUnitsGrpc()
+        #region gRPC
+        private async Task<IList<UserUnitDto>?> GetUserUnitsWithGrpc()
         {
-            MyUnits = new List<MyUnit>();
+            IList<UserUnitDto> userUnitsDtos;
             try
             {
-                var UserUnitResponses = await GrpcUserUnitService.DoGrpcGetUserUnitAsync();
-                PopulateMyUnits(UserUnitResponses);
+                userUnitsDtos = await GrpcUserUnitService.DoGrpcGetUserUnitAsync();
+                return userUnitsDtos;
+            }
+            catch (RpcException e)
+            {
+                ToastService.ShowError($"{e.StatusCode}", ":(");
+            }
+            catch (Exception e)
+            {
+                ToastService.ShowError($"{e.Message}", ":(");
+            }
+
+            return null;
+        }
+
+        private async Task GetMyUnitsGrpc()
+        {
+            ArmyUnits = new List<ArmyUnit>();
+            try
+            {
+                var UserUnitDtos = await GrpcUserUnitService.DoGrpcGetUserUnitAsync();
+                GetArmyUnits(UserUnitDtos);
             }
             catch (RpcException e)
             {
@@ -140,26 +192,6 @@ namespace BlazorGrpcWebApp.Client.Pages
                 ToastService.ShowSuccess(response.Message, "Success");
             else ToastService.ShowError(response.Message, ":(");
         }
-
-        private Task ShowDeleteUserUnitDialog(int userUnitId)
-        {
-            var parameters = new DialogParameters();
-            parameters.Add("Color", Color.Error);
-            parameters.Add("Page", this);
-            parameters.Add("UserUnitId", userUnitId);
-            var options = new DialogOptions() { CloseButton = false };
-            DialogService.Show<DeleteUserUnitDialog>("", parameters, options);
-            return Task.CompletedTask;
-        }
-
-        private Task ShowReviveArmyDialog()
-        {
-            var parameters = new DialogParameters();
-            parameters.Add("Color", Color.Error);
-            parameters.Add("Page", this);
-            var options = new DialogOptions() { CloseButton = false };
-            DialogService.Show<ReviveArmyDialog>("", parameters, options);
-            return Task.CompletedTask;
-        }
+        #endregion
     }
 }

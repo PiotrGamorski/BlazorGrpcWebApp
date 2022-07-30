@@ -1,5 +1,8 @@
 ﻿@page "/army"
-@using BlazorGrpcWebApp.Shared.Helpers
+@using BlazorGrpcWebApp.Client.Interfaces.Rest
+@using BlazorGrpcWebApp.Shared.Models.UI_Models
+@inject IAppSettingsService AppSettingsService
+@inject IArmyRestService ArmyRestService
 @inject IUnitService UnitService
 @inject IArmyService ArmyService
 @inject IGrpcUserUnitService GrpcUserUnitService
@@ -25,10 +28,10 @@
                               Class="mt-0"/>
            </MudCardHeader>
            <MudCardContent>
-                @if (grpcUnitsResponses.Count > 0)
+                @if (ArmyUnits != null && ArmyUnits.Count > 0)
                 {
-                    <MudTable Items="@MyUnits"
-                              Filter="new Func<MyUnit, bool>(Filter)"
+                    <MudTable Items="@ArmyUnits"
+                              Filter="new Func<ArmyUnit, bool>(Filter)"
                               RowsPerPage="15" 
                               Hover="true"
                               Dense="true" 
@@ -38,13 +41,13 @@
                             <MudTh></MudTh>
                             <MudTh>
                                 <MudTableSortLabel InitialDirection="SortDirection.None" 
-                                                   SortBy="new Func<MyUnit, object>(x => x.Title!)">
+                                                   SortBy="new Func<ArmyUnit, object>(x => x.Title!)">
                                 Title                 
                                 </MudTableSortLabel>
                             </MudTh>
                             <MudTh>
                                 <MudTableSortLabel InitialDirection="SortDirection.Descending" 
-                                                   SortBy="new Func<MyUnit, object>(x => x.HitPoints!)">
+                                                   SortBy="new Func<ArmyUnit, object>(x => x.HitPoints!)">
                                 Hit Points                
                                 </MudTableSortLabel>
                             </MudTh>
@@ -105,8 +108,8 @@
 {
     private string ArmySearchString { get; set; } = string.Empty;
     
-    private bool Filter(MyUnit myUnit) => FilterImplementation(myUnit, ArmySearchString);
-    private bool FilterImplementation(MyUnit myUnit, string searchString)
+    private bool Filter(ArmyUnit armyUnit) => FilterImplementation(armyUnit, ArmySearchString);
+    private bool FilterImplementation(ArmyUnit myUnit, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString)) return true;
         else if (myUnit.Title!.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;

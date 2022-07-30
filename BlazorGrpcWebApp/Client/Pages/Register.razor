@@ -1,11 +1,12 @@
 ﻿@page "/register"
 @using BlazorGrpcWebApp.Client.Interfaces
-@using BlazorGrpcWebApp.Client.Interfaces.Providers.Rest
+@using BlazorGrpcWebApp.Client.Interfaces.Rest
+@using BlazorGrpcWebApp.Shared.Models.UI_Models
 @using Grpc.Core
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
 @inject IUnitService UnitService
-@inject IAuthRestProvider AuthProvider
+@inject IAuthRestService AuthRestService
 @inject IGrpcUserService GrpcUserService
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
@@ -139,7 +140,7 @@
     // uses REST Api
     private async Task HandleRegistrationRestApi()
     {
-        var result = await AuthProvider.Register(userRegister);
+        var result = await AuthRestService.Register(userRegister);
         if (result!.Success)
         {
             ToastService.ShowSuccess(result.Message);

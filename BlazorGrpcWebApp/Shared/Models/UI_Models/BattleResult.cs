@@ -1,4 +1,4 @@
-﻿namespace BlazorGrpcWebApp.Shared.Models
+﻿namespace BlazorGrpcWebApp.Shared.Models.UI_Models
 {
     public class BattleResult
     {

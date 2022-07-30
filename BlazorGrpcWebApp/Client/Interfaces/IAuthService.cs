@@ -1,4 +1,5 @@
 ﻿using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 
 namespace BlazorGrpcWebApp.Client.Interfaces
 {

@@ -1,14 +1,15 @@
-﻿using BlazorGrpcWebApp.Client.Interfaces.Providers.Rest;
+﻿using BlazorGrpcWebApp.Client.Interfaces.Rest;
 using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using System.Net.Http.Json;
 
-namespace BlazorGrpcWebApp.Client.Providers.Rest
+namespace BlazorGrpcWebApp.Client.Services.Rest
 {
-    public class AuthRestProvider : IAuthRestProvider
+    public class AuthRestService : IAuthRestService
     {
         private readonly HttpClient _httpClient;
 
-        public AuthRestProvider(HttpClient httpClient)
+        public AuthRestService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

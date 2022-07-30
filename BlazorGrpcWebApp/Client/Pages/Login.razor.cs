@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Client.Authentication;
 using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -28,7 +28,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             {
                 try
                 {
-                    var result = await AuthProvider.Login(userLogin);
+                    var result = await AuthRestService.Login(userLogin);
                     if (result!.Success)
                     {
                         try
