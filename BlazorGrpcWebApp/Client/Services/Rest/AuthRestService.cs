@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services.Rest
 {
+    //Delivers functionality for Login and Register Razor pages
     public class AuthRestService : IAuthRestService
     {
         private readonly HttpClient _httpClient;

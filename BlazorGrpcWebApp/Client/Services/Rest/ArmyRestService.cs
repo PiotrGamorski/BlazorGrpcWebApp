@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services.Rest
 {
+    //Delivers functionality for Army Razor page
     public class ArmyRestService : IArmyRestService
     {
         private readonly HttpClient _httpClient;

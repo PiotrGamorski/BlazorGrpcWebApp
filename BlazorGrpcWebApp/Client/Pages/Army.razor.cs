@@ -128,12 +128,33 @@ namespace BlazorGrpcWebApp.Client.Pages
             return null;
         }
 
+        private async Task DeleteUserUnitWithRest(int userUnitId)
+        {
+            try
+            {
+                var response = await ArmyRestService.DeleteUserUnit(userUnitId);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var userUnitsDtos = await GetUserUnitsWithRest();
+                    PopulateArmyUnits(UserUnitsDtos);
+                    StateHasChanged();
+                }
+                else
+                    ToastService.ShowError("Something went wrong...", ":(");
+            }
+            catch (Exception e)
+            {
+                ToastService.ShowError(e.Message);
+            }
+        }
+
         private async Task HealUserUnitWithRest(int userUnitId)
         {
             try
             {
                 var response = await ArmyRestService.HealUserUnit(userUnitId);
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var userUnitsDtos = await GetUserUnitsWithRest();
@@ -146,7 +167,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
                     ToastService.ShowSuccess(response.Content.ToString());
                 }
-                
+
                 else ToastService.ShowError(response.Content.ToString(), ":(");
             }
             catch (Exception e)
@@ -173,27 +194,6 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
             else ToastService.ShowError(await result.Content.ReadAsStringAsync());
         }
-
-        private async Task DeleteUserUnitWithRest(int userUnitId)
-        {
-            try
-            {
-                var response = await ArmyRestService.DeleteUserUnit(userUnitId);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var userUnitsDtos = await GetUserUnitsWithRest();
-                    PopulateArmyUnits(UserUnitsDtos);
-                    StateHasChanged();
-                }
-                else
-                    ToastService.ShowError("Something went wrong...", ":(");
-            }
-            catch (Exception e)
-            {
-                ToastService.ShowError(e.Message);
-            }
-        }
         #endregion
 
 
@@ -216,6 +216,24 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
 
             return null;
+        }
+
+        private async Task DeleteUserUnitGrpc(int userUnitId)
+        {
+            var response = await GrpcUserUnitService.DoDeleteUserUnitGrpc(userUnitId);
+
+            if (response.Success)
+            {
+                var userUnitsDtos = await GetUserUnitsWithGrpc();
+                PopulateArmyUnits(userUnitsDtos);
+                StateHasChanged();
+
+                await BananaService.GrpcGetBananas();
+                await BananaService.BananasChanged();
+
+                ToastService.ShowSuccess(response.Message, "Success");
+            }
+            else ToastService.ShowError(response.Message, ":(");
         }
 
         private async Task HealUserUnitWithGrpc(int userUnitId)
@@ -254,24 +272,6 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
             else
                 ToastService.ShowError(reviveArmyResponse.Message, ":(");
-        }
-
-        private async Task DeleteUserUnitGrpc(int userUnitId)
-        {
-            var response = await GrpcUserUnitService.DoDeleteUserUnitGrpc(userUnitId);
-
-            if (response.Success)
-            {
-                var userUnitsDtos = await GetUserUnitsWithGrpc();
-                PopulateArmyUnits(userUnitsDtos);
-                StateHasChanged();
-
-                await BananaService.GrpcGetBananas();
-                await BananaService.BananasChanged();
-
-                ToastService.ShowSuccess(response.Message, "Success");
-            }
-            else ToastService.ShowError(response.Message, ":(");
         }
         #endregion
     }

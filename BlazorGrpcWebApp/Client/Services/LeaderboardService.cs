@@ -16,6 +16,8 @@ namespace BlazorGrpcWebApp.Client.Services
         private readonly GrpcChannel _channel;
         private UserServiceGrpc.UserServiceGrpcClient _userServiceGrpcClient;
         private BattleLogServiceGrpc.BattleLogServiceGrpcClient _battleLogServiceGrpcClient;
+        public IList<UserStatistic>? Leaderboard { get; set; } = new List<UserStatistic>();
+        public IList<GrpcUserGetLeaderboardResponse> GrpcLeaderboardResponses { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
 
         public LeaderboardService(HttpClient httpClient)
         {
@@ -25,14 +27,13 @@ namespace BlazorGrpcWebApp.Client.Services
             _userServiceGrpcClient = new UserServiceGrpc.UserServiceGrpcClient(_channel);
             _battleLogServiceGrpcClient = new BattleLogServiceGrpc.BattleLogServiceGrpcClient(_channel);
         }
-
-        public IList<UserStatistic>? Leaderboard { get; set; } = new List<UserStatistic>();
-        public IList<GrpcUserGetLeaderboardResponse> GrpcLeaderboardResponses { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
+    
 
         public async Task GetLeaderboardRestApi()
         {
             Leaderboard = await _httpClient.GetFromJsonAsync<IList<UserStatistic>>("api/user/leaderboard");
         }
+
 
         public async Task DoGrpcGetLeaderboard()
         {
