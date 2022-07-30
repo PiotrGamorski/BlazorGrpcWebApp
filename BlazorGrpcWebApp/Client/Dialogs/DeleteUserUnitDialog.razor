@@ -25,7 +25,7 @@
 
     private async Task Submit()
     {
-        await Page!.DeleteUserUnitGrpc(UserUnitId);
+        await Page!.Delete(UserUnitId);
             MudDialog!.Close(DialogResult.Ok(true));
     }
 

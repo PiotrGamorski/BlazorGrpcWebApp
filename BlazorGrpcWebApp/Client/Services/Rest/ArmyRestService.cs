@@ -1,6 +1,5 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces.Rest;
 using BlazorGrpcWebApp.Shared.Dtos;
-using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services.Rest
@@ -14,17 +13,27 @@ namespace BlazorGrpcWebApp.Client.Services.Rest
             _httpClient = httpClient;
         }
 
-        [Authorize]
-        public async Task<List<UserUnitDto>> GetArmy()
+        public async Task<List<UserUnitDto>> GetUserUnits()
         {
             var result = await _httpClient.GetFromJsonAsync<List<UserUnitDto>>("api/userunit");
             return result!;
         }
 
-        [Authorize]
+        public async Task<HttpResponseMessage> HealUserUnit(int userUnitId)
+        {
+            var result = await _httpClient.PutAsJsonAsync("api/userunit/heal", userUnitId);
+            return result;
+        }
+
         public async Task<HttpResponseMessage> ReviveArmy()
         {
             var result = await _httpClient.PostAsJsonAsync<string>("api/battle/reviveArmy", null!);
+            return result;
+        }
+
+        public async Task<HttpResponseMessage> DeleteUserUnit(int userUnitId)
+        {
+            var result = await _httpClient.DeleteAsync($"api/userunit/{userUnitId}");
             return result;
         }
     }

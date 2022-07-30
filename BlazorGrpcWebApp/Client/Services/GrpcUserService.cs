@@ -37,7 +37,6 @@ namespace BlazorGrpcWebApp.Client.Services
             }, deadline);
         }
 
-        #region Grpc Calls
         public async Task<RegisterGrpcUserResponse> DoGrpcUserRegister(RegisterGrpcUserRequest request, int deadline)
         {
             var grpcUser = new GrpcUserExistsRequest() { GrpcUser = request.GrpcUser };
@@ -92,6 +91,5 @@ namespace BlazorGrpcWebApp.Client.Services
         { 
             return await _userServiceGrpcClient.GrpcUserAddBananasAsync(request);
         }
-        #endregion
     }
 }

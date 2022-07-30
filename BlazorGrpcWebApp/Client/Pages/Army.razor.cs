@@ -22,9 +22,10 @@ namespace BlazorGrpcWebApp.Client.Pages
             else
                 UserUnitsDtos = await GetUserUnitsWithRest();
 
-            GetArmyUnits(UserUnitsDtos);
+            PopulateArmyUnits(UserUnitsDtos);
             StateHasChanged();
         }
+
 
         private Task ShowDeleteUserUnitDialog(int userUnitId)
         {
@@ -47,7 +48,8 @@ namespace BlazorGrpcWebApp.Client.Pages
             return Task.CompletedTask;
         }
 
-        private void GetArmyUnits(IList<UserUnitDto>? UserUnitDtos)
+
+        private void PopulateArmyUnits(IList<UserUnitDto>? UserUnitDtos)
         {
             foreach (var item in UserUnitDtos!)
             {
@@ -89,13 +91,32 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
         }
 
+        private async Task Heal(int userUnitId)
+        {
+            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"))) await HealUserUnitWithGrpc(userUnitId);
+            else await HealUserUnitWithRest(userUnitId);
+        }
+
+        public async Task ReviveArmy()
+        {
+            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"))) await ReviveArmyWithGrpc();
+            else await ReviveArmyWithRest();
+        }
+
+        public async Task Delete(int userUnitId)
+        {
+            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"))) await DeleteUserUnitGrpc(userUnitId);
+            else await DeleteUserUnitWithRest(userUnitId);
+        }
+
+
         #region Rest
         private async Task<IList<UserUnitDto>?> GetUserUnitsWithRest()
         {
             IList<UserUnitDto>? userUnitsDtos;
             try
             {
-                userUnitsDtos = (await ArmyRestService.GetArmy()).ToList();
+                userUnitsDtos = (await ArmyRestService.GetUserUnits()).ToList();
                 return userUnitsDtos;
             }
             catch (Exception e)
@@ -106,15 +127,62 @@ namespace BlazorGrpcWebApp.Client.Pages
             return null;
         }
 
-        private async Task ReviveArmy()
+        private async Task HealUserUnitWithRest(int userUnitId)
+        {
+            try
+            {
+                var response = await ArmyRestService.HealUserUnit(userUnitId);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var userUnitsDtos = await GetUserUnitsWithRest();
+                    PopulateArmyUnits(UserUnitsDtos);
+                    StateHasChanged();
+                    // update bananas
+
+                    ToastService.ShowSuccess(response.Content.ToString());
+                }
+                
+                else ToastService.ShowError(response.Content.ToString(), ":(");
+            }
+            catch (Exception e)
+            {
+                ToastService.ShowError(e.Message, ":(");
+            }
+        }
+
+        private async Task ReviveArmyWithRest()
         {
             var result = await ArmyRestService.ReviveArmy();
+
             if (result.StatusCode == System.Net.HttpStatusCode.OK)
                 ToastService.ShowSuccess(await result.Content.ReadAsStringAsync());
             else
                 ToastService.ShowError(await result.Content.ReadAsStringAsync());
         }
+
+        private async Task DeleteUserUnitWithRest(int userUnitId)
+        {
+            try
+            {
+                var response = await ArmyRestService.DeleteUserUnit(userUnitId);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var userUnitsDtos = await GetUserUnitsWithRest();
+                    PopulateArmyUnits(UserUnitsDtos);
+                    StateHasChanged();
+                }
+                else
+                    ToastService.ShowError("Something went wrong...", ":(");
+            }
+            catch (Exception e)
+            {
+                ToastService.ShowError(e.Message);
+            }
+        }
         #endregion
+
 
         #region gRPC
         private async Task<IList<UserUnitDto>?> GetUserUnitsWithGrpc()
@@ -137,59 +205,59 @@ namespace BlazorGrpcWebApp.Client.Pages
             return null;
         }
 
-        private async Task GetMyUnitsGrpc()
+        private async Task HealUserUnitWithGrpc(int userUnitId)
         {
-            ArmyUnits = new List<ArmyUnit>();
-            try
-            {
-                var UserUnitDtos = await GrpcUserUnitService.DoGrpcGetUserUnitAsync();
-                GetArmyUnits(UserUnitDtos);
-            }
-            catch (RpcException e)
-            {
-                ToastService.ShowError($"{e.StatusCode}", ":(");
-            }
-            catch (Exception e)
-            {
-                ToastService.ShowError($"{e.Message}", ":(");
-            }
-        }
+            var response = await ArmyGrpcService.DoGrpcHealUnit(userUnitId);
 
-        private async Task HealUnitGrpc(int userUnitId)
-        {
-            var healUnitResponse = await ArmyGrpcService.DoGrpcHealUnit(userUnitId);
-            await GetMyUnitsGrpc();
-            await BananaService.GrpcGetBananas();
-            await BananaService.BananasChanged();
+            if (response.Success)
+            {
+                var userUnitsDtos = await GetUserUnitsWithGrpc();
+                PopulateArmyUnits(userUnitsDtos);
+                StateHasChanged();
 
-            if (healUnitResponse.Success)
-                ToastService.ShowSuccess(healUnitResponse.Message, "Success");
+                await BananaService.GrpcGetBananas();
+                await BananaService.BananasChanged();
+
+                ToastService.ShowSuccess(response.Message, "Success");
+            }
             else
-                ToastService.ShowError(healUnitResponse.Message, ":(");
+                ToastService.ShowError(response.Message, ":(");
         }
 
-        public async Task ReviveArmyGrpc()
+        private async Task ReviveArmyWithGrpc()
         {
             var reviveArmyResponse = await ArmyGrpcService.DoGrpcReviveArmy();
-            await GetMyUnitsGrpc();
-            await BananaService.GrpcGetBananas();
-            await BananaService.BananasChanged();
 
             if (reviveArmyResponse.Success)
+            {
+                var userUnitsDtos = await GetUserUnitsWithGrpc();
+                PopulateArmyUnits(userUnitsDtos);
+                StateHasChanged();
+
+                await BananaService.GrpcGetBananas();
+                await BananaService.BananasChanged();
+
                 ToastService.ShowSuccess(reviveArmyResponse.Message, "Success");
+            }
             else
                 ToastService.ShowError(reviveArmyResponse.Message, ":(");
         }
 
-        public async Task DeleteUserUnitGrpc(int userUnitId)
+        private async Task DeleteUserUnitGrpc(int userUnitId)
         {
             var response = await GrpcUserUnitService.DoDeleteUserUnitGrpc(userUnitId);
-            await GetMyUnitsGrpc();
-            StateHasChanged();
-            await BananaService.GrpcGetBananas();
-            await BananaService.BananasChanged();
+
             if (response.Success)
+            {
+                var userUnitsDtos = await GetUserUnitsWithGrpc();
+                PopulateArmyUnits(userUnitsDtos);
+                StateHasChanged();
+
+                await BananaService.GrpcGetBananas();
+                await BananaService.BananasChanged();
+
                 ToastService.ShowSuccess(response.Message, "Success");
+            }
             else ToastService.ShowError(response.Message, ":(");
         }
         #endregion

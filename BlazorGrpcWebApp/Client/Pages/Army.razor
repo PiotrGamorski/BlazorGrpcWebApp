@@ -65,7 +65,7 @@
                                            Color="Color.Success"
                                            Disabled="@(context.HitPoints == 100 ? true : false)"
                                            Style="margin-right: 5px"
-                                           OnClick="async () => await HealUnitGrpc(context.UserUnitId)">
+                                           OnClick="async () => await Heal(context.UserUnitId)">
                                            <MudTooltip Placement="Placement.Left" Text="Heals the unit to maximum hit points.">
                                                <MudIcon Style="margin-right: 3px;" Icon="@Icons.Filled.HealthAndSafety"/>
                                            </MudTooltip>
