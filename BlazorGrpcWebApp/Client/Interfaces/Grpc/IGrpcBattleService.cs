@@ -1,6 +1,6 @@
 ﻿using BlazorGrpcWebApp.Shared.Models;
 
-namespace BlazorGrpcWebApp.Client.Interfaces
+namespace BlazorGrpcWebApp.Client.Interfaces.Grpc
 {
     public interface IGrpcBattleService
     {

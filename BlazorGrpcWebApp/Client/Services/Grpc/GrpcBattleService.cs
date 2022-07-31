@@ -1,13 +1,12 @@
-﻿using BlazorGrpcWebApp.Client.Interfaces;
+﻿using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Models;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Json;
 
-namespace BlazorGrpcWebApp.Client.Services
+namespace BlazorGrpcWebApp.Client.Services.Grpc
 {
     public class GrpcBattleService : IGrpcBattleService
     {

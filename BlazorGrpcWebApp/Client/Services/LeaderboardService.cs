@@ -9,6 +9,7 @@ using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services
 {
+    //Delivers functionality to Leaderboard Razor page
     [Authorize]
     public class LeaderboardService : ILeaderboardService
     {
@@ -33,6 +34,8 @@ namespace BlazorGrpcWebApp.Client.Services
         {
             Leaderboard = await _httpClient.GetFromJsonAsync<IList<UserStatistic>>("api/user/leaderboard");
         }
+        //TODO: split this service into Rest and gRPC
+        //TODO: add rest methods
 
 
         public async Task DoGrpcGetLeaderboard()
@@ -48,6 +51,7 @@ namespace BlazorGrpcWebApp.Client.Services
             }
         }
 
+        //Checks if there are any logs to be shown
         public async Task<bool> DoGrpcShowBattleLogs(int opponentId)
         {
             var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");

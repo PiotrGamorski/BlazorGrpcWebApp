@@ -1,9 +1,7 @@
 ﻿using BlazorGrpcWebApp.Client.Authentication;
-using BlazorGrpcWebApp.Client.Dialogs;
 using BlazorGrpcWebApp.Shared;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -26,14 +24,6 @@ namespace BlazorGrpcWebApp.Client.Pages
             await PopulateMyLeaderBoard();
         }
 
-        private string GetMyUserStyle(int userId)
-        {
-            if (userId == myUserId)
-                return "color: crimson; font-weight: 600px;";
-            else
-                return string.Empty;
-        }
-
         private async Task PopulateMyLeaderBoard()
         {
             foreach (var item in LeaderboardService.GrpcLeaderboardResponses)
@@ -46,16 +36,6 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
         }
 
-        private Task OpenFightBattleDialog(int opponentId)
-        {
-            var parameters = new DialogParameters();
-            parameters.Add("Color", Color.Error);
-            parameters.Add("Page", this);
-            parameters.Add("OpponentId", opponentId);
-            var options = new DialogOptions() { CloseButton = false };
-            DialogService.Show<FightBattleDialog>("", parameters, options);
-            return Task.CompletedTask;
-        }
 
         public async Task FightOpponentGrpc(int opponentId)
         {
@@ -92,25 +72,5 @@ namespace BlazorGrpcWebApp.Client.Pages
         { 
             return await LeaderboardService.DoGrpcGetBattleLogs(opponentId);
         }
-
-        private Task OpenBattleLogsDialog(int opponentId)
-        {
-            var parameters = new DialogParameters();
-            parameters.Add("Color", Color.Error);
-            parameters.Add("Page", this);
-            parameters.Add("OpponentId", opponentId);
-            var options = new DialogOptions() { CloseButton = false };
-            DialogService.Show<BattleLogsDialog>("", parameters, options);
-            return Task.CompletedTask;
-        }
-
-        private bool Filter(GrpcUserGetLeaderboardResponse res) => FilterImplementation(res, LeaderboardSearchString);
-        private bool FilterImplementation(GrpcUserGetLeaderboardResponse res, string searchString)
-        {
-            if (string.IsNullOrWhiteSpace(searchString)) return true;
-            else if (res.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
-            else return false;
-        }
-
     }
 }
