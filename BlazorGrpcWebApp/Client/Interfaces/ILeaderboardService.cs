@@ -1,12 +1,12 @@
 ﻿using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Dtos;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 
 namespace BlazorGrpcWebApp.Client.Interfaces
 {
     public interface ILeaderboardService
     {
-        IList<UserStatistic>? Leaderboard { get; set; }
-        IList<GrpcUserGetLeaderboardResponse> GrpcLeaderboardResponses { get; set; }
+        IList<GrpcUserGetLeaderboardResponse> Leaderboard { get; set; }
+
         Task GetLeaderboardRestApi();
         Task DoGrpcGetLeaderboard();
         Task<bool> DoGrpcShowBattleLogs(int opponentId);

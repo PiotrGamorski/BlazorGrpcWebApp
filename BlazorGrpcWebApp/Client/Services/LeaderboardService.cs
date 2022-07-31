@@ -1,6 +1,7 @@
-﻿using BlazorGrpcWebApp.Client.Interfaces;
+﻿using AutoMapper;
+using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Dtos;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
@@ -13,15 +14,16 @@ namespace BlazorGrpcWebApp.Client.Services
     [Authorize]
     public class LeaderboardService : ILeaderboardService
     {
+        private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
         private readonly GrpcChannel _channel;
         private UserServiceGrpc.UserServiceGrpcClient _userServiceGrpcClient;
         private BattleLogServiceGrpc.BattleLogServiceGrpcClient _battleLogServiceGrpcClient;
-        public IList<UserStatistic>? Leaderboard { get; set; } = new List<UserStatistic>();
-        public IList<GrpcUserGetLeaderboardResponse> GrpcLeaderboardResponses { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
+        public IList<GrpcUserGetLeaderboardResponse> Leaderboard { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
 
-        public LeaderboardService(HttpClient httpClient)
+        public LeaderboardService(IMapper mapper, HttpClient httpClient)
         {
+            _mapper = mapper;
             _httpClient = httpClient;
             var httpClientGrpc = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
             _channel = GrpcChannel.ForAddress("https://localhost:7039", new GrpcChannelOptions { HttpClient = httpClientGrpc });
@@ -32,7 +34,11 @@ namespace BlazorGrpcWebApp.Client.Services
 
         public async Task GetLeaderboardRestApi()
         {
-            Leaderboard = await _httpClient.GetFromJsonAsync<IList<UserStatistic>>("api/user/leaderboard");
+            var result = await _httpClient.GetFromJsonAsync<IList<UserLeaderboardEntry>>("api/user/leaderboard");
+            foreach (var item in result!)
+            {
+                Leaderboard.Add(_mapper.Map<GrpcUserGetLeaderboardResponse>(item));
+            }
         }
         //TODO: split this service into Rest and gRPC
         //TODO: add rest methods
@@ -40,13 +46,13 @@ namespace BlazorGrpcWebApp.Client.Services
 
         public async Task DoGrpcGetLeaderboard()
         {
-            GrpcLeaderboardResponses = new List<GrpcUserGetLeaderboardResponse>();
+            Leaderboard = new List<GrpcUserGetLeaderboardResponse>();
             var response = _userServiceGrpcClient.GrpcUserGetLeaderboard(new GrpcUserGetLeaderboardRequest() { });
             while (await response.ResponseStream.MoveNext(new CancellationToken()))
             {
-                if (!GrpcLeaderboardResponses.Contains(response.ResponseStream.Current))
+                if (!Leaderboard.Contains(response.ResponseStream.Current))
                 {
-                    GrpcLeaderboardResponses.Add(response.ResponseStream.Current);
+                    Leaderboard.Add(response.ResponseStream.Current);
                 }
             }
         }

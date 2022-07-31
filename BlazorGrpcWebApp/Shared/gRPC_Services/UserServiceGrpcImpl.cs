@@ -125,7 +125,6 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
         }
     }
 
-    #region Helper Methods
     private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
 #pragma warning disable CA1416 // Validate platform compatibility
@@ -169,6 +168,5 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
         return Task.FromResult(jwt);
     }
-    #endregion
 }
 

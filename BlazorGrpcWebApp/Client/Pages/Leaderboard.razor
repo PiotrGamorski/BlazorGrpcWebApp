@@ -26,9 +26,9 @@
                               Class="mt-0"/>
             </MudCardHeader>
             <MudCardContent>
-                @if (MyLeaderboard.Count() > 0)
+                @if (UserLeaderboard.Count() > 0)
                 {
-                    <MudTable Items="@MyLeaderboard"
+                    <MudTable Items="@UserLeaderboard"
                               Filter="new Func<GrpcUserGetLeaderboardResponse, bool>(Filter)"
                               Hover="true"
                               RowsPerPage="15" 

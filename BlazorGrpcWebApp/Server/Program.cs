@@ -8,6 +8,7 @@ using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Server.Services;
 using BlazorGrpcWebApp.Shared.gRPC_Services;
 using BlazorGrpcWebApp.Server.EntitySeeder;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddTransient<ISeeder, EntitySeeder>();
 builder.Services.AddGrpc();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

@@ -16,6 +16,8 @@ using BlazorGrpcWebApp.Client.Interfaces.Rest;
 using BlazorGrpcWebApp.Client.Services.Rest;
 using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Client.Services.Grpc;
+using System.Reflection;
+using BlazorGrpcWebApp.Client.MappingProfile;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -46,6 +48,7 @@ builder.Services.AddScoped<IGrpcUserService, GrpcUserService>();
 builder.Services.AddScoped<IGrpcUserUnitService, GrpcUserUnitService>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddScoped<IGrpcBattleService, GrpcBattleService>();
+builder.Services.AddAutoMapper(typeof(ClientAppMappingProfile));
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredSessionStorage();

@@ -26,7 +26,7 @@
 
     protected override void OnInitialized()
     {
-        UserName = Page!.MyLeaderboard.FirstOrDefault(l => l.UserId == OpponentId)!.UserName;
+        UserName = Page!.UserLeaderboard.FirstOrDefault(l => l.UserId == OpponentId)!.UserName;
     }
 
     private async Task Submit()

@@ -1,7 +1,8 @@
-﻿using BlazorGrpcWebApp.Server.Interfaces;
+﻿using AutoMapper;
+using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Shared.Data;
-using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,13 @@ namespace BlazorGrpcWebApp.Server.Controllers
     {
         private readonly DataContext _dataContext;
         private readonly IUtilityService _utilityService;
-        public UserController(DataContext dataContext, IUtilityService utilityService)
+        private readonly IMapper _mapper;
+
+        public UserController(DataContext dataContext, IUtilityService utilityService, IMapper mapper)
         {
             _dataContext = dataContext;
             _utilityService = utilityService;
+            _mapper = mapper;
         }
 
         [HttpGet("getbananas")]
@@ -47,16 +51,14 @@ namespace BlazorGrpcWebApp.Server.Controllers
                 .ThenBy(u => u.DateCreated)
                 .ToList();
 
-            int rank = 1;
             // Rank is computed based on upper order
-            var response = users.Select(u => new UserStatistic()
+            int rank = 1;
+            var response = users.Select(user => 
             {
-                Rank = rank++,
-                UserId = u.Id,
-                UserName = u.UserName,
-                Battles = u.Battles,
-                Victories = u.Victories,
-                Defeats = u.Defeats,
+                var userLeaderBoardEntry = _mapper.Map<UserLeaderboardEntry>(user);
+                userLeaderBoardEntry.Rank = rank++;
+
+                return userLeaderBoardEntry;
             });
 
             return Ok(response);

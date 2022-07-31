@@ -11,7 +11,7 @@ namespace BlazorGrpcWebApp.Client.Pages
         public bool BattleCompleted { get; set; }
         private bool IsVictorious { get; set; }
         private string LeaderboardSearchString { get; set; } = string.Empty;
-        public IList<GrpcUserGetLeaderboardResponse> MyLeaderboard { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
+        public IList<GrpcUserGetLeaderboardResponse> UserLeaderboard { get; set; } = new List<GrpcUserGetLeaderboardResponse>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -26,11 +26,11 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task PopulateMyLeaderBoard()
         {
-            foreach (var item in LeaderboardService.GrpcLeaderboardResponses)
+            foreach (var item in LeaderboardService.Leaderboard)
             {
-                MyLeaderboard.Add(item);
+                UserLeaderboard.Add(item);
             }
-            foreach (var item in MyLeaderboard)
+            foreach (var item in UserLeaderboard)
             {
                 item.ShowLogs = await LeaderboardService.DoGrpcShowBattleLogs(item.UserId);
             }
@@ -39,7 +39,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         public async Task FightOpponentGrpc(int opponentId)
         {
-            MyLeaderboard = new List<GrpcUserGetLeaderboardResponse>();
+            UserLeaderboard = new List<GrpcUserGetLeaderboardResponse>();
             BattleCompleted = false;
             try
             {
