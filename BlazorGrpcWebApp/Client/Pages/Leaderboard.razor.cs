@@ -20,7 +20,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
             BattleCompleted = false;
 
-            await LeaderboardService.DoGrpcGetLeaderboard();
+            await LeaderboardService.GetLeaderboardWithGrpc();
             await PopulateMyLeaderBoard();
         }
 
@@ -32,7 +32,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
             foreach (var item in UserLeaderboard)
             {
-                item.ShowLogs = await LeaderboardService.DoGrpcShowBattleLogs(item.UserId);
+                item.ShowLogs = await LeaderboardService.ShowBattleLogsWithGrpc(item.UserId);
             }
         }
 
@@ -44,7 +44,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             try
             {
                 IsVictorious = await GrpcBattleService.DoGrpcStartBattle(opponentId);
-                await LeaderboardService.DoGrpcGetLeaderboard();
+                await LeaderboardService.GetLeaderboardWithGrpc();
                 await PopulateMyLeaderBoard();
                 BattleCompleted = true;
                 StateHasChanged();
@@ -70,7 +70,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         public async Task<List<string>> GetBattleLogs(int opponentId)
         { 
-            return await LeaderboardService.DoGrpcGetBattleLogs(opponentId);
+            return await LeaderboardService.GetBattleLogsWithGrpc(opponentId);
         }
     }
 }

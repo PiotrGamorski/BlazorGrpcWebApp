@@ -32,33 +32,35 @@ namespace BlazorGrpcWebApp.Client.Services
         }
     
 
-        public async Task GetLeaderboardRestApi()
+        public async Task GetLeaderboardWithRest()
         {
-            var result = await _httpClient.GetFromJsonAsync<IList<UserLeaderboardEntry>>("api/user/leaderboard");
-            foreach (var item in result!)
+            var response = await _httpClient.GetFromJsonAsync<IList<UserLeaderboardEntry>>("api/user/leaderboard");
+            // TODO: Add if condition?
+            foreach (var userLeaderboardEntry in response!)
             {
-                Leaderboard.Add(_mapper.Map<GrpcUserGetLeaderboardResponse>(item));
+                var leaderboardItem = _mapper.Map<GrpcUserGetLeaderboardResponse>(userLeaderboardEntry);
+                if (!Leaderboard.Contains(leaderboardItem)) 
+                    Leaderboard.Add(leaderboardItem);
+
             }
         }
         //TODO: split this service into Rest and gRPC
         //TODO: add rest methods
 
 
-        public async Task DoGrpcGetLeaderboard()
+        public async Task GetLeaderboardWithGrpc()
         {
             Leaderboard = new List<GrpcUserGetLeaderboardResponse>();
             var response = _userServiceGrpcClient.GrpcUserGetLeaderboard(new GrpcUserGetLeaderboardRequest() { });
+
             while (await response.ResponseStream.MoveNext(new CancellationToken()))
             {
-                if (!Leaderboard.Contains(response.ResponseStream.Current))
-                {
+                if (!Leaderboard.Contains(response.ResponseStream.Current)) 
                     Leaderboard.Add(response.ResponseStream.Current);
-                }
             }
         }
 
-        //Checks if there are any logs to be shown
-        public async Task<bool> DoGrpcShowBattleLogs(int opponentId)
+        public async Task<bool> ShowBattleLogsWithGrpc(int opponentId)
         {
             var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
             var response = await _battleLogServiceGrpcClient.GrpcShowBattleLogsAsync(new GrpcShowBattleLogsRequest
@@ -70,7 +72,7 @@ namespace BlazorGrpcWebApp.Client.Services
             return response.Show;
         }
 
-        public async Task<List<string>> DoGrpcGetBattleLogs(int opponentId)
+        public async Task<List<string>> GetBattleLogsWithGrpc(int opponentId)
         {
             var authUserId = await _httpClient.GetFromJsonAsync<int>("api/user/getAuthUserId");
             var response = _battleLogServiceGrpcClient.GrpcGetBattleLogs(new GrpcGetBattleLogsRequest()
