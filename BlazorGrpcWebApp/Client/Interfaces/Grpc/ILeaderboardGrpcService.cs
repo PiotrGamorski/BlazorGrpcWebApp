@@ -1,13 +1,11 @@
 ﻿using BlazorGrpcWebApp.Shared;
-using BlazorGrpcWebApp.Shared.Models.UI_Models;
 
-namespace BlazorGrpcWebApp.Client.Interfaces
+namespace BlazorGrpcWebApp.Client.Interfaces.Grpc
 {
-    public interface ILeaderboardService
+    public interface ILeaderboardGrpcService
     {
         IList<GrpcUserGetLeaderboardResponse> Leaderboard { get; set; }
 
-        Task GetLeaderboardWithRest();
         Task GetLeaderboardWithGrpc();
         Task<bool> ShowBattleLogsWithGrpc(int opponentId);
         Task<List<string>> GetBattleLogsWithGrpc(int opponentId);

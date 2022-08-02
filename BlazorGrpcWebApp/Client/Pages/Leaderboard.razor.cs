@@ -1,5 +1,6 @@
 ﻿using BlazorGrpcWebApp.Client.Authentication;
 using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Models.Controllers_Models;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 
@@ -7,7 +8,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 {
     public partial class Leaderboard : ComponentBase
     {
-        private int myUserId;
+        private int authUserId;
         public bool BattleCompleted { get; set; }
         private bool IsVictorious { get; set; }
         private string LeaderboardSearchString { get; set; } = string.Empty;
@@ -16,23 +17,27 @@ namespace BlazorGrpcWebApp.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
-            myUserId = int.Parse(authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            authUserId = int.Parse(authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
 
             BattleCompleted = false;
 
-            await LeaderboardService.GetLeaderboardWithGrpc();
-            await PopulateMyLeaderBoard();
+            if(bool.Parse(AppSettingsService.GetValueFromPagesSec("Leaderboard")))
+                await LeaderboardGrpcService.GetLeaderboardWithGrpc();
+            else
+                await LeaderboardRestService.GetLeaderboardWithRest();
+
+            await PopulateAuthUserLeaderBoard();
         }
 
-        private async Task PopulateMyLeaderBoard()
+        private async Task PopulateAuthUserLeaderBoard()
         {
-            foreach (var item in LeaderboardService.Leaderboard)
+            foreach (var item in LeaderboardGrpcService.Leaderboard)
             {
                 UserLeaderboard.Add(item);
             }
             foreach (var item in UserLeaderboard)
             {
-                item.ShowLogs = await LeaderboardService.ShowBattleLogsWithGrpc(item.UserId);
+                item.ShowLogs = await LeaderboardGrpcService.ShowBattleLogsWithGrpc(item.UserId);
             }
         }
 
@@ -44,8 +49,8 @@ namespace BlazorGrpcWebApp.Client.Pages
             try
             {
                 IsVictorious = await GrpcBattleService.DoGrpcStartBattle(opponentId);
-                await LeaderboardService.GetLeaderboardWithGrpc();
-                await PopulateMyLeaderBoard();
+                await LeaderboardGrpcService.GetLeaderboardWithGrpc();
+                await PopulateAuthUserLeaderBoard();
                 BattleCompleted = true;
                 StateHasChanged();
 
@@ -69,8 +74,26 @@ namespace BlazorGrpcWebApp.Client.Pages
         }
 
         public async Task<List<string>> GetBattleLogs(int opponentId)
-        { 
-            return await LeaderboardService.GetBattleLogsWithGrpc(opponentId);
+        {
+            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Leaderboard")))
+                return await LeaderboardGrpcService.GetBattleLogsWithGrpc(opponentId);
+            else
+            {
+                var response = await LeaderboardRestService
+                    .GetBattleLogsWithRest(new GetBattleLogsRequest() { AuthUserId = authUserId, OpponentId = opponentId });
+                var result = new List<string>();
+                if (response.Success && response.Data != null && response.Data.Any())
+                {
+                    foreach (var battleLog in response.Data)
+                    { 
+                        result.Add(battleLog.Log);
+                    }
+                    return result;
+                }
+
+                ToastService.ShowError(response.Message, "Error");
+                return result;
+            }     
         }
     }
 }

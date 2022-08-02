@@ -1,9 +1,12 @@
 ﻿@page "/leaderboard"
 @using BlazorGrpcWebApp.Client.Dialogs
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
+@using BlazorGrpcWebApp.Client.Interfaces.Rest
 @using Grpc.Core
-@inject ILeaderboardService LeaderboardService
-@inject IGrpcBattleService GrpcBattleService
+@inject IAppSettingsService AppSettingsService
+@inject ILeaderboardGrpcService LeaderboardGrpcService
+@inject ILeaderboardRestService LeaderboardRestService
+@inject IBattleGrpcService GrpcBattleService
 @inject IBananaService BananaService
 @inject IToastService ToastService
 @inject IDialogService DialogService
@@ -49,7 +52,7 @@
                             <MudTd DataLabel="Defeats" Style="@GetMyUserStyle(context.UserId)">@context.Defeats</MudTd>
                             <MudTd DataLabel="Battles" Style="@GetMyUserStyle(context.UserId)">@context.Battles</MudTd>
                             <MudTd DataLabel="Fight">
-                                @if (context.UserId != myUserId)
+                                @if (context.UserId != authUserId)
                                 {
                                     <MudButton Color="Color.Error" 
                                                Variant="Variant.Filled"
@@ -98,7 +101,7 @@
 {
     private string GetMyUserStyle(int userId)
     {
-        if (userId == myUserId) return "color: crimson; font-weight: 600px;";
+        if (userId == authUserId) return "color: crimson; font-weight: 600px;";
         else return string.Empty;       
     }
 

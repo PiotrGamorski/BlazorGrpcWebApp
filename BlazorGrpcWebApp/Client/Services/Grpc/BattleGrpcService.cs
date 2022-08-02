@@ -8,7 +8,7 @@ using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services.Grpc
 {
-    public class GrpcBattleService : IGrpcBattleService
+    public class BattleGrpcService : IBattleGrpcService
     {
         private readonly GrpcChannel _channel;
         private BattleServiceGrpc.BattleServiceGrpcClient _battleServiceGrpcClient;
@@ -16,7 +16,7 @@ namespace BlazorGrpcWebApp.Client.Services.Grpc
 
         public List<string> LastBattleLogs { get; set; } = new List<string>();
 
-        public GrpcBattleService(HttpClient httpClient)
+        public BattleGrpcService(HttpClient httpClient)
         {
             var httpClientGrpc = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
             _channel = GrpcChannel.ForAddress("https://localhost:7039", new GrpcChannelOptions { HttpClient = httpClientGrpc });
