@@ -1,4 +1,5 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces;
+using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Json;
@@ -8,13 +9,13 @@ namespace BlazorGrpcWebApp.Client.Services
     public class BananaService : IBananaService
     {
         private readonly HttpClient _httpClient;
-        private readonly IGrpcUserService _grpcUserService;
+        private readonly IUserGrpcService _grpcUserService;
 
         // one needs to introduce event Action as StateHasChanged is only avaiable in razor files.
         public event Action? OnChange;
         public int Bananas { get; set; }
 
-        public BananaService(HttpClient httpClient, IGrpcUserService grpcUserService)
+        public BananaService(HttpClient httpClient, IUserGrpcService grpcUserService)
         {
             _httpClient = httpClient;
             _grpcUserService = grpcUserService;

@@ -1,5 +1,6 @@
 ﻿@page "/register"
 @using BlazorGrpcWebApp.Client.Interfaces
+@using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
 @using BlazorGrpcWebApp.Shared.Models.UI_Models
 @using Grpc.Core
@@ -7,7 +8,7 @@
 @using System.Text.RegularExpressions
 @inject IUnitService UnitService
 @inject IAuthRestService AuthRestService
-@inject IGrpcUserService GrpcUserService
+@inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
 
@@ -153,7 +154,7 @@
     private async Task HandleRegistrationGrpc(int startUnitId)
     {
         userRegister.DateOfBirth = (DateTime) date!;
-        var result = await GrpcUserService.Register(userRegister, startUnitId, grpcRegisterDeadline);
+        var result = await GrpcUserService.RegisterWithGrpc(userRegister, startUnitId, grpcRegisterDeadline);
         if (result.Success)
         {
             ToastService.ShowSuccess(result.Message);

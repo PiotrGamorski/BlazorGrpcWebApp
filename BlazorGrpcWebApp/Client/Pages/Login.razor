@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
+@using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -7,7 +8,7 @@
 @inject IAppSettingsService AppSettingsService
 @inject IAuthRestService AuthRestService
 @inject ILogoutNavMenuService LogoutService
-@inject IGrpcUserService GrpcUserService
+@inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
 
  Please log in below or <a href="register">register</a> for a new account.

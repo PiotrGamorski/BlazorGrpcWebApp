@@ -31,7 +31,7 @@
 
     private async Task Submit()
     {
-        await Page!.FightOpponentGrpc(OpponentId);
+        await Page!.FightOpponent(OpponentId);
         if(Page.BattleCompleted)
             MudDialog!.Close(DialogResult.Ok(true));
     }

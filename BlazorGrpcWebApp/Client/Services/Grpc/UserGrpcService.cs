@@ -1,4 +1,4 @@
-﻿using BlazorGrpcWebApp.Client.Interfaces;
+﻿using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Google.Protobuf.WellKnownTypes;
@@ -6,31 +6,31 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 
-namespace BlazorGrpcWebApp.Client.Services
+namespace BlazorGrpcWebApp.Client.Services.Grpc
 {
-    public class GrpcUserService : IGrpcUserService
+    public class UserGrpcService : IUserGrpcService
     {
         private readonly GrpcChannel _channel;
         private UserServiceGrpc.UserServiceGrpcClient _userServiceGrpcClient;
-        public GrpcUserService()
+        public UserGrpcService()
         {
             var httpClientGrpc = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
             _channel = GrpcChannel.ForAddress("https://localhost:7039", new GrpcChannelOptions { HttpClient = httpClientGrpc });
             _userServiceGrpcClient = new UserServiceGrpc.UserServiceGrpcClient(_channel);
         }
 
-        public async Task<RegisterGrpcUserResponse> Register(UserRegister request, int startUnitId, int deadline)
+        public async Task<RegisterGrpcUserResponse> RegisterWithGrpc(UserRegister request, int startUnitId, int deadline)
         {
             return await DoGrpcUserRegister(new RegisterGrpcUserRequest()
-            { 
-                GrpcUser = new GrpcUser() 
+            {
+                GrpcUser = new GrpcUser()
                 {
-                   UserName = request.Username,
-                   Email = request.Email,
-                   Bananas = request.Bananas,
-                   DateOfBirth = Timestamp.FromDateTime(new DateTime(request.DateOfBirth.Ticks, DateTimeKind.Utc)),
-                   IsConfirmed = request.IsConfirmed,
-                   DateCreated = Timestamp.FromDateTime(DateTime.UtcNow),
+                    UserName = request.Username,
+                    Email = request.Email,
+                    Bananas = request.Bananas,
+                    DateOfBirth = Timestamp.FromDateTime(new DateTime(request.DateOfBirth.Ticks, DateTimeKind.Utc)),
+                    IsConfirmed = request.IsConfirmed,
+                    DateCreated = Timestamp.FromDateTime(DateTime.UtcNow),
                 },
                 Password = request.Password,
                 StartUnitId = startUnitId,
@@ -56,7 +56,7 @@ namespace BlazorGrpcWebApp.Client.Services
                 return new RegisterGrpcUserResponse() { Success = false, Message = e.Status.ToString() };
             }
             catch (Exception e)
-            { 
+            {
                 return new RegisterGrpcUserResponse() { Success = false, Message = e.Message };
             }
         }
@@ -88,7 +88,7 @@ namespace BlazorGrpcWebApp.Client.Services
         }
 
         public async Task<GrpcUserAddBananasResponse> DoGrpcUserAddBananas(GrpcUserAddBananasRequest request)
-        { 
+        {
             return await _userServiceGrpcClient.GrpcUserAddBananasAsync(request);
         }
     }
