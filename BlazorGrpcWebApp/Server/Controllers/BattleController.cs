@@ -14,13 +14,11 @@ namespace BlazorGrpcWebApp.Server.Controllers
     public class BattleController : ControllerBase
     {
         private readonly DataContext _dataContext;
-        private readonly IUtilityService _utilityService;
         private readonly IBattleService _battleService;
 
-        public BattleController(DataContext dataContext, IUtilityService utilityService, IBattleService battleService)
+        public BattleController(DataContext dataContext, IBattleService battleService)
         {
             _dataContext = dataContext;
-            _utilityService = utilityService;
             _battleService = battleService;
         }
 
