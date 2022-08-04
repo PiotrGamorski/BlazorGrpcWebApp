@@ -14,6 +14,11 @@
     <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini" Elevation="1">
         <MudDrawerHeader >
             @*TODO*@
+            <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" 
+                     Color="Color.Error" 
+                     Size="Size.Large">
+            </MudIcon>
+            <MudText Color="Color.Error">MudBlazor</MudText>
         </MudDrawerHeader>
         <NavMenu DrawerOpen="DrawerOpen">
         @if (DrawerOpen)
