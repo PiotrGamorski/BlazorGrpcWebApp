@@ -1,18 +1,20 @@
 ﻿@inherits LayoutComponentBase
 @using Blazored.Toast.Configuration
 
-<MudThemeProvider Theme="MyMudBlazorTheme" />
+<MudThemeProvider Theme="Theme" />
 <MudDialogProvider MaxWidth="MaxWidth.Large" CloseButton="true"/>
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Dense="true">
+    <MudAppBar Dense="true" Elevation="3">
         <MudIconButton Icon="@Icons.Material.Filled.Dehaze" Color="Color.Primary" Edge="Edge.Start" OnClick="ToggleDrawer"/>
         <MudSpacer />
         <TopMenu/>
     </MudAppBar> 
-
-    <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini">
+    <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini" Elevation="1">
+        <MudDrawerHeader >
+            @*TODO*@
+        </MudDrawerHeader>
         <NavMenu DrawerOpen="DrawerOpen">
         @if (DrawerOpen)
         {
@@ -32,22 +34,6 @@
     </MudMainContent>
 </MudLayout>
 
-@*<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <TopMenu/>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>*@
-
 <BlazoredToasts Position="ToastPosition.BottomRight"/>
 
 @code 
@@ -59,65 +45,74 @@
         DrawerOpen = !DrawerOpen;
     }
 
-    MudTheme MyMudBlazorTheme = new MudTheme()
+    MudTheme Theme = new MudTheme()
     {
         Palette = new Palette()
         {
             // Box Lines + Font
             Primary = "#ffff",
-            Secondary = "#a80000ff",
+            Secondary = "#7e6fffff",
             Tertiary = "#444f",
+
             // Main Background
-            Background = "#333f",
+            Background = "#1a1a27ff",
+
             // Paper Background
-            //Surface = "#222f",
-            Surface = "#222222",
+            Surface = "#1e1e2dff",
+
             // Drawer Background
-            DrawerBackground = "#222f",
+            DrawerBackground = "#1a1a27ff",
+
+            // Appbar Background
+            AppbarBackground = "#1a1a27ff",
+
             Success = "#32CD32ff",
             TextPrimary = "#eeef",
             TextSecondary = "#eeef",
             DrawerText = "#eeee",
             DrawerIcon = "rgba(255,255,255, 1)",
-            AppbarBackground = "#222222",
             TableHover = "#aaaf",
             ActionDefault = "fff7",
             ActionDisabled = "#fff7",
             Warning = "#bb8800ff",
-            Error = "#a80000ff",
+            Error = "#7e6fffff",
         },
         LayoutProperties = new LayoutProperties()
         {
-            DrawerWidthLeft = "200px",
+            DrawerWidthLeft = "14vw",
             DrawerMiniWidthLeft = "65px",
         },
-        
+
         Typography = new Typography()
         {
-            Body1 = new()
+            Default = new Default()
             {
-                FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
-                FontSize = "18px",
-                FontWeight = 1,
-                LetterSpacing = String.Empty,
-                LineHeight = 0
-            },
-            Body2 = new()
-            {
-                FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
-                FontSize = "14px",
-                FontWeight = 1,
-                LetterSpacing = String.Empty,
-                LineHeight = 0
-            },
-            H6 = new()
-            {
-                FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
-                FontSize = "20px",
-                FontWeight = 1,
-                LetterSpacing = String.Empty,
-                LineHeight = 0
+                FontFamily = new[] { "Roboto-Regular", "Helvetica", "Arial", "sans-serif" }
             }
+            //Body1 = new()
+            //{
+            //    FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
+            //    FontSize = "18px",
+            //    FontWeight = 1,
+            //    LetterSpacing = String.Empty,
+            //    LineHeight = 0
+            //},
+            //Body2 = new()
+            //{
+            //    FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
+            //    FontSize = "14px",
+            //    FontWeight = 1,
+            //    LetterSpacing = String.Empty,
+            //    LineHeight = 0
+            //},
+            //H6 = new()
+            //{
+            //    FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
+            //    FontSize = "20px",
+            //    FontWeight = 1,
+            //    LetterSpacing = String.Empty,
+            //    LineHeight = 0
+            //}
         }
     };
 }

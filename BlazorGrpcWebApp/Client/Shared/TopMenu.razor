@@ -9,7 +9,7 @@
     <div class="top-menu">
         <img src = "icons/banana.png"/>
         <MudButton Variant="Variant.Filled" Color="Color.Default">
-                @if (areBananasLoaded)
+                @if (bananasLoaded)
                 {
                     <MudText Style="font-family:'Roboto">@BananaService.Bananas</MudText>
                 }
@@ -20,6 +20,14 @@
             </MudButton>
         <AddBananas/>
     </div>
+    <div style="margin-left: 0; z-index: 999;">
+        <MudNavMenu>
+            <MudNavGroup Title="Settings" @bind-Expanded=_isExpanded Style="">
+                <MudNavLink Href="#">Users</MudNavLink>
+                <MudNavLink Href="#">Security</MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    </div>
     </Authorized>
     <NotAuthorized>
         <MudCard>
@@ -27,28 +35,27 @@
             <NavLink href="register" style="margin-left: 0">Register</NavLink>
         </MudCard>
     </NotAuthorized>
-
 </AuthorizeView>
 
 @code {
-    private bool areBananasLoaded { get; set; }
+    private bool bananasLoaded;
+    private bool _isExpanded;
 
     protected override async Task OnInitializedAsync()
     {
-        areBananasLoaded = false;
-        var authenticationState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
-        if (authenticationState.User.Identity!.AuthenticationType == "jwt")
-            await BananaService.GrpcGetBananas();
-        areBananasLoaded = true;
+        bananasLoaded = false;
 
-        // subscribe to the event
-        // This needs to be added, as other component executes a function effecting Bananas amount
+        var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+        var isAuthenticated = authState.User.Identity?.IsAuthenticated;
+        if (isAuthenticated ?? false)
+            await BananaService.GrpcGetBananas();
+
+        bananasLoaded = true;
         BananaService.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
-        // unsubscribe to the event
         BananaService.OnChange -= StateHasChanged;
     }
 }

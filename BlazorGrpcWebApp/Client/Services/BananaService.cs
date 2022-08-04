@@ -1,6 +1,7 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces;
 using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Json;
 
@@ -34,10 +35,16 @@ namespace BlazorGrpcWebApp.Client.Services
         }
 
         #region REST Api calls
-        public async Task GetBananas()
+        public async Task<GenericAuthResponse<int>> GetBananas(int authUserId)
         {
-            Bananas = await _httpClient.GetFromJsonAsync<int>("api/user/getbananas");
-            await BananasChanged();
+            var response = await _httpClient.GetFromJsonAsync<GenericAuthResponse<int>>($"api/user/{authUserId}/getbananas");
+            if (response!.Success)
+            {
+                Bananas = response.Data;
+                await BananasChanged();
+            }
+
+            return response;
         }
 
         public async Task AddBananas(int amount)

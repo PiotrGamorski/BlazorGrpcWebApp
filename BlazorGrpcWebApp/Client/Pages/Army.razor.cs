@@ -4,18 +4,27 @@ using BlazorGrpcWebApp.Client.Dialogs;
 using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using MudBlazor;
+using BlazorGrpcWebApp.Client.Authentication;
+using System.Security.Claims;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
     public partial class Army : ComponentBase
     {
-        private string? ImgPath { get; set; }
+        private bool useGrpc;
+        private int authUserId;
+        private string? ImgPath;
         private IList<UserUnitDto>? UserUnitsDtos { get; set; }
         private IList<ArmyUnit>? ArmyUnits { get; set; }
 
 
         protected override async Task OnInitializedAsync()
         {
+            useGrpc = bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"));
+
+            var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+            authUserId = int.Parse(authState.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
             ArmyUnits = new List<ArmyUnit>();
 
             if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army")))
@@ -28,7 +37,7 @@ namespace BlazorGrpcWebApp.Client.Pages
         }
 
 
-        private Task ShowDeleteUserUnitDialog(int userUnitId)
+        public Task ShowDeleteUserUnitDialog(int userUnitId)
         {
             var parameters = new DialogParameters();
             parameters.Add("Color", Color.Error);
@@ -39,7 +48,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             return Task.CompletedTask;
         }
 
-        private Task ShowReviveArmyDialog()
+        public Task ShowReviveArmyDialog()
         {
             var parameters = new DialogParameters();
             parameters.Add("Color", Color.Error);
@@ -50,7 +59,7 @@ namespace BlazorGrpcWebApp.Client.Pages
         }
 
 
-        private void PopulateArmyUnits(IList<UserUnitDto>? UserUnitDtos)
+        public void PopulateArmyUnits(IList<UserUnitDto>? UserUnitDtos)
         {
             foreach (var item in UserUnitDtos!)
             {
@@ -92,21 +101,21 @@ namespace BlazorGrpcWebApp.Client.Pages
             }
         }
 
-        private async Task Heal(int userUnitId)
+        public async Task Heal(int userUnitId)
         {
-            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"))) await HealUserUnitWithGrpc(userUnitId);
+            if (useGrpc) await HealUserUnitWithGrpc(userUnitId);
             else await HealUserUnitWithRest(userUnitId);
         }
 
         public async Task ReviveArmy()
         {
-            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"))) await ReviveArmyWithGrpc();
+            if (useGrpc) await ReviveArmyWithGrpc();
             else await ReviveArmyWithRest();
         }
 
         public async Task Delete(int userUnitId)
         {
-            if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Army"))) await DeleteUserUnitGrpc(userUnitId);
+            if (useGrpc) await DeleteUserUnitGrpc(userUnitId);
             else await DeleteUserUnitWithRest(userUnitId);
         }
 
@@ -139,6 +148,11 @@ namespace BlazorGrpcWebApp.Client.Pages
                     var userUnitsDtos = await GetUserUnitsWithRest();
                     PopulateArmyUnits(UserUnitsDtos);
                     StateHasChanged();
+
+                    await BananaRestService.GetBananas(authUserId);
+                    await BananaRestService.BananasChanged();
+
+                    ToastService.ShowSuccess("Your Unit has been deleted", "Success");
                 }
                 else
                     ToastService.ShowError("Something went wrong...", ":(");
@@ -161,13 +175,11 @@ namespace BlazorGrpcWebApp.Client.Pages
                     PopulateArmyUnits(UserUnitsDtos);
                     StateHasChanged();
 
-                    // TODO: use or create proper rest service
-                    await BananaService.GrpcGetBananas();
-                    await BananaService.BananasChanged();
+                    await BananaRestService.GetBananas(authUserId);
+                    await BananaRestService.BananasChanged();
 
                     ToastService.ShowSuccess(response.Content.ToString());
                 }
-
                 else ToastService.ShowError(response.Content.ToString(), ":(");
             }
             catch (Exception e)
@@ -186,9 +198,8 @@ namespace BlazorGrpcWebApp.Client.Pages
                 PopulateArmyUnits(UserUnitsDtos);
                 StateHasChanged();
 
-                // TODO: use or create proper rest service
-                await BananaService.GrpcGetBananas();
-                await BananaService.BananasChanged();
+                await BananaRestService.GetBananas(authUserId);
+                await BananaRestService.BananasChanged();
 
                 ToastService.ShowSuccess(await result.Content.ReadAsStringAsync());
             }
@@ -233,7 +244,7 @@ namespace BlazorGrpcWebApp.Client.Pages
 
                 ToastService.ShowSuccess(response.Message, "Success");
             }
-            else ToastService.ShowError(response.Message, ":(");
+            else ToastService.ShowError(response.Message, "Error");
         }
 
         private async Task HealUserUnitWithGrpc(int userUnitId)

@@ -17,6 +17,10 @@ namespace BlazorGrpcWebApp.Client.Services
         private readonly GrpcChannel _channel;
         private UnitServiceGrpc.UnitServiceGrpcClient _unitServiceGrpcClient;
 
+        public int deadline { get; set; } = 5000;
+        public IList<Unit> Units { get; set; } = new List<Unit>();
+        public IList<UserUnit> UserUnits { get; set; } = new List<UserUnit>();
+
         public UnitService(IToastService toastService, IBananaService bananaService, HttpClient httpClient)
         {
             _toastService = toastService;
@@ -27,9 +31,6 @@ namespace BlazorGrpcWebApp.Client.Services
             _unitServiceGrpcClient = new UnitServiceGrpc.UnitServiceGrpcClient(_channel);
         }
 
-        public int deadline { get; set; } = 5000;
-        public IList<Unit> Units { get; set; } = new List<Unit>();
-        public IList<UserUnit> MyUnits { get; set; } = new List<UserUnit>();
 
         #region Rest API calls
         public async Task LoadUnitsAsync()
@@ -40,7 +41,7 @@ namespace BlazorGrpcWebApp.Client.Services
             }
         }
 
-        public async Task AddUnit(int unitId)
+        public async Task AddUnit(int unitId, int authUserId)
         {
             var unit = Units.First(u => u.Id == unitId);
             if (unit != null)
@@ -50,8 +51,14 @@ namespace BlazorGrpcWebApp.Client.Services
                     _toastService.ShowError(await result.Content.ReadAsStringAsync());
                 else
                 {
-                    await _bananaService.GetBananas();
-                    MyUnits.Add(new UserUnit { UnitId = unit.Id, HitPoints = unit.HitPoints });
+                    var response = await _bananaService.GetBananas(authUserId);
+                    if (!response.Success)
+                    {
+                        _toastService.ShowError(response.Message, "Error");
+                        return;
+                    }
+
+                    UserUnits.Add(new UserUnit { UnitId = unit.Id, HitPoints = unit.HitPoints });
                     _toastService.ShowSuccess($"Your {unit.Title} has been built!", "Unit built!");
                 }
             }
@@ -74,17 +81,17 @@ namespace BlazorGrpcWebApp.Client.Services
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.DeadlineExceeded)
             {
-                _toastService.ShowError(e.Status.ToString(), ":(");
+                _toastService.ShowError(e.Status.ToString(), "Error");
                 return new List<GrpcUnitResponse>();
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.NotFound)
             {
-                _toastService.ShowError(e.Status.ToString(), ":(");
+                _toastService.ShowError(e.Status.ToString(), "Error");
                 return new List<GrpcUnitResponse>();
             }
             catch (Exception e)
             {
-                _toastService.ShowError(e.Message, ":(");
+                _toastService.ShowError(e.Message, "Error");
                 return new List<GrpcUnitResponse>();
             }
         }

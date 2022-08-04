@@ -41,6 +41,7 @@ builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
 builder.Services.AddScoped<IArmyGrpcService, ArmyGrpcService>();
 builder.Services.AddScoped<IArmyRestService, ArmyRestService>();
 builder.Services.AddScoped<IBananaService, BananaService>();
+builder.Services.AddScoped<IBananaRestService, BananaRestService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ILogoutNavMenuService, LogoutNavMenuService>();
 builder.Services.AddScoped<IUserGrpcService, UserGrpcService>();

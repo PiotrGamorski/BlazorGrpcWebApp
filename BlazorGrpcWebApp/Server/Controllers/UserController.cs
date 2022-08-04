@@ -2,6 +2,7 @@
 using BlazorGrpcWebApp.Server.Interfaces;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Models;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,11 +26,14 @@ namespace BlazorGrpcWebApp.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("getbananas")]
-        public async Task<IActionResult> GetBananas()
+        [HttpGet("{authUserId}/getbananas")]
+        public async Task<ActionResult<GenericAuthResponse<int>>> GetBananas([FromQuery] int authUserId)
         {
-            var user = await _utilityService.GetUser();
-            return Ok(user!.Bananas);
+            var authUser = await _dataContext.Users.FindAsync(authUserId);
+            if (authUser == null) 
+                return NotFound(new GenericAuthResponse<int>() {  Success = false, Message = StatusCodes.Status404NotFound.ToString() });
+            else 
+                return Ok(new GenericAuthResponse<int>() { Data = authUser.Bananas, Success = true});
         }
 
         [HttpPut("addbananas")]
@@ -38,6 +42,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             var user = await _utilityService.GetUser();
             user!.Bananas += bananas;
             await _dataContext.SaveChangesAsync();
+
             return Ok(user.Bananas);
         }
 
@@ -51,7 +56,6 @@ namespace BlazorGrpcWebApp.Server.Controllers
                 .ThenBy(u => u.DateCreated)
                 .ToList();
 
-            // Rank is computed based on upper order
             int rank = 1;
             var response = users.Select(user => 
             {
@@ -64,7 +68,6 @@ namespace BlazorGrpcWebApp.Server.Controllers
             return Ok(response);
         }
 
-        // Api needed to get authorised user for gRPC services
         [HttpGet("getAuthUserId")]
         public Task<int> GetAuthorisedUserId()
         {

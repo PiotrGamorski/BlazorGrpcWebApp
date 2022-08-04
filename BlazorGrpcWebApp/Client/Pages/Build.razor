@@ -1,6 +1,11 @@
 ﻿@page "/build"
+@using BlazorGrpcWebApp.Client.Interfaces.Rest
 @using Grpc.Core
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAppSettingsService AppSettingsService
 @inject IBananaService BananaService
+@inject IBananaRestService BananaRestService
 @inject IUnitService UnitService
 @inject IToastService ToastService
 @inject IGrpcUserUnitService GrpcUserUnitService
@@ -16,49 +21,62 @@
     </select>
 </div>
 <br />
-<MudButton @onclick="BuildUnitGrpc" 
+<MudButton @onclick="BuildUnit" 
            Color="Color.Secondary" 
            Variant="Variant.Filled">
            Build
 </MudButton>
 
 @code {
+    private int authUserId;
+    private bool useGrpc;
     private int selectedUnitId { get; set; } = 1;
     private int SnackBarRefInterval { get; set; } = 5000;
     private string? SnackBarRefMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
+        authUserId = int.Parse(authState.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        useGrpc = bool.Parse(AppSettingsService.GetValueFromPagesSec("Build"));
+
         await UnitService.LoadUnitsAsync();
         //await UnitService.DoGetUnits(2000);
     }
 
-    public async Task BuildUnitRestApi()
+    public async Task BuildUnit()
+    {
+        if (useGrpc) await BuildUnitWithGrpc();
+        else await BuildUnitWithRest();
+    }
+
+    private async Task BuildUnitWithRest()
     {
         var selectedUnit = UnitService.Units.FirstOrDefault(u => u.Id == selectedUnitId);
         if (selectedUnit != null)
         {
             if (BananaService.Bananas < selectedUnit.BananaCost)
             {
-                ToastService.ShowError("Not enough bananas!", ":(");
+                ToastService.ShowInfo("Not enough bananas!", ":(");
                 return;
             }
 
-            await BananaService.EatBananas(selectedUnit.BananaCost);
             try
             {
-                // AddUnit uses Rest Api Call
-                await UnitService.AddUnit(selectedUnitId);
+                await UnitService.AddUnit(selectedUnitId, authUserId);
+                await BananaService.EatBananas(selectedUnit.BananaCost);
+                ToastService.ShowSuccess($"Your {selectedUnit.Title} has been built!");
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                ToastService.ShowError(e.Message, "Error");
             }
         }
-        else throw new InvalidOperationException("Cannot build Unit");
+        else ToastService.ShowError("Operation can not be performed", "Error");
     }
 
-    public async Task BuildUnitGrpc()
+    private async Task BuildUnitWithGrpc()
     {
         var selectedUnit = UnitService.Units.FirstOrDefault(u => u.Id == selectedUnitId);
         if (selectedUnit != null)
@@ -67,10 +85,10 @@
             await BananaService.EatBananas(selectedUnit.BananaCost);
 
             if (grpcResponse.Success)
-                ToastService.ShowSuccess($"{grpcResponse.Message}", "Unit built!");
+                ToastService.ShowSuccess($"Your {selectedUnit.Title} has been built");
             else
-                ToastService.ShowError($"{grpcResponse.Message}", ":(");
+                ToastService.ShowError($"{grpcResponse.Message}", "Error");
         }
-        else ToastService.ShowError("Cannot build Unit", ":(");
+        else ToastService.ShowError("Operation can not be performed", "Error");
     }
 }

@@ -66,13 +66,16 @@ namespace BlazorGrpcWebApp.Server.Controllers
         public async Task<IActionResult> DeleteUserUnit([FromRoute] int userUnitId)
         {
             var authUserId = _utilityService.GetUserUserId();
+            var authUser = await _dataContext.Users.FindAsync(authUserId);
             var userUnit = await _dataContext.UserUnits
                 .FirstOrDefaultAsync(u => u.Id == userUnitId && u.UserId == authUserId);
+            var bananasReward = userUnit!.HitPoints;
 
             if(userUnit == null)
                 return NotFound();
 
             _dataContext.UserUnits.Remove(userUnit);
+            authUser!.Bananas += bananasReward;
             await _dataContext.SaveChangesAsync();
 
             return Ok();

@@ -2,12 +2,14 @@
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
 @using BlazorGrpcWebApp.Shared.Models.UI_Models
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAppSettingsService AppSettingsService
 @inject IArmyGrpcService ArmyGrpcService
 @inject IArmyRestService ArmyRestService
 @inject IUnitService UnitService
 @inject IGrpcUserUnitService GrpcUserUnitService
 @inject IBananaService BananaService
+@inject IBananaRestService BananaRestService
 @inject IToastService ToastService
 @inject IDialogService DialogService
 @attribute [Authorize]
