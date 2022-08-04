@@ -12,13 +12,15 @@
         <TopMenu/>
     </MudAppBar> 
     <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini" Elevation="1">
-        <MudDrawerHeader >
-            @*TODO*@
+        <MudDrawerHeader Style="align-items: center">
             <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" 
                      Color="Color.Error" 
                      Size="Size.Large">
             </MudIcon>
-            <MudText Color="Color.Error">MudBlazor</MudText>
+            <MudText Color="Color.Error" 
+                     Typo="Typo.h5"
+                     Style="padding-left: 10px">MudBlazor
+            </MudText>
         </MudDrawerHeader>
         <NavMenu DrawerOpen="DrawerOpen">
         @if (DrawerOpen)
@@ -92,7 +94,7 @@
         {
             Default = new Default()
             {
-                FontFamily = new[] { "Roboto-Regular", "Helvetica", "Arial", "sans-serif" }
+                FontFamily = new[] { "Roboto-Regular" }
             }
             //Body1 = new()
             //{

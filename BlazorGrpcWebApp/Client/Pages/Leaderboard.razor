@@ -47,11 +47,11 @@
                             <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="Rank" Style="@GetMyUserStyle(context.UserId)">@context.Rank</MudTd>
-                            <MudTd DataLabel="User" Style="@GetMyUserStyle(context.UserId)">@context.UserName</MudTd>
-                            <MudTd DataLabel="Victories" Style="@GetMyUserStyle(context.UserId)">@context.Victories</MudTd>
-                            <MudTd DataLabel="Defeats" Style="@GetMyUserStyle(context.UserId)">@context.Defeats</MudTd>
-                            <MudTd DataLabel="Battles" Style="@GetMyUserStyle(context.UserId)">@context.Battles</MudTd>
+                            <MudTd DataLabel="Rank" Style="@GetAuthUserStyle(context.UserId)">@context.Rank</MudTd>
+                            <MudTd DataLabel="User" Style="@GetAuthUserStyle(context.UserId)">@context.UserName</MudTd>
+                            <MudTd DataLabel="Victories" Style="@GetAuthUserStyle(context.UserId)">@context.Victories</MudTd>
+                            <MudTd DataLabel="Defeats" Style="@GetAuthUserStyle(context.UserId)">@context.Defeats</MudTd>
+                            <MudTd DataLabel="Battles" Style="@GetAuthUserStyle(context.UserId)">@context.Battles</MudTd>
                             <MudTd DataLabel="Fight">
                                 @if (context.UserId != authUserId)
                                 {
@@ -100,9 +100,9 @@
 
 @code 
 {
-    private string GetMyUserStyle(int userId)
+    private string GetAuthUserStyle(int userId)
     {
-        if (userId == authUserId) return "color: crimson; font-weight: 600px;";
+        if (userId == authUserId) return "color: #7e6fffff; font-weight: 800px;";
         else return string.Empty;       
     }
 

@@ -11,21 +11,31 @@
 @inject IGrpcUserUnitService GrpcUserUnitService
 @attribute [Authorize]
 
-<h3>Build</h3>
-<div>
-    <select @bind="selectedUnitId" class="form-control">
-        @foreach (var unit in UnitService.Units)
-        {
-            <option value="@unit.Id">@unit.Title // @unit.BananaCost Bananas</option>
-        }
-    </select>
-</div>
-<br />
-<MudButton @onclick="BuildUnit" 
-           Color="Color.Secondary" 
-           Variant="Variant.Filled">
-           Build
-</MudButton>
+<MudText Typo="Typo.h4">Build</MudText>
+<MudGrid>
+    <MudItem xs="6">
+        <MudPaper>
+            <MudSelect T="int" 
+                       Variant="Variant.Outlined" 
+                       AnchorOrigin="Origin.BottomCenter"
+                       @bind-Value="@selectedUnitId"
+                       ToStringFunc="@(new Func<int, string>(ConvertToBuildItem))">
+                @foreach(var unit in UnitService.Units)
+                {
+                    <MudSelectItem Value="unit.Id"/>            
+                }
+            </MudSelect>
+            <br/>
+            <br/>
+            <MudButton @onclick="BuildUnit" 
+                       Color="Color.Secondary" 
+                       Variant="Variant.Filled">
+                       Build
+            </MudButton>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
 
 @code {
     private int authUserId;
@@ -43,6 +53,12 @@
 
         await UnitService.LoadUnitsAsync();
         //await UnitService.DoGetUnits(2000);
+    }
+
+    private string ConvertToBuildItem(int unitId)
+    {
+        var unit = UnitService.Units.FirstOrDefault(u => u.Id == unitId);
+        return $"{unit!.Title} // {unit!.BananaCost} Bananas";
     }
 
     public async Task BuildUnit()
