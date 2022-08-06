@@ -1,15 +1,18 @@
 ﻿@using BlazorGrpcWebApp.Client.Authentication
 @using BlazorGrpcWebApp.Client.Interfaces
+@using BlazorGrpcWebApp.Client.Interfaces.Grpc
+@using BlazorGrpcWebApp.Shared.Data
+@using System.Security.Claims
 @inject IBananaService BananaService
 @implements IDisposable
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView>
     <Authorized>
-    <div class="top-menu">
-        <img src = "icons/banana.png"/>
-        <MudButton Variant="Variant.Filled" Color="Color.Default">
-                @if (bananasLoaded)
+        <MudCard Style="display:flex">
+            <MudImage Src = "icons/banana.png"/>
+            <MudButton Variant="Variant.Filled" Color="Color.Default">
+                @if (bananasHaveLoaded)
                 {
                     <MudText Style="font-family:'Roboto">@BananaService.Bananas</MudText>
                 }
@@ -18,16 +21,35 @@
                     <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
                 }
             </MudButton>
-        <AddBananas/>
-    </div>
-    <div style="margin-left: 0; z-index: 999;">
-        <MudNavMenu>
-            <MudNavGroup Title="Settings" @bind-Expanded=_isExpanded Style="">
-                <MudNavLink Href="#">Users</MudNavLink>
-                <MudNavLink Href="#">Security</MudNavLink>
-            </MudNavGroup>
-        </MudNavMenu>
-    </div>
+            <AddBananas/>
+        </MudCard>
+        <MudCard Style="display: flex;">
+            <MudButton Variant="Variant.Filled" @onclick="ToggleSettings">
+                <MudAvatar Size="Size.Small" Color="Color.Tertiary">
+                    @authUserInitials
+                </MudAvatar>
+                <MudIcon Icon="@Icons.Filled.ArrowDropDown"/>
+            </MudButton>
+            <MudPopover Open="@isExpanded"  
+                        Class="px-4 pt-4"
+                        AnchorOrigin="Origin.BottomCenter"
+                        TransformOrigin="Origin.TopCenter"
+                        Style="width:12vw">
+                <MudText Style="font-size: 0.90rem">Signed in as</MudText>
+                <MudText Style="margin-bottom:5px">@authUserName</MudText>
+                <MudDivider Style="margin-bottom:5px"/>
+                <MudText Style="margin-bottom: 10px">Your Account</MudText>
+                <MudDivider/>
+                <MudText Style="margin-bottom: 10px">Sign Out</MudText>        
+            </MudPopover>
+        </MudCard>
+        <MudCard>
+            <MudTooltip Text="GitHub">
+                <MudNavLink Href="https://github.com/PiotrGamorski" 
+                            Match="NavLinkMatch.All" 
+                            Icon="@Icons.Custom.Brands.GitHub"/>
+            </MudTooltip>
+        </MudCard>
     </Authorized>
     <NotAuthorized>
         <MudCard>
@@ -38,24 +60,35 @@
 </AuthorizeView>
 
 @code {
-    private bool bananasLoaded;
-    private bool _isExpanded;
+    private bool bananasHaveLoaded;
+    private string? authUserName;
+    private string? authUserInitials;
+    private bool isExpanded = false;
 
     protected override async Task OnInitializedAsync()
     {
-        bananasLoaded = false;
+        bananasHaveLoaded = false;
 
         var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
         var isAuthenticated = authState.User.Identity?.IsAuthenticated;
         if (isAuthenticated ?? false)
+        {
+            authUserName = authState.User.FindFirst(c => c.Type == ClaimTypes.Name)!.Value;
+            authUserInitials = authUserName.Substring(0,1);
             await BananaService.GrpcGetBananas();
+        }
 
-        bananasLoaded = true;
+        bananasHaveLoaded = true;
         BananaService.OnChange += StateHasChanged;
     }
 
     public void Dispose()
     {
         BananaService.OnChange -= StateHasChanged;
+    }
+
+    public void ToggleSettings()
+    {
+        isExpanded = !isExpanded;
     }
 }

@@ -7,8 +7,13 @@
 
 <MudLayout>
     <MudAppBar Dense="true" Elevation="3">
-        <MudIconButton Icon="@Icons.Material.Filled.Dehaze" Color="Color.Primary" Edge="Edge.Start" OnClick="ToggleDrawer"/>
-        <MudSpacer />
+        <MudContainer>
+            <MudIconButton Icon="@Icons.Material.Filled.Dehaze" 
+                       Color="Color.Primary" 
+                       Edge="Edge.Start" 
+                       OnClick="ToggleDrawer"/>
+        </MudContainer>
+        <MudSpacer/>
         <TopMenu/>
     </MudAppBar> 
     <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini" Elevation="1">
@@ -33,7 +38,6 @@
         }
         </NavMenu>
     </MudDrawer>
-
     <MudMainContent Class="pt-16">
         <MudContainer MaxWidth="MaxWidth.ExtraLarge">
             @Body
@@ -47,6 +51,11 @@
 {
     bool DrawerOpen { get; set; } = true;
 
+    void ToggleSettings()
+    {
+        
+    }
+
     void ToggleDrawer()
     {
         DrawerOpen = !DrawerOpen;
@@ -59,7 +68,7 @@
             // Box Lines + Font
             Primary = "#ffff",
             Secondary = "#7e6fffff",
-            Tertiary = "#444f",
+            Tertiary = "#ff4081ff",
 
             // Main Background
             Background = "#1a1a27ff",

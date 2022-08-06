@@ -3,17 +3,27 @@
 @inject NavigationManager NavigationManager
 @inject ILogoutNavMenuService LogoutNavMenuService
 
-<MudNavMenu>
+<MudNavMenu Style="height: 100%">
 @ChildContent
-<MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+<MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
+    <MudText>Home</MudText>
+</MudNavLink>
         <AuthorizeView>
             <Authorized>
-                <MudNavLink Href="build" Match="NavLinkMatch.All" Icon="@Icons.Filled.GroupAdd">Build</MudNavLink>
-                <MudNavLink Href="army" Match="NavLinkMatch.All" Icon="@Icons.Filled.Group">My Army</MudNavLink>
-                <MudNavLink Href="leaderboard" Match="NavLinkMatch.All" Icon="@Icons.Filled.Leaderboard">Leaderboard</MudNavLink>
+                <MudNavLink Href="build" Match="NavLinkMatch.All" Icon="@Icons.Filled.GroupAdd">
+                    <MudText>Build</MudText>
+                </MudNavLink>
+                <MudNavLink Href="army" Match="NavLinkMatch.All" Icon="@Icons.Filled.Group">
+                    <MudText>My Army</MudText>
+                </MudNavLink>
+                <MudNavLink Href="leaderboard" Match="NavLinkMatch.All" Icon="@Icons.Filled.Leaderboard">
+                    <MudText>Leaderboard</MudText>
+                </MudNavLink>
             </Authorized>
             <NotAuthorized>
-                <MudNavLink Href="register" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccessibilityNew">Register</MudNavLink>
+                <MudNavLink Href="register" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccessibilityNew">
+                    <MudText>Register</MudText>
+                </MudNavLink>
             </NotAuthorized>
         </AuthorizeView>
         <AuthorizeView>
@@ -22,7 +32,7 @@
                 {
                     <MudNavLink Icon="@Icons.Material.Filled.Logout"
                                 Match="NavLinkMatch.All"
-                                Style="opacity: 100%; pointer-events: auto;"
+                                Style="opacity: 100%; pointer-events: auto; position: fixed; bottom: 5px;"
                                 @onclick="Logout">
                                 Logout</MudNavLink>
                 }
@@ -30,7 +40,8 @@
                 {
                     <MudNavLink Icon="@Icons.Material.Filled.Logout"
                                 Match="NavLinkMatch.All"
-                                Style="opacity: 50%; pointer-events: none;">Logout
+                                Style="opacity: 50%; pointer-events: none; position: fixed; bottom: 5px;">
+                                <MudText>Logout</MudText>
                     </MudNavLink>
                 }
             </Authorized>
@@ -39,15 +50,18 @@
                 {
                         <MudNavLink Icon="@Icons.Material.Filled.Logout"
                                     Match="NavLinkMatch.All"
-                                    Style="opacity: 100%; pointer-events: auto;"
+                                    Style="opacity: 100%; pointer-events: auto; position: fixed; bottom: 5px;"
                                     @onclick="Logout">
-                                    Logout</MudNavLink>
+                                    <MudText>Logout</MudText>
+                         </MudNavLink>
                 }
                 else
                 {
                     <MudNavLink Icon="@Icons.Material.Filled.Logout"
                                 Match="NavLinkMatch.All"
-                                Style="opacity: 50%; pointer-events: none;">Logout</MudNavLink>
+                                Style="opacity: 50%; pointer-events: none; position: fixed; bottom: 5px;">
+                                <MudText>Logout</MudText>
+                    </MudNavLink>
                 }
             </NotAuthorized>
         </AuthorizeView>

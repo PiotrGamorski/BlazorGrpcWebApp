@@ -12,6 +12,7 @@ namespace BlazorGrpcWebApp.Client.Authentication
         private readonly ISessionStorageService _sessionStorageService;
         private readonly HttpClient _httpClient;
         private readonly IBananaService _bananaService;
+
         public CustomAuthStateProvider(ISessionStorageService sessionStorageService, HttpClient httpClient, IBananaService bananaService)
         {
             _sessionStorageService = sessionStorageService;
@@ -21,9 +22,8 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            // it'll be null at first, but after refresh it'll have the item
             var authToken = await _sessionStorageService.GetItemAsync<string>("authToken");
-            ClaimsIdentity identity = new ClaimsIdentity();
+            var identity = new ClaimsIdentity();
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
@@ -31,8 +31,6 @@ namespace BlazorGrpcWebApp.Client.Authentication
                 identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             }
-            else 
-                identity = new ClaimsIdentity();
 
             var user = new ClaimsPrincipal(identity);
             var state = new AuthenticationState(user);
@@ -42,7 +40,7 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
         public async Task MarkUserAsAuthenticated(string authToken)
         {
-            ClaimsIdentity identity = new ClaimsIdentity();
+            ClaimsIdentity identity;
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
@@ -51,16 +49,14 @@ namespace BlazorGrpcWebApp.Client.Authentication
                 {
                     identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-                    //await _bananaService.GetBananas();
+                    
                     await _bananaService.GrpcGetBananas();
                 }
                 catch(Exception e)
                 {
                     await _sessionStorageService.RemoveItemAsync("authToken");
-                    identity = new ClaimsIdentity();
                     throw new Exception(e.Message);
                 }
-                
 
                 var user = new ClaimsPrincipal(identity);
                 var state = new AuthenticationState(user);
@@ -74,7 +70,7 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
-
+            
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
 
             return Task.CompletedTask;

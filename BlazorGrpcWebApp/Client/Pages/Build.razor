@@ -12,9 +12,14 @@
 @attribute [Authorize]
 
 <MudText Typo="Typo.h4">Build</MudText>
+<br/>
 <MudGrid>
     <MudItem xs="6">
         <MudPaper>
+            <MudText Typo="Typo.h6" Style="margin-bottom: 20px">
+                Select hero class and build your unit.
+            </MudText>
+            <div style="padding-left:10px">
             <MudSelect T="int" 
                        Variant="Variant.Outlined" 
                        AnchorOrigin="Origin.BottomCenter"
@@ -25,6 +30,8 @@
                     <MudSelectItem Value="unit.Id"/>            
                 }
             </MudSelect>
+            </div>
+
             <br/>
             <br/>
             <MudButton @onclick="BuildUnit" 
