@@ -43,7 +43,6 @@ builder.Services.AddScoped<IArmyRestService, ArmyRestService>();
 builder.Services.AddScoped<IBananaService, BananaService>();
 builder.Services.AddScoped<IBananaRestService, BananaRestService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
-builder.Services.AddScoped<ISignOutService, SignOutService>();
 builder.Services.AddScoped<IUserGrpcService, UserGrpcService>();
 builder.Services.AddScoped<IGrpcUserUnitService, GrpcUserUnitService>();
 builder.Services.AddScoped<ILeaderboardGrpcService, LeaderboardGrpcService>();

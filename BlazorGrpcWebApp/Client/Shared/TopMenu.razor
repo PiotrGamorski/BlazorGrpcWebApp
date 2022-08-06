@@ -5,7 +5,7 @@
 @using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@inject ISignOutService SignOutService
+@*@inject ISignOutService SignOutService*@
 @inject IBananaService BananaService
 @implements IDisposable
 
@@ -40,11 +40,11 @@
                 <MudText Style="font-size: 0.90rem">Signed in as</MudText>
                 <MudText Style="margin-bottom:5px">@authUserName</MudText>
                 <MudDivider Style="margin-bottom:5px"/>
-                <MudText Style="margin-bottom: 5px">Your Account</MudText>
-                <MudDivider Style="margin-bottom: 5px"/>
+                <MudText Style="margin-bottom:5px">Your Account</MudText>
+                <MudDivider Style="margin-bottom:5px"/>
                 <MudLink Style="cursor:pointer; text-decoration:none"
                          @onclick="Signout">
-                    <MudText>Sign out</MudText>   
+                    <MudText Style="margin-bottom:5px">Sign out</MudText>   
                 </MudLink>    
             </MudPopover>
         </MudCard>

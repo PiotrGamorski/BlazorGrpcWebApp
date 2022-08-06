@@ -41,7 +41,6 @@ namespace BlazorGrpcWebApp.Client.Pages
                         }
 
                         await sessionStorage.SetItemAsync("authToken", result.Data);
-                        await LogoutService.Authenticated();
                         NavigationManager.NavigateTo("/");
                     }
                     else
@@ -79,7 +78,6 @@ namespace BlazorGrpcWebApp.Client.Pages
                             ToastService.ShowError(e.Message);
                         }
                         await sessionStorage.SetItemAsync("authToken", result.Data);
-                        await LogoutService.Authenticated();
                         NavigationManager.NavigateTo("/");
                     }
                     else
