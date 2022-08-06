@@ -1,9 +1,4 @@
-﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
-@inject ILogoutNavMenuService LogoutNavMenuService
-
-<MudNavMenu Style="height: 100%">
+﻿<MudNavMenu Style="height: 100%">
 @ChildContent
 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
     <MudText>Home</MudText>
@@ -26,45 +21,6 @@
                 </MudNavLink>
             </NotAuthorized>
         </AuthorizeView>
-        <AuthorizeView>
-            <Authorized>
-                @if(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true)
-                {
-                    <MudNavLink Icon="@Icons.Material.Filled.Logout"
-                                Match="NavLinkMatch.All"
-                                Style="opacity: 100%; pointer-events: auto; position: fixed; bottom: 5px;"
-                                @onclick="Logout">
-                                Logout</MudNavLink>
-                }
-                else
-                {
-                    <MudNavLink Icon="@Icons.Material.Filled.Logout"
-                                Match="NavLinkMatch.All"
-                                Style="opacity: 50%; pointer-events: none; position: fixed; bottom: 5px;">
-                                <MudText>Logout</MudText>
-                    </MudNavLink>
-                }
-            </Authorized>
-            <NotAuthorized>
-                @if(DisableLogout == false || LogoutNavMenuService.isAuthenticated == true)
-                {
-                        <MudNavLink Icon="@Icons.Material.Filled.Logout"
-                                    Match="NavLinkMatch.All"
-                                    Style="opacity: 100%; pointer-events: auto; position: fixed; bottom: 5px;"
-                                    @onclick="Logout">
-                                    <MudText>Logout</MudText>
-                         </MudNavLink>
-                }
-                else
-                {
-                    <MudNavLink Icon="@Icons.Material.Filled.Logout"
-                                Match="NavLinkMatch.All"
-                                Style="opacity: 50%; pointer-events: none; position: fixed; bottom: 5px;">
-                                <MudText>Logout</MudText>
-                    </MudNavLink>
-                }
-            </NotAuthorized>
-        </AuthorizeView>
 </MudNavMenu>
 
 @code {
@@ -72,26 +28,4 @@
     public RenderFragment? ChildContent { get; set; }
     [Parameter]
     public bool DrawerOpen { get; set; }
-    private bool DisableLogout { get; set; } = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authenticationState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
-        DisableLogout = authenticationState.User.Identity!.AuthenticationType == "jwt" ? false : true;
-
-        LogoutNavMenuService.OnChange += StateHasChanged;
-    }
-
-    private async Task Logout()
-    {
-        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
-        DisableLogout = true;
-        await LogoutNavMenuService.NotAuthenticated();
-        NavigationManager.NavigateTo("/");
-    }
-
-    public void Dispose()
-    {   
-        LogoutNavMenuService.OnChange -= StateHasChanged;
-    }
 }

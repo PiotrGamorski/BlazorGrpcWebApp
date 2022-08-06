@@ -3,9 +3,11 @@
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Shared.Data
 @using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ISignOutService SignOutService
 @inject IBananaService BananaService
 @implements IDisposable
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView>
     <Authorized>
@@ -38,9 +40,12 @@
                 <MudText Style="font-size: 0.90rem">Signed in as</MudText>
                 <MudText Style="margin-bottom:5px">@authUserName</MudText>
                 <MudDivider Style="margin-bottom:5px"/>
-                <MudText Style="margin-bottom: 10px">Your Account</MudText>
-                <MudDivider/>
-                <MudText Style="margin-bottom: 10px">Sign Out</MudText>        
+                <MudText Style="margin-bottom: 5px">Your Account</MudText>
+                <MudDivider Style="margin-bottom: 5px"/>
+                <MudLink Style="cursor:pointer; text-decoration:none"
+                         @onclick="Signout">
+                    <MudText>Sign out</MudText>   
+                </MudLink>    
             </MudPopover>
         </MudCard>
         <MudCard>
@@ -75,6 +80,8 @@
         {
             authUserName = authState.User.FindFirst(c => c.Type == ClaimTypes.Name)!.Value;
             authUserInitials = authUserName.Substring(0,1);
+            StateHasChanged();
+
             await BananaService.GrpcGetBananas();
         }
 
@@ -82,13 +89,20 @@
         BananaService.OnChange += StateHasChanged;
     }
 
+    private async Task Signout()
+    {
+        isExpanded = false;
+        await ((CustomAuthStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void ToggleSettings()
+    {
+        isExpanded = !isExpanded;
+    }
+
     public void Dispose()
     {
         BananaService.OnChange -= StateHasChanged;
-    }
-
-    public void ToggleSettings()
-    {
-        isExpanded = !isExpanded;
     }
 }

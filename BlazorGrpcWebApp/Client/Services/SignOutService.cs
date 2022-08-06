@@ -2,7 +2,7 @@
 
 namespace BlazorGrpcWebApp.Client.Services
 {
-    public class LogoutNavMenuService : ILogoutNavMenuService
+    public class SignOutService : ISignOutService
     {
         public event Action? OnChange;
         public bool isAuthenticated { get; set; } = false;
