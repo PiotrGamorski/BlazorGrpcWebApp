@@ -4,6 +4,7 @@ using BlazorGrpcWebApp.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorGrpcWebApp.Server.Migrations
 {
     [DbContext(typeof(DataContextForMigrations))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220807170325_CreateRolesTable")]
+    partial class CreateRolesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,12 +105,7 @@ namespace BlazorGrpcWebApp.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserRoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Roles");
                 });
@@ -194,27 +191,6 @@ namespace BlazorGrpcWebApp.Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserRoles");
-                });
-
             modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserUnit", b =>
                 {
                     b.Property<int>("Id")
@@ -295,22 +271,6 @@ namespace BlazorGrpcWebApp.Server.Migrations
                     b.Navigation("Opponent");
                 });
 
-            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.Role", b =>
-                {
-                    b.HasOne("BlazorGrpcWebApp.Shared.Entities.UserRole", null)
-                        .WithMany("Roles")
-                        .HasForeignKey("UserRoleId");
-                });
-
-            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserRole", b =>
-                {
-                    b.HasOne("BlazorGrpcWebApp.Shared.Entities.User", null)
-                        .WithMany("Roles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserUnit", b =>
                 {
                     b.HasOne("BlazorGrpcWebApp.Shared.Entities.Unit", "Unit")
@@ -330,14 +290,7 @@ namespace BlazorGrpcWebApp.Server.Migrations
 
             modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.User", b =>
                 {
-                    b.Navigation("Roles");
-
                     b.Navigation("Units");
-                });
-
-            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserRole", b =>
-                {
-                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }

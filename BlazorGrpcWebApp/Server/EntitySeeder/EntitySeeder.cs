@@ -26,6 +26,13 @@ namespace BlazorGrpcWebApp.Server.EntitySeeder
                     _dBContext.Units.AddRange(units);
                     _dBContext.SaveChanges();
                 }
+
+                if (!_dBContext.Roles.Any())
+                {
+                    var roles = GetRoles();
+                    _dBContext.Roles.AddRange(roles);
+                    _dBContext.SaveChanges();
+                }
             }
         }
 
@@ -57,6 +64,15 @@ namespace BlazorGrpcWebApp.Server.EntitySeeder
                     Attack = 20,
                     Defense = 1,
                 }
+            };
+        }
+
+        private IEnumerable<Role> GetRoles()
+        {
+            return new List<Role>()
+            {
+                new Role() { Name = "Admin" },
+                new Role() { Name = "User"}
             };
         }
     }

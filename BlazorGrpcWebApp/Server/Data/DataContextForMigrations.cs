@@ -47,5 +47,7 @@ namespace BlazorGrpcWebApp.Server
         public DbSet<UserUnit> UserUnits { get; set; }
         public DbSet<Battle> Battles { get; set; }
         public DbSet<BattleLog> BattleLogs { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
     }
 }
