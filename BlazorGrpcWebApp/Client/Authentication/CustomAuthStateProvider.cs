@@ -1,5 +1,4 @@
 ﻿using Blazored.SessionStorage;
-using BlazorGrpcWebApp.Client.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -11,13 +10,14 @@ namespace BlazorGrpcWebApp.Client.Authentication
     {
         private readonly ISessionStorageService _sessionStorageService;
         private readonly HttpClient _httpClient;
-        private readonly IBananaService _bananaService;
+        private readonly AuthServicesProvider _servicesProvider;
 
-        public CustomAuthStateProvider(ISessionStorageService sessionStorageService, HttpClient httpClient, IBananaService bananaService)
+        public CustomAuthStateProvider(ISessionStorageService sessionStorageService, HttpClient httpClient, 
+            AuthServicesProvider customAuthServicesProvider)
         {
             _sessionStorageService = sessionStorageService;
             _httpClient = httpClient;
-            _bananaService = bananaService;
+            _servicesProvider = customAuthServicesProvider;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -49,8 +49,6 @@ namespace BlazorGrpcWebApp.Client.Authentication
                 {
                     identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-                    
-                    await _bananaService.GrpcGetBananas();
                 }
                 catch(Exception e)
                 {
@@ -60,6 +58,7 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
                 var user = new ClaimsPrincipal(identity);
                 var state = new AuthenticationState(user);
+                await ExecuteOnAuthentication(state);
                 NotifyAuthenticationStateChanged(Task.FromResult(state));
             }
         }
@@ -94,6 +93,12 @@ namespace BlazorGrpcWebApp.Client.Authentication
             var claims = keyValuePairs!.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()!));
 
             return claims;
+        }
+
+        private async Task ExecuteOnAuthentication(AuthenticationState authState)
+        {
+            await _servicesProvider._bananaService.GrpcGetBananas();
+            _servicesProvider._topMenuService.SetAuthUserNameAndInitials(authState);
         }
     }
 }

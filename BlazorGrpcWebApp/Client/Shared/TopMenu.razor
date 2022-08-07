@@ -1,11 +1,11 @@
 ﻿@using BlazorGrpcWebApp.Client.Authentication
-@using BlazorGrpcWebApp.Client.Interfaces
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
+@using BlazorGrpcWebApp.Client.Interfaces.Shared
 @using BlazorGrpcWebApp.Shared.Data
 @using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@*@inject ISignOutService SignOutService*@
+@inject ITopMenuService Service
 @inject IBananaService BananaService
 @implements IDisposable
 
@@ -28,7 +28,7 @@
         <MudCard Style="display: flex;">
             <MudButton Variant="Variant.Filled" @onclick="ToggleSettings">
                 <MudAvatar Size="Size.Small" Color="Color.Tertiary">
-                    @authUserInitials
+                    @Service.AuthUserInitials
                 </MudAvatar>
                 <MudIcon Icon="@Icons.Filled.ArrowDropDown"/>
             </MudButton>
@@ -38,7 +38,7 @@
                         TransformOrigin="Origin.TopCenter"
                         Style="width:12vw">
                 <MudText Style="font-size: 0.90rem">Signed in as</MudText>
-                <MudText Style="margin-bottom:5px">@authUserName</MudText>
+                <MudText Style="margin-bottom:5px">@Service.AuthUserName</MudText>
                 <MudDivider Style="margin-bottom:5px"/>
                 <MudText Style="margin-bottom:5px">Your Account</MudText>
                 <MudDivider Style="margin-bottom:5px"/>
@@ -65,23 +65,15 @@
 </AuthorizeView>
 
 @code {
-    private bool bananasHaveLoaded;
-    private string? authUserName;
-    private string? authUserInitials;
+    private bool bananasHaveLoaded = false;
     private bool isExpanded = false;
 
     protected override async Task OnInitializedAsync()
     {
-        bananasHaveLoaded = false;
-
         var authState = await ((CustomAuthStateProvider)AuthenticationStateProvider).GetAuthenticationStateAsync();
         var isAuthenticated = authState.User.Identity?.IsAuthenticated;
         if (isAuthenticated ?? false)
         {
-            authUserName = authState.User.FindFirst(c => c.Type == ClaimTypes.Name)!.Value;
-            authUserInitials = authUserName.Substring(0,1);
-            StateHasChanged();
-
             await BananaService.GrpcGetBananas();
         }
 

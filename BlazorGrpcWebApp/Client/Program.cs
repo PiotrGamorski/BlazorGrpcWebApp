@@ -17,6 +17,8 @@ using BlazorGrpcWebApp.Client.Services.Rest;
 using BlazorGrpcWebApp.Client.Interfaces.Grpc;
 using BlazorGrpcWebApp.Client.Services.Grpc;
 using BlazorGrpcWebApp.Client.MappingProfile;
+using BlazorGrpcWebApp.Client.Interfaces.Shared;
+using BlazorGrpcWebApp.Client.Services.Shared;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -35,9 +37,11 @@ using var response = await httpClient.GetAsync("appsettings.json");
 using var stream = await response.Content.ReadAsStreamAsync();
 
 builder.Configuration.AddJsonStream(stream);
+builder.Services.AddScoped<AuthServicesProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<IAuthRestService, AuthRestService>();
 builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
+builder.Services.AddSingleton<ITopMenuService, TopMenuService>();
 builder.Services.AddScoped<IArmyGrpcService, ArmyGrpcService>();
 builder.Services.AddScoped<IArmyRestService, ArmyRestService>();
 builder.Services.AddScoped<IBananaService, BananaService>();
