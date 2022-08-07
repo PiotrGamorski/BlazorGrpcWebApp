@@ -1,4 +1,5 @@
-﻿using BlazorGrpcWebApp.Shared.Data;
+﻿using BlazorGrpcWebApp.Server.Claims;
+using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
         {
             var response = new GenericAuthResponse<string>();
             var user = await _dataContext!.Users.FirstOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+            var roles = await _dataContext!.Roles.ToListAsync();
             if (user == null)
             {
                 response.Success = false;
@@ -97,11 +99,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
 
         private Task<string> CreateToken(User user)
         {
-            List<Claim> claims = new List<Claim>()
-            { 
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-            };
+            var claims = UserClaims.CreateClaims(user);
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
