@@ -1,11 +1,10 @@
-﻿using BlazorGrpcWebApp.Server.Claims;
+﻿using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace BlazorGrpcWebApp.Server.Repositories
@@ -33,11 +32,15 @@ namespace BlazorGrpcWebApp.Server.Repositories
             else if (!await VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
-                response.Message = "Wrong password.";
+                response.Message = "Wrong email or password.";
             }
             else 
             {
-                response.Data = await CreateToken(user);
+                var userRoles = await _dataContext.UserRoles
+                    .Include(ur => ur.Role)
+                    .Where(ur => ur.UserId == user!.Id)
+                    .ToListAsync();
+                response.Data = await CreateToken(user, userRoles);
                 response.Success = true;
             }
             
@@ -57,6 +60,26 @@ namespace BlazorGrpcWebApp.Server.Repositories
 
                 await _dataContext!.Users.AddAsync(user);
                 await _dataContext.SaveChangesAsync();
+
+                if (!_dataContext.UserRoles.Any())
+                {
+                    var roleIds = _dataContext.Roles.Select(r => r.Id).ToList();
+                    if (roleIds.Any())
+                    {
+                        foreach (var id in roleIds)
+                        { 
+                            await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = id });
+                        }
+                        await _dataContext.SaveChangesAsync();
+                    }
+                }
+                else
+                { 
+                    var userRole = await _dataContext.Roles.FirstOrDefaultAsync(ur => ur.Name == "User");
+                    await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = userRole!.Id });
+                    await _dataContext.SaveChangesAsync();
+                }
+                
                 return new GenericAuthResponse<int>() { Data = user.Id, Success = true, Message = "Registration successfull!" };
             }
             catch (Exception e)
@@ -97,9 +120,9 @@ namespace BlazorGrpcWebApp.Server.Repositories
             }
         }
 
-        private Task<string> CreateToken(User user)
+        private Task<string> CreateToken(User user, List<UserRole> userRoles)
         {
-            var claims = UserClaims.CreateClaims(user);
+            var claims = UserClaims.CreateClaims(user, userRoles);
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

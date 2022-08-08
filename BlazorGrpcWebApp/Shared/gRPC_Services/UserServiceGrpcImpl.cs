@@ -1,4 +1,5 @@
 ﻿using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using Grpc.Core;
@@ -24,7 +25,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
         try
         {
             await CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            var userToBeSaved = new User()
+            var user = new User()
             {
                 Email = request.GrpcUser.Email,
                 UserName = request.GrpcUser.UserName,
@@ -37,17 +38,36 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 IsDeleted = request.GrpcUser.IsDeleted,
             };           
 
-            await _dataContext.Users.AddAsync(userToBeSaved);
+            await _dataContext.Users.AddAsync(user);
             await _dataContext.SaveChangesAsync();
 
             var startUnit = new UserUnit()
             {
-                UserId = _dataContext.Users.Where(u => u.Email == userToBeSaved.Email).First().Id,
+                UserId = _dataContext.Users.Where(u => u.Email == user.Email).First().Id,
                 UnitId = request.StartUnitId,
                 HitPoints = (await _dataContext.FindAsync<Unit>(request.StartUnitId))!.HitPoints,
             };
             await _dataContext.UserUnits.AddAsync(startUnit);
             await _dataContext.SaveChangesAsync();
+
+            if (!_dataContext.UserRoles.Any())
+            {
+                var roleIds = _dataContext.Roles.Select(r => r.Id).ToList();
+                if (roleIds.Any())
+                {
+                    foreach (var id in roleIds)
+                    {
+                        await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = id });
+                    }
+                    await _dataContext.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                var userRole = await _dataContext.Roles.FirstOrDefaultAsync(ur => ur.Name == "User");
+                await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = userRole!.Id });
+                await _dataContext.SaveChangesAsync();
+            }
 
             return new RegisterGrpcUserResponse() { Data = request.GrpcUser.Id, Success = true, Message = "Registration successfull!" };
         }
@@ -66,12 +86,20 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
         try
         {
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.GrpcUser.Email.ToLower());
+
             if (user == null)
                 return new LoginGrpcUserRespone() { Success = false, Message = "User Not Found" };
             else if (user != null && !await VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 return new LoginGrpcUserRespone() { Success = false, Message = "Wrong password" };
             else
-                return new LoginGrpcUserRespone() { Data = await CreateToken(user!), Success = true };
+            {
+                var userRoles = await _dataContext.UserRoles
+                    .Include(ur => ur.Role)
+                    .Where(ur => ur.UserId == user!.Id)
+                    .ToListAsync();
+
+                return new LoginGrpcUserRespone() { Data = await CreateToken(user!, userRoles), Success = true };
+            }
         }
         catch (Exception e)
         {
@@ -153,13 +181,14 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 #pragma warning restore CA1416 // Validate platform compatibility
     }
 
-    private Task<string> CreateToken(User user)
+    private Task<string> CreateToken(User user, List<UserRole> userRoles)
     {
-        List<Claim> claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-            };
+        var claims = UserClaims.CreateClaims(user, userRoles);
+        //List<Claim> claims = new List<Claim>()
+        //{
+        //    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        //    new Claim(ClaimTypes.Name, user.UserName),
+        //};
 
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
