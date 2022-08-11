@@ -41,6 +41,7 @@ builder.Services.AddScoped<AuthServicesProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<IAuthRestService, AuthRestService>();
 builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
+builder.Services.AddSingleton<IUserRolesService, UserRolesService>();
 builder.Services.AddSingleton<ITopMenuService, TopMenuService>();
 builder.Services.AddScoped<IArmyGrpcService, ArmyGrpcService>();
 builder.Services.AddScoped<IArmyRestService, ArmyRestService>();

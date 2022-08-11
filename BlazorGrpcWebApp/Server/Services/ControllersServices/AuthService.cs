@@ -1,4 +1,5 @@
-﻿using BlazorGrpcWebApp.Shared.Claims;
+﻿using BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces;
+using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
@@ -7,13 +8,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 
-namespace BlazorGrpcWebApp.Server.Repositories
+namespace BlazorGrpcWebApp.Server.Services.ControllersServices
 {
-    public class AuthRepository : IAuthRepository
+    public class AuthService : IAuthService
     {
         private readonly DataContext _dataContext;
         private readonly IConfiguration _configuration;
-        public AuthRepository(DataContext dataContext, IConfiguration configuration)
+        public AuthService(DataContext dataContext, IConfiguration configuration)
         {
             _dataContext = dataContext;
             _configuration = configuration;
@@ -34,7 +35,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
                 response.Success = false;
                 response.Message = "Wrong email or password.";
             }
-            else 
+            else
             {
                 var userRoles = await _dataContext.UserRoles
                     .Include(ur => ur.Role)
@@ -43,14 +44,14 @@ namespace BlazorGrpcWebApp.Server.Repositories
                 response.Data = await CreateToken(user, userRoles);
                 response.Success = true;
             }
-            
+
             return response;
         }
 
         public async Task<GenericAuthResponse<int>> Register(User user, string password)
         {
-            if(await UserExists(user.Email))
-                return new GenericAuthResponse<int>() { Success = false, Message = "User already exists."};
+            if (await UserExists(user.Email))
+                return new GenericAuthResponse<int>() { Success = false, Message = "User already exists." };
 
             try
             {
@@ -67,19 +68,19 @@ namespace BlazorGrpcWebApp.Server.Repositories
                     if (roleIds.Any())
                     {
                         foreach (var id in roleIds)
-                        { 
+                        {
                             await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = id });
                         }
                         await _dataContext.SaveChangesAsync();
                     }
                 }
                 else
-                { 
+                {
                     var userRole = await _dataContext.Roles.FirstOrDefaultAsync(ur => ur.Name == "User");
                     await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = userRole!.Id });
                     await _dataContext.SaveChangesAsync();
                 }
-                
+
                 return new GenericAuthResponse<int>() { Data = user.Id, Success = true, Message = "Registration successfull!" };
             }
             catch (Exception e)
@@ -90,7 +91,7 @@ namespace BlazorGrpcWebApp.Server.Repositories
 
         public async Task<bool> UserExists(string email)
         {
-            if (await _dataContext!.Users.AnyAsync(user => user.Email.ToLower() == (email.ToLower())))
+            if (await _dataContext!.Users.AnyAsync(user => user.Email.ToLower() == email.ToLower()))
                 return true;
 
             return false;
@@ -112,8 +113,8 @@ namespace BlazorGrpcWebApp.Server.Repositories
             {
                 var computePasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 foreach (var index in Enumerable.Range(0, computePasswordHash.Length))
-                { 
-                    if(computePasswordHash[index] != passwordHash[index])
+                {
+                    if (computePasswordHash[index] != passwordHash[index])
                         return Task.FromResult(false);
                 }
                 return Task.FromResult(true);

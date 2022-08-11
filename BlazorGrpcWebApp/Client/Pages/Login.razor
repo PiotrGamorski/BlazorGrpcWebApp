@@ -1,4 +1,5 @@
 ﻿@page "/login"
+@layout LoginLayout
 @using System.ComponentModel.DataAnnotations
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
@@ -10,44 +11,127 @@
 @inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
 
- Please log in below or <a href="register">register</a> for a new account.
- <br/>
+<MudThemeProvider Theme="_loginTheme" />
  <MudGrid>
-     <MudItem xs="12" sm="5">
-         <MudPaper Class="pa-4">
-             <MudForm Model="@userLogin"
-                      @bind-IsValid="@success">
-                 <MudTextField T="string" 
-                              Label="Email"
-                              InputType="InputType.Email"
-                              Variant="Variant.Outlined"
-                              Required="true"
-                              RequiredError="Email is required!"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
-                              @bind-Value="userLogin.Email"/>
-                <br/>
-                <MudTextField T="string"
-                              Label="Password"
-                              Variant="Variant.Outlined"
-                              InputType="InputType.Password"
-                              Required="true" 
-                              RequiredError="Password is required!"
-                              @bind-Value="userLogin.Password"/>
-                <MudCardActions>
+     <MudItem lg="12">
+         <MudContainer Style="align-items:center; justify-content:center; display:flex; flex-direction:column">
+             <MudIcon Icon="@Icons.Custom.Brands.GitHub" 
+                      Color="Color.Tertiary" 
+                      Title="GitHub" 
+                      Style="width: 45px; height:45px; margin-bottom: 35px"/>
+             <MudText Typo="Typo.h5" 
+                      Color="Color.Tertiary"  
+                      Style="margin-bottom:20px; font-weight: 100;">
+                      Sign in to BlazorBattles
+             </MudText>
+             <MudCard Style="width: 300px; padding: 16px; border-radius: 6px; border: 1px solid #21262d; background-color:#161b22">
+                <MudForm Model="@userLogin"
+                         @bind-IsValid="@success">
+                    <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                        Username or email address
+                    </MudText>
+                    <MudTextField T="string"
+                                  InputType="InputType.Email"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  RequiredError="Email is required!"
+                                  Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
+                                  @bind-Value="userLogin.Email"
+                                  Style="font-size:small; color:#c9d1d3;"/>
+                    <br/>
+                    <div style="display: flex; align-items:center; justify-content:space-between; padding-bottom:2px">
+                        <MudText Style="font-size:small; color:#c9d1d3">Password</MudText>
+                        <MudLink Href="" 
+                                 Color="Color.Info" 
+                                 Style="text-transform: none; font-size:small;">
+                                 Forgot password?
+                        </MudLink>
+                    </div>
+                    <MudTextField T="string"
+                                  Variant="Variant.Outlined"
+                                  InputType="InputType.Password"
+                                  Required="true" 
+                                  RequiredError="Password is required!"
+                                  @bind-Value="userLogin.Password"
+                                  Style="font-size:small; color:#c9d1d3"/>
+                    <br/>
                     <MudButton Variant="Variant.Filled" 
+                               Style="text-transform: none; width: 100%; border-radius: 6px"
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
                                OnClick="async () => await HandleLogin()">
-                               Login
+                               Sign In
                     </MudButton>
-                </MudCardActions>
-             </MudForm>
-         </MudPaper>
+                </MudForm>
+             </MudCard>
+         </MudContainer>
+         <br/>
+         <MudContainer>
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <MudCard Style="width: 300px; padding: 16px; background-color: transparent; border: 1px solid #21262d; border-radius: 6px">
+                    <div style="display: flex; align-items: center; justify-content:center">
+                        <MudText Color="Color.Tertiary" Style="font-size:small; margin-right: 5px">
+                            New to BlazorBattles?
+                        </MudText>
+                        <MudLink Href="/register" Color="Color.Info">
+                            <MudText Style="text-transform: none; font-size:small">
+                                Create an account
+                            </MudText>
+                        </MudLink>.
+                    </div>
+                </MudCard>
+            </div>
+         <br/>
+         <br/>
+         </MudContainer>
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <MudCard Style="width: 300px; padding: 16px; background-color: transparent;">
+                    <div style="display: flex; align-items: center; justify-content:center">
+                        <MudLink Href="/register" Color="Color.Info">
+                            <MudText Style="text-transform: none; font-size:11px">
+                                Terms
+                            </MudText>
+                        </MudLink>
+                        <MudSpacer/>
+                        <MudLink Href="/register" Color="Color.Info">
+                            <MudText Style="text-transform: none; font-size:11px">
+                                Privacy
+                            </MudText>
+                        </MudLink>
+                        <MudSpacer/>
+                        <MudLink Href="/register" Color="Color.Info">
+                            <MudText Style="text-transform: none; font-size:11px">
+                                Security
+                            </MudText>
+                        </MudLink>
+                        <MudSpacer/>
+                        <MudLink Href="/register" Color="Color.Primary">
+                            <MudText Style="text-transform: none; font-size:11px">
+                                Contact BlazorBattles
+                            </MudText>
+                        </MudLink>
+                    </div>
+                </MudCard>
+            </div>
+         <MudContainer>
+
+         </MudContainer>
      </MudItem>
  </MudGrid>
+
+ <style>
+    .mud-input {
+        background-color: @_loginTheme.Palette.Background;
+        height: 35px;
+    }
+    .mud-input-outlined-border {
+        color: #21262d;
+    }
+ </style>
     
 @code {
+    private readonly MudTheme _loginTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
     private bool success = false;
 
     private IEnumerable<string> ValidateEmail(string email)

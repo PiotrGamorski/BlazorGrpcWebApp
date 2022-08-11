@@ -7,11 +7,13 @@ namespace BlazorGrpcWebApp.Client.Authentication
     {
         public readonly IBananaService _bananaService;
         public readonly ITopMenuService _topMenuService;
+        public readonly IUserRolesService _userRolesService;
 
-        public AuthServicesProvider(IBananaService bananaService, ITopMenuService topMenuService)
+        public AuthServicesProvider(IBananaService bananaService, ITopMenuService topMenuService, IUserRolesService userRolesService)
         {
             _bananaService = bananaService;
             _topMenuService = topMenuService;
+            _userRolesService = userRolesService;
         }
     }
 }

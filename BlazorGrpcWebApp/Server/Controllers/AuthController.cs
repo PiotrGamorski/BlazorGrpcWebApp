@@ -1,4 +1,4 @@
-﻿using BlazorGrpcWebApp.Server.Repositories;
+﻿using BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,16 +9,16 @@ namespace BlazorGrpcWebApp.Server.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthRepository _authRepository;
-        public AuthController(IAuthRepository authRepository)
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
         {
-            _authRepository = authRepository;
+            _authService = authService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegister request)
         {
-            var response = await _authRepository.Register(new User() 
+            var response = await _authService.Register(new User() 
             {
                 UserName = request.Username,
                 Email = request.Email,
@@ -35,7 +35,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLogin request)
         { 
-            var response = await _authRepository.Login(request.Email, request.Password);
+            var response = await _authService.Login(request.Email, request.Password);
             if (!response.Success)
                 return BadRequest(response);
             return Ok(response);

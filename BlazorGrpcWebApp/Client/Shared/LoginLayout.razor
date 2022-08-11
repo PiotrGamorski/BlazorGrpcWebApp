@@ -1,0 +1,15 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="Theme" />
+<MudDialogProvider MaxWidth="MaxWidth.Large" CloseButton="true"/>
+<MudSnackbarProvider />
+
+<MudMainContent Class="pt-16">
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+        @Body
+    </MudContainer>
+</MudMainContent>
+
+@code {
+    MudTheme Theme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
+}

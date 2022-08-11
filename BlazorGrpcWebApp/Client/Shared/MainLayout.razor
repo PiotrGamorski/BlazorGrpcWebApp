@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
 @using Blazored.Toast.Configuration
 
 <MudThemeProvider Theme="Theme" />
@@ -16,6 +17,14 @@
         <MudSpacer/>
         <TopMenu/>
     </MudAppBar> 
+    <div id="threejscontainer" style="width: 100vw; 
+                                      height: 100vh; 
+                                      display: block; 
+                                      position: fixed; 
+                                      top: 0; 
+                                      left: 0; 
+                                      z-index: -9999; 
+                                      overflow:hidden;"></div>
     <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini" Elevation="1">
         <MudDrawerHeader Style="align-items: center">
             <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" 
@@ -49,11 +58,21 @@
 
 @code 
 {
+    bool useThreeJs = false;
     bool DrawerOpen { get; set; } = true;
+    const string canvasId = "canvas-id";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (useThreeJs)
+        {
+            await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.load");
+        }
+    }
 
     void ToggleSettings()
     {
-        
+
     }
 
     void ToggleDrawer()
@@ -61,74 +80,5 @@
         DrawerOpen = !DrawerOpen;
     }
 
-    MudTheme Theme = new MudTheme()
-    {
-        Palette = new Palette()
-        {
-            // Box Lines + Font
-            Primary = "#ffff",
-            Secondary = "#7e6fffff",
-            Tertiary = "#ff4081ff",
-
-            // Main Background
-            Background = "#1a1a27ff",
-
-            // Paper Background
-            Surface = "#1e1e2dff",
-
-            // Drawer Background
-            DrawerBackground = "#1a1a27ff",
-
-            // Appbar Background
-            AppbarBackground = "#1a1a27ff",
-
-            Success = "#32CD32ff",
-            TextPrimary = "#eeef",
-            TextSecondary = "#eeef",
-            DrawerText = "#eeee",
-            DrawerIcon = "rgba(255,255,255, 1)",
-            TableHover = "#aaaf",
-            ActionDefault = "fff7",
-            ActionDisabled = "#fff7",
-            Warning = "#bb8800ff",
-            Error = "#7e6fffff",
-        },
-        LayoutProperties = new LayoutProperties()
-        {
-            DrawerWidthLeft = "14vw",
-            DrawerMiniWidthLeft = "65px",
-        },
-
-        Typography = new Typography()
-        {
-            Default = new Default()
-            {
-                FontFamily = new[] { "Roboto-Regular" }
-            }
-            //Body1 = new()
-            //{
-            //    FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
-            //    FontSize = "18px",
-            //    FontWeight = 1,
-            //    LetterSpacing = String.Empty,
-            //    LineHeight = 0
-            //},
-            //Body2 = new()
-            //{
-            //    FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
-            //    FontSize = "14px",
-            //    FontWeight = 1,
-            //    LetterSpacing = String.Empty,
-            //    LineHeight = 0
-            //},
-            //H6 = new()
-            //{
-            //    FontFamily = new string[] { "FujitsuInfinityPro-Regular" },
-            //    FontSize = "20px",
-            //    FontWeight = 1,
-            //    LetterSpacing = String.Empty,
-            //    LineHeight = 0
-            //}
-        }
-    };
+    MudTheme Theme = ThemesProvider.MudThemeProvider.CreateMainMudTheme();
 }

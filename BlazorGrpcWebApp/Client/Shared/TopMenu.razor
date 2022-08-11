@@ -5,6 +5,7 @@
 @using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject IUserRolesService UserRolesService
 @inject ITopMenuService Service
 @inject IBananaService BananaService
 @implements IDisposable
@@ -23,7 +24,10 @@
                     <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
                 }
             </MudButton>
-            <AddBananas/>
+            @if (UserRolesService.HasAdminRole)
+            {
+                <AddBananas/>
+            }
         </MudCard>
         <MudCard Style="display: flex;">
             <MudButton Variant="Variant.Filled" @onclick="ToggleSettings">

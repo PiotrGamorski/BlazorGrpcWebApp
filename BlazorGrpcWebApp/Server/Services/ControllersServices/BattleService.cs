@@ -1,14 +1,14 @@
-﻿using BlazorGrpcWebApp.Server.Interfaces;
+﻿using BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlazorGrpcWebApp.Server.Services
+namespace BlazorGrpcWebApp.Server.Services.ControllersServices
 {
     public class BattleService : IBattleService
     {
-        public BattleService(){}
+        public BattleService() { }
 
         public async Task Fight(DataContext dataContext, User attacker, User opponent, BattleResult result)
         {

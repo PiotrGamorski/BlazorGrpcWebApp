@@ -7,6 +7,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces.Shared
         string AuthUserName { get; set; }
         string AuthUserInitials { get; set; }
 
-        void SetAuthUserNameAndInitials(AuthenticationState authState);
+        void SetProperties(AuthenticationState authState);
     }
 }

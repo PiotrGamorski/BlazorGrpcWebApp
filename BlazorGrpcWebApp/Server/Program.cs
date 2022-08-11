@@ -1,7 +1,6 @@
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Server;
 using Microsoft.EntityFrameworkCore;
-using BlazorGrpcWebApp.Server.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using BlazorGrpcWebApp.Server.Interfaces;
@@ -9,6 +8,8 @@ using BlazorGrpcWebApp.Server.Services;
 using BlazorGrpcWebApp.Shared.gRPC_Services;
 using BlazorGrpcWebApp.Server.EntitySeeder;
 using System.Reflection;
+using BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces;
+using BlazorGrpcWebApp.Server.Services.ControllersServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +30,7 @@ builder.Services.AddGrpc();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

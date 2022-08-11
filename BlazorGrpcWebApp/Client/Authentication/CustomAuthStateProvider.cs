@@ -98,7 +98,8 @@ namespace BlazorGrpcWebApp.Client.Authentication
         private async Task ExecuteOnAuthentication(AuthenticationState authState)
         {
             await _servicesProvider._bananaService.GrpcGetBananas();
-            _servicesProvider._topMenuService.SetAuthUserNameAndInitials(authState);
+            _servicesProvider._topMenuService.SetProperties(authState);
+            _servicesProvider._userRolesService.SetUserRoles(authState);
         }
     }
 }

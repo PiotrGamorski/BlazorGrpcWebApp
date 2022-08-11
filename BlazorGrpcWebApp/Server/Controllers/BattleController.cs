@@ -1,4 +1,4 @@
-﻿using BlazorGrpcWebApp.Server.Interfaces;
+﻿using BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Models;
 using BlazorGrpcWebApp.Shared.Models.Controllers_Models;

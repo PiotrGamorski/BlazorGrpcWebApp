@@ -11,23 +11,25 @@ html {
 
 .form-control {
     border-color: #808080;
-    background-color: #1a1a27ff;
+    background-color: #0d1117;
     color: #DCDCDC;
+    border-radius: 6px
 }
 
 .form-control:focus {
-    border-color: #7e6fffff;
-    background-color: #1a1a27ff;
+    border-color: #53a6ff;
+    background-color: #0d1117;
     color: #DCDCDC;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(200, 0, 0, 0.6);
 }
 
 .form-control:disabled {
-    background-color: #1a1a27ff;
+    background-color: #0d1117;
 }
 
 .form-text {
     display: initial;
+    color :#c9d1d3;
 }
 
 .dropdown-menu {
@@ -49,20 +51,20 @@ input {
 }
 
 input:hover {
-    border-color: #A80000;
+    border-color: #53a6ff;
 }
 
 
-input:focus {
+/*input:focus {
     outline: none;
-    border-color: #A80000;
-    border-left: 1px solid #A80000;
-    border-top: 1px solid #A80000;
-    border-bottom: 1px solid #A80000;
-    box-shadow: 0px 0px 1px #A80000;
-    -moz-box-shadow: 0px 0px 1px #A80000;
-    -webkit-box-shadow: 0px 0px 1px #A80000;
-}
+    border-color: #53a6ff;
+    border-left: 1px solid #53a6ff;
+    border-top: 1px solid #53a6ff;
+    border-bottom: 1px solid #53a6ff;
+    box-shadow: 0px 0px 1px #53a6ff;
+    -moz-box-shadow: 0px 0px 1px #53a6ff;
+    -webkit-box-shadow: 0px 0px 1px #53a6ff;
+}*/
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -71,7 +73,7 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
 }
 input:-webkit-autofill{
-    -webkit-text-fill-color: #7e6fffff !important;
+    -webkit-text-fill-color: #c9d1d3 !important;
 }
 
 ul.pagination {

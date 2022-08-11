@@ -9,7 +9,7 @@ namespace BlazorGrpcWebApp.Client.Services.Shared
         public string AuthUserName { get; set; } = string.Empty;
         public string AuthUserInitials { get; set; } = string.Empty;
 
-        public void SetAuthUserNameAndInitials(AuthenticationState authState)
+        public void SetProperties(AuthenticationState authState)
         {
             AuthUserName = authState.User.FindFirst(c => c.Type == ClaimTypes.Name)!.Value;
             AuthUserInitials = AuthUserName.Substring(0, 1);
