@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Shared\BlazorGrpcWebApp.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\textures\" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,54 @@
+﻿@page "/start"
+@layout StartLayout
+@inject IJSRuntime JSRuntime
+
+<AuthorizeView>
+    <NotAuthorized>
+        <nav style="display: flex; align-items: center; justify-content:space-around; min-height: 8vh">
+            <div style="display: flex; align-items: center; justify-content:space-around">
+                <MudIcon Icon="@Icons.Custom.Brands.GitHub"
+                         Title="GitHub"
+                         Style="margin-right: 10px; width: 30px; height:30px"/>
+                <ul style="display: flex">
+                    <li style="padding-left: 20px; padding-right:20px">item</li>
+                    <li>item2</li>
+                </ul>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <MudButton>Sign in</MudButton>
+                <MudButton Style="border: 1px solid white">Sign up</MudButton>
+            </div>
+        </nav>
+
+        <MudGrid>
+            <MudItem lg="6">
+                three.js
+            </MudItem>
+            <MudItem lg="6">
+                <div id="threejscontainer" class="canvas"></div>
+            </MudItem>
+        </MudGrid>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+<style>
+    .canvas {
+        width: 100vw; 
+        height: 100vh; 
+        display: block; 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        z-index: -1; 
+        overflow:hidden;
+    }
+</style>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+            //await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.load");
+            await JSRuntime.InvokeVoidAsync("GlobeThreeJS.load");
+    }
+}

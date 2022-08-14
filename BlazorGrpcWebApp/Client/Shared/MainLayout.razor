@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject IJSRuntime JSRuntime
 @using Blazored.Toast.Configuration
 
 <MudThemeProvider Theme="Theme" />
@@ -17,14 +16,6 @@
         <MudSpacer/>
         <TopMenu/>
     </MudAppBar> 
-    <div id="threejscontainer" style="width: 100vw; 
-                                      height: 100vh; 
-                                      display: block; 
-                                      position: fixed; 
-                                      top: 0; 
-                                      left: 0; 
-                                      z-index: -9999; 
-                                      overflow:hidden;"></div>
     <MudDrawer @bind-Open="DrawerOpen" Variant="DrawerVariant.Mini" Elevation="1">
         <MudDrawerHeader Style="align-items: center">
             <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" 
@@ -61,19 +52,6 @@
     bool useThreeJs = false;
     bool DrawerOpen { get; set; } = true;
     const string canvasId = "canvas-id";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (useThreeJs)
-        {
-            await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.load");
-        }
-    }
-
-    void ToggleSettings()
-    {
-
-    }
 
     void ToggleDrawer()
     {
