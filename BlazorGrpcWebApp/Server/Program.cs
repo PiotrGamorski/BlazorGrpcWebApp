@@ -74,13 +74,13 @@ else
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
+
 var provider = new FileExtensionContentTypeProvider();
-provider.Mappings.Add(".hdr", "text/xml");
+provider.Mappings[".hdr"] = "text/xml";
 app.UseStaticFiles(new StaticFileOptions
 { 
     ContentTypeProvider = provider
 });
-//app.UseStaticFiles();
 
 app.UseRouting();
 app.UseGrpcWeb();

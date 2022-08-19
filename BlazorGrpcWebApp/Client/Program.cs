@@ -54,6 +54,7 @@ builder.Services.AddScoped<ILeaderboardGrpcService, LeaderboardGrpcService>();
 builder.Services.AddScoped<ILeaderboardRestService, LeaderboardRestService>();
 builder.Services.AddScoped<IBattleGrpcService, BattleGrpcService>();
 builder.Services.AddScoped<IBattleRestService, BattleRestService>();
+builder.Services.AddScoped<ICommonDataService, CommonDataService>();
 builder.Services.AddAutoMapper(typeof(ClientAppMappingProfile));
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();

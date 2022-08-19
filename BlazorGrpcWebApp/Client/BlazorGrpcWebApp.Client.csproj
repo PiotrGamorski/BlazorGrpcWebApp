@@ -23,6 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\shaders\partials\" />
+    <Folder Include="wwwroot\shaders\sphere\" />
     <Folder Include="wwwroot\textures\" />
   </ItemGroup>
 

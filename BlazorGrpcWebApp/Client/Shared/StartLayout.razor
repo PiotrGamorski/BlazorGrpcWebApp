@@ -12,6 +12,28 @@
 </MudMainContent>
 </MudLayout>
 
+<style>
+    .mud-layout{
+        display: block;
+        position: fixed;
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+        background-size: 250% auto;
+        background-repeat: no-repeat;
+        background-position: 50% 45%;
+        z-index: -10;
+        background-image: url(https://github.githubassets.com/images/modules/site/home/hero-glow.svg);
+    }
+    .mud-main-content {
+        height: 100vh;
+        width: 100vw;
+        background-image: url(https://github.githubassets.com/images/modules/site/home/hero-glow.svg);
+        background-repeat: no-repeat;
+        background-position-x: 37.5vw;
+    }
+</style>
+
 @code {
-    MudTheme _startTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
+    MudTheme _startTheme = ThemesProvider.MudThemeProvider.CreateStartMudTheme();
 }

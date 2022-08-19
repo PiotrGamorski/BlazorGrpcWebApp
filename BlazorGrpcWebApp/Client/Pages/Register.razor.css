@@ -1,5 +1,9 @@
-﻿.required::after {
+﻿/*.required::after {
     content: " *";
     font-weight: bold;
     color: red;
+}
+*/
+.mud-container {
+    background-color: darkred !important;
 }

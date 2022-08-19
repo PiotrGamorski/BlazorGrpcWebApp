@@ -1,54 +1,134 @@
 ﻿@page "/start"
+@using BlazorGrpcWebApp.Client.Services
 @layout StartLayout
 @inject IJSRuntime JSRuntime
+@inject ICommonDataService CommonData
+@inject NavigationManager NavigationManager
 
-<AuthorizeView>
-    <NotAuthorized>
-        <nav style="display: flex; align-items: center; justify-content:space-around; min-height: 8vh">
-            <div style="display: flex; align-items: center; justify-content:space-around">
-                <MudIcon Icon="@Icons.Custom.Brands.GitHub"
-                         Title="GitHub"
-                         Style="margin-right: 10px; width: 30px; height:30px"/>
-                <ul style="display: flex">
-                    <li style="padding-left: 20px; padding-right:20px">item</li>
-                    <li>item2</li>
-                </ul>
-            </div>
-            <div style="display: flex; align-items: center;">
-                <MudButton>Sign in</MudButton>
-                <MudButton Style="border: 1px solid white">Sign up</MudButton>
-            </div>
-        </nav>
+<MudThemeProvider Theme="_startTheme" />
+<div id="threejscontainer" class="canvas"></div>
+<nav style="display: flex; align-items: center; justify-content:space-around; min-height: 8vh">
+    <div style="display: flex; align-items: center; justify-content:space-around">
+        @*<MudImage Src="img/Babylon.js-logo.png" 
+                       Alt="Logo" Elevation="25" 
+                       Class="rounded-lg"
+                       Width="100"
+                       Height="66"
+                       Style=""/>*@    
+        <MudIcon Icon="@Icons.Custom.Brands.GitHub"
+                Title="GitHub"        
+                Style="margin-right: 10px; width: 30px; height:30px"/>
+        <ul style="display: flex">
+            <li style="padding-left: 20px; padding-right:20px">item</li>
+            <li>item2</li>
+        </ul>                
+    </div>
+    <div style="display: flex; align-items: center; justify-content:space-around">
+            <ul style="display: flex; align-items: center">
+                <li style="padding-left: 20px; padding-right:20px">
+                        <MudButton Style="text-transform: none; width: 100%">
+                            <MudText @onclick="@(()=>NavigationManager.NavigateTo("/login"))">
+                                Sign in
+                            </MudText>
+                        </MudButton>
+                </li>
+                <li>
+                    <MudButton Class="btn-Primary"
+                               Style="border: 1px solid white"
+                               @onclick="@(()=>NavigationManager.NavigateTo("/register"))">
+                        <MudText>Sign up</MudText>
+                    </MudButton>        
+                </li>        
+            </ul>      
+    </div>       
+</nav>            
 
-        <MudGrid>
-            <MudItem lg="6">
-                three.js
-            </MudItem>
-            <MudItem lg="6">
-                <div id="threejscontainer" class="canvas"></div>
-            </MudItem>
-        </MudGrid>
-    </NotAuthorized>
-</AuthorizeView>
-
+<MudElement HtmlTag="div" Style="width: 95vw; display:flex; align-items:center; justify-content:center">
+    <MudElement HtmlTag="div" 
+                Style="flex-direction:column; margin-top: 20vh;">
+        <MudElement HtmlTag="div">
+            <MudText Class="secular">Let's build from here,</MudText>
+            <MudText Class="secular">together.</MudText>
+            <br/>
+            <MudText Typo="Typo.h5">The complete developer platform to build,</MudText>
+            <MudText Typo="Typo.h5">scale, and deliver secure software.</MudText>                
+        </MudElement>
+        <br/>
+        <MudElement HtmlTag="div"
+                    Style="display: flex; align-items: center;">
+            <MudGrid Style="max-width: 600px; align-items: center">
+                <MudItem xs="7" Style="flex-basis:unset">
+                    <input type="email" 
+                           class="content-input"
+                           style="width: 300px"
+                           placeholder="Email address"
+                           autocomplete="off"
+                           @bind-value="CommonData.EmailAddress"/>                  
+                </MudItem>
+                <MudItem xs="5">
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Secondary" 
+                               Class="ml-auto"
+                               Style="padding: 10px 20px 10px 20px"
+                               @onclick="@(()=>NavigationManager.NavigateTo($"/register"))">
+                        <MudText>Sing up for Blazor Battles</MudText>           
+                    </MudButton>        
+                </MudItem>
+            </MudGrid>
+        </MudElement>
+    </MudElement>
+</MudElement>
 
 <style>
     .canvas {
-        width: 100vw; 
+        width: 50vw; 
         height: 100vh; 
         display: block; 
         position: fixed; 
         top: 0; 
-        left: 0; 
+        left: 40vw; 
         z-index: -1; 
-        overflow:hidden;
+        overflow: hidden;
+    }
+    .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-Primary {
+        text-transform: none;
+        width: 100%;
+        border-radius: 6px;
+    }
+    .secular {
+        font-size: 64px;
+        color:#ffffff;
+        font-family:'Secular One';
+    }
+    .content-input {
+        border-radius: 6px;
+        border: 1px solid #808080;
+        height: 45px;
+        color:#24292f;
+        font-size:medium;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .content-input:focus {
+        outline: none !important;
+        transition: box-shadow 0.2s ease-in-out;
+        border: 2.5px solid #165ddb;
     }
 </style>
 
 @code {
+    private readonly MudTheme _startTheme = ThemesProvider.MudThemeProvider.CreateStartMudTheme();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-            //await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.load");
-            await JSRuntime.InvokeVoidAsync("GlobeThreeJS.load");
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("Earth.load");
+        }
     }
 }

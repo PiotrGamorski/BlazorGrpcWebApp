@@ -24,22 +24,22 @@ function loadScene() {
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.0;
 
     camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 1000);
-    camera.position.set(0, 0, 500);
+    camera.position.set(50, 150, 400);
     controls = new OrbitControls(camera, renderer.domElement);
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.5;
     controls.enableDamping = true;
 
     let pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(200,200,200);
+    pointLight.position.set(600,300,300);
     scene.add(pointLight);
 
     let envmaploader = new THREE.PMREMGenerator(renderer);
 
-    new RGBELoader().setPath('textures/').load('cayley_interior_4k.hdr', function(hdrmap) {
+    new RGBELoader().setPath('textures/').load('cayley_interior_4k.hdr', async function(hdrmap) {
         let envmap = envmaploader.fromCubemap(hdrmap)
         let texture = new THREE.CanvasTexture(new FlakesTexture());
         texture.wrapS = THREE.RepeatWrapping;
@@ -47,19 +47,24 @@ function loadScene() {
         texture.repeat.x = 10;
         texture.repeat.y = 6;
 
+        let loader = new THREE.TextureLoader();
+        let earthTexture =  await loader.load('img/globeHRes.jpg', renderer.render(scene, camera));
+
         const gMaterial = {
             clearcoat : 1.0,
             clearcoatRoughness: 0.1,
             metalness: 0.9,
             roughness: 0.5,
             color: 0x8418ca,
+            reflectivity: 1.0,
             normalMap: texture,
-            normalScale: new THREE.Vector2(0.15, 0.15),
-            envMap: envmap.texture
+            normalScale: new THREE.Vector2(0.05, 0.05),
+            envMap: envmap.texture,
+            map: earthTexture,
         }
 
-        let globeGeometry = new THREE.SphereGeometry(100, 64, 64);
-        let globeMaterial= new THREE.MeshPhysicalMaterial(gMaterial);
+        let globeGeometry = new THREE.SphereBufferGeometry(100, 64, 64);
+        let globeMaterial = new THREE.MeshPhysicalMaterial(gMaterial);
         let globeMesh = new THREE.Mesh(globeGeometry, globeMaterial);
         scene.add(globeMesh);
     })
