@@ -74,6 +74,41 @@ namespace BlazorGrpcWebApp.Client.ThemesProvider
                 },
             };
         }
+        public static MudTheme CreateRegisterMudTheme()
+        {
+            return new MudTheme()
+            {
+                Palette = new Palette()
+                {
+                    // Box Lines + Font
+                    Primary = "#c9d1d3",
+                    Secondary = "#238636",
+                    Tertiary = "#c9d1d3",
+
+                    // Main Background
+                    Background = "#0d1117",
+
+                    // Paper Background
+                    Surface = "#0d1117",
+
+                    Success = "#32CD32ff",
+                    TextPrimary = "#c9d1d3",
+                    TextSecondary = "#c9d1d3",
+                    ActionDefault = "#fff7",
+                    ActionDisabled = "#fff7",
+                    Warning = "#bb8800ff",
+                    Info = "#53a6ff",
+                    Error = "#53a6ff",
+                },
+                Typography = new Typography()
+                {
+                    Default = new Default()
+                    {
+                        FontFamily = new[] { "Roboto-Regular" }
+                    }
+                },
+            };
+        }
         public static MudTheme CreateMainMudTheme()
         {
             return new MudTheme()

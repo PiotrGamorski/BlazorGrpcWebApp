@@ -1,4 +1,5 @@
 ﻿@page "/register"
+@layout RegisterLayout
 @using BlazorGrpcWebApp.Client.Interfaces
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
@@ -15,113 +16,185 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
-<h3>Register</h3>
 <MudGrid>
-    <MudItem xs="12" sm="5">
-        <MudPaper Class="pa-4">
-            <MudForm @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField T="string" 
-                              Label="Email"
-                              InputType="InputType.Email"
-                              Variant="Variant.Outlined"
-                              Required="true"
-                              RequiredError="Email is required!"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
-                              @bind-Value="userRegister.Email"/>
-                <br/>              
-                <MudTextField T="string"
-                              Label="Username"
-                              InputType="InputType.Text"
-                              Variant="Variant.Outlined"
-                              Required="true"
-                              RequiredError="Username is required!"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidateUsername))"
-                              @bind-Value="userRegister.Username"/>
-                <br/>
-                <MudTextField T="string"
-                              Label="Password"
-                              Variant="Variant.Outlined"
-                              InputType="InputType.Password"
-                              Required="true" 
-                              RequiredError="Password is required!"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidatePassword))"
-                              @bind-Value="userRegister.Password"/>
-                <br/>
-                <MudTextField T="string"
-                              Label="Confirm Password"
-                              Variant="Variant.Outlined"
-                              InputType="InputType.Password"
-                              Required="true" 
-                              RequiredError="Password confirmation is required!"
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidateConfirmPassword))"
-                              @bind-Value="userRegister.ConfirmPassword"/>
-                <br/>
-                <MudTextField T="string"
-                              Label="Bio"
-                              InputType="InputType.Text"
-                              Variant="Variant.Outlined"
-                              @bind-Value="userRegister.Bio"/>
-                <br/>
-                <MudSelect Label="Start Unit"
-                           AnchorOrigin="Origin.BottomCenter"
-                           Variant="Variant.Outlined"
-                           @bind-Value="userRegister.StartUnitId"
-                           ToStringFunc="@(new Func<int, string>(ConvertToTitle))">
-                    @foreach(var unit in grpcUnitsResponses)
+    <MudItem lg="12" sm="5">
+        <MudContainer Style="align-items:center; justify-content:center; display:flex; flex-direction:column">
+            <MudImage Src="img/Babylon.js-logo.png" 
+                       Alt="Logo" Elevation="25" 
+                       Class="rounded-lg"
+                       Width="150"
+                       Height="100"
+                       Style="margin-bottom: 35px"/>
+            <MudText Typo="Typo.h5" 
+                      Color="Color.Tertiary"  
+                      Style="margin-bottom:20px; font-weight: 100;">
+                      Sign up to Blazor Battles
+            </MudText>    
+            <MudCard Style="width: 400px; padding: 16px; border-radius: 6px; border: 1px solid #21262d; background-color:#161b22">
+                <MudForm @bind-IsValid="@success" @bind-Errors="@errors">
+                    <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                        Email address
+                    </MudText>
+                    <MudTextField T="string" 
+                                InputType="InputType.Email"
+                                Variant="Variant.Outlined"
+                                Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
+                                Class="register-form-item"
+                                @bind-Value="userRegister.Email"/>
+                    <br/>
+                    @if (isEmailValid)
                     {
-                        <MudSelectItem Value="@unit.GrpcUnit.Id">
-                            <span style="font-family: Roboto; font-size:initial">@unit.GrpcUnit.Title</span>
-                        </MudSelectItem>
+                        <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
+                            <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                                Username
+                            </MudText>
+                            <MudTextField T="string"
+                                    InputType="InputType.Text"
+                                    Variant="Variant.Outlined"
+                                    Validation="@(new Func<string, IEnumerable<string>>(ValidateUsername))"
+                                    Class="register-form-item"
+                                    @bind-Value="userRegister.Username"/>
+                        <br/>
+                        </Animate>
+                        @if (isUsernameValid)
+                        {
+                            <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
+                                <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                                    Password
+                                </MudText>
+                                <MudTextField T="string"
+                                    Variant="Variant.Outlined"
+                                    InputType="InputType.Password"
+                                    Validation="@(new Func<string, IEnumerable<string>>(ValidatePassword))"
+                                    Class="register-form-item"
+                                    @bind-Value="userRegister.Password"/>
+                                <br/>
+                            </Animate>
+                            @if (isPasswordValid)
+                            { 
+                                <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
+                                    <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                                        Confirm Password
+                                    </MudText>
+                                    <MudTextField T="string"
+                                        Variant="Variant.Outlined"
+                                        InputType="InputType.Password"
+                                        Validation="@(new Func<string, IEnumerable<string>>(ValidateConfirmPassword))"
+                                        Class="register-form-item"
+                                        @bind-Value="userRegister.ConfirmPassword"/>
+                                    <br/>
+                                </Animate>
+                                @if (isPasswordConfirmedValid)
+                                {
+                                    <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
+                                        @if (isAdmin)
+                                        {
+                                            <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                                                Bio
+                                            </MudText>
+                                            <MudTextField T="string"
+                                            InputType="InputType.Text"
+                                            Variant="Variant.Outlined"
+                                            Class="register-form-item"
+                                            @bind-Value="userRegister.Bio"/>
+                                            <br/>
+                                        }
+                                        <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                                            Start Unit
+                                        </MudText>
+                                        <MudSelect AnchorOrigin="Origin.BottomCenter"
+                                            Variant="Variant.Outlined"
+                                            Class="register-form-item"
+                                            @bind-Value="userRegister.StartUnitId"
+                                            ToStringFunc="@(new Func<int, string>(ConvertToTitle))">
+                                        @foreach (var unit in grpcUnitsResponses)
+                                        {
+                                            <MudSelectItem Value="@unit.GrpcUnit.Id">
+                                                <span style="font-family: Roboto-Regular; font-size:small">@unit.GrpcUnit.Title</span>
+                                            </MudSelectItem>
+                                        }
+                                        </MudSelect>
+                                        <br/>
+                                        @if (isAdmin)
+                                        { 
+                                            <MudTextField T="int"
+                                                InputType="InputType.Number"
+                                                Variant="Variant.Outlined"
+                                                Validation="@(new Func<int, IEnumerable<string>>(ValidateBananasNumber))"
+                                                Placeholder="Bananas"
+                                                Class="register-form-item"
+                                                @bind-Value="userRegister.Bananas"/>
+                                            <br/>
+                                        }
+                                        <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
+                                            Select your Date of Birth
+                                        </MudText>
+                                        <MudDatePicker Variant="Variant.Outlined"
+                                            Editable="true"
+                                            Rounded="true"
+                                            PickerVariant="PickerVariant.Inline"
+                                            Elevation="1"
+                                            Color="Color.Secondary"
+                                            Class="register-form-item"
+                                            @bind-Date="date"/>
+                                        <br/>
+                                        <MudCheckBox T="bool" 
+                                            @bind-Checked="userRegister.IsConfirmed" 
+                                            Style="font-family: Roboto-Regular; font-size:smaller">
+                                            <MudText Style="font-family: Roboto-Regular; font-size:smaller">
+                                                Confirmed
+                                            </MudText>
+                                        </MudCheckBox>
+                                        <MudCardActions Style="padding: 0">
+                                            <MudButton OnClick="async () => await HandleRegistrationGrpc(userRegister.StartUnitId)" 
+                                                Variant="Variant.Filled"
+                                                Class="ml-auto"
+                                                Style="text-transform: none; width: 100%; border-radius: 6px;"
+                                                Color="Color.Secondary" 
+                                                Disabled="@(!AllowSignUp)">
+                                                Sign up
+                                            </MudButton>
+                                        </MudCardActions>
+                                    </Animate>
+                                }
+                            }
+                        }
                     }
-                </MudSelect>
-                <br/>
-                <MudTextField T="int"
-                              Label="Bananas"
-                              InputType="InputType.Number"
-                              Variant="Variant.Outlined"
-                              Validation="@(new Func<int, IEnumerable<string>>(ValidateBananasNumber))"
-                              @bind-Value="userRegister.Bananas"/>
-                <br/>
-                <MudDatePicker Label="Select your Date of Birth"
-                               Variant="Variant.Outlined"
-                               Style="font-family: Roboto;"
-                               Editable="true"
-                               Rounded="true"
-                               PickerVariant="PickerVariant.Inline"
-                               Elevation="1"
-                               Color="Color.Error"
-                               @bind-Date="date"
-                                />
-                <br/>
-                <div class="d-flex">
-                <MudSwitch @bind-Checked="userRegister.IsConfirmed" 
-                           Class="mud-width-full" 
-                           Color="Color.Error">
-                    <MudText Style="font-family: Roboto; font-size:smaller">Confirmed</MudText>
-                </MudSwitch>
-                </div>
-                <MudCardActions>
-                    <MudButton OnClick="async () => await HandleRegistrationGrpc(userRegister.StartUnitId)" 
-                               Variant="Variant.Filled" 
-                               Color="Color.Error" 
-                               Disabled="@(!success)"
-                               Class="ml-auto">
-                               Register
-                    </MudButton>
-                </MudCardActions>
-            </MudForm>
-        </MudPaper>
+                </MudForm>
+            </MudCard>
+            </MudContainer>
     </MudItem>
 </MudGrid>
 
+<style>
+    .register-form-item {
+        font-family: Roboto-Regular;
+        font-size: small;
+        color: #c9d1d3;
+    }
+    .mud-input {
+        background-color: #0d1117;
+        height: 35px;
+    }
+    .mud-input-outlined-border {
+        color: #21262d;
+    }
+</style>
+
 @code {
-    private bool success;
+    private bool isAdmin = false;
+    private bool success = false;
+    private bool isEmailValid = false;
+    private bool isUsernameValid = false;
+    private bool isPasswordValid = false;
+    private bool isPasswordConfirmedValid = false;
     private string[] errors = { };
     private DateTime? date = DateTime.Today;
-    private UserRegister userRegister = new UserRegister();
+    private UserRegister userRegister = new UserRegister() { Bananas = 100, IsConfirmed = false, Bio = string.Empty };
     private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
     private int grpcRegisterDeadline { get; set; } = 5000;
     private IJSObjectReference? module;
+    public bool AllowSignUp { get { return success && userRegister.IsConfirmed; } }
 
     protected override async Task OnInitializedAsync()
     {
@@ -178,28 +251,32 @@
         else ToastService.ShowError(result.Message);
     }
 
-    //Validation Methods
+    #region Validation Methods
     private IEnumerable<string> ValidateEmail(string email)
     {
         var emailValidator = new EmailAddressAttribute();
         if (string.IsNullOrEmpty(email))
-            yield return "Email address is required!";
+            yield return "Email address is required";
         if (!emailValidator.IsValid(email))
-            yield return "Email address in invalid!";
+            yield return "Email address in invalid";
+        if (emailValidator.IsValid(email) && !string.IsNullOrEmpty(email))
+            isEmailValid = true;
     }
 
     private IEnumerable<string> ValidateUsername(string username)
     {
         if (string.IsNullOrEmpty(username))
-            yield return "Username is required!";
+            yield return "Username is required";
         if (username.Length > 16)
-            yield return "Your username is too long! (16 characters max)";
+            yield return "Your username is too long (16 characters max)";
+        if(!string.IsNullOrEmpty(username) && !(username.Length > 16))
+            isUsernameValid = true;
     }
 
     private IEnumerable<string> ValidatePassword(string password)
     {
         if (string.IsNullOrEmpty(password))
-            yield return "Password is required!";
+            yield return "Password is required";
         if (password.Length < 8)
             yield return "Password must be at least of length 8";
         if (password.Length > 100)
@@ -210,12 +287,17 @@
             yield return "Password must contain at least one lowercase letter";
         if (!Regex.IsMatch(password, @"[0-9]"))
             yield return "Password must contain at least one digit";
+        if (!string.IsNullOrEmpty(password) && !(password.Length < 8) && !(password.Length > 100) &&
+            Regex.IsMatch(password, @"[A-Z]") && Regex.IsMatch(password, @"[a-z]") && Regex.IsMatch(password, @"[0-9]"))
+            isPasswordValid = true;   
     }
 
     private IEnumerable<string> ValidateConfirmPassword(string password)
     {
         if(password != userRegister.Password)
             yield return "Passwords don't match";
+        if(password == userRegister.Password)
+            isPasswordConfirmedValid = true;
     }
 
     private IEnumerable<string> ValidateBananasNumber(int number)
@@ -223,6 +305,7 @@
         if (number < 1 || number > 1000)
             yield return "Please choose a number between 1 and 1000.";
     }
+    #endregion
 
     private string ConvertToTitle(int id)
     {

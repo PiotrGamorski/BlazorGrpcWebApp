@@ -91,7 +91,6 @@ function loadScene() {
         .easing(TWEEN.Easing.Quintic.Out)
         .start();
 
-    console.log(earthMesh.material);
     new TWEEN.Tween(earthMesh.material)
         .to({ opacity : 1 }, 1000)
         .delay(500)

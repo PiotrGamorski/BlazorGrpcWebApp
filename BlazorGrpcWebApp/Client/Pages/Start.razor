@@ -48,7 +48,11 @@
                 Style="flex-direction:column; margin-top: 20vh;">
         <MudElement HtmlTag="div">
             <MudText Class="secular">Let's build from here,</MudText>
-            <MudText Class="secular">together.</MudText>
+            <Animate Animation="Animations.FadeIn"  
+                     Delay="TimeSpan.FromSeconds(1.5)"
+                     Duration="TimeSpan.FromSeconds(1)">
+                <MudText Class="secular">@text</MudText>
+            </Animate>
             <br/>
             <MudText Typo="Typo.h5">The complete developer platform to build,</MudText>
             <MudText Typo="Typo.h5">scale, and deliver secure software.</MudText>                
@@ -123,6 +127,11 @@
 
 @code {
     private readonly MudTheme _startTheme = ThemesProvider.MudThemeProvider.CreateStartMudTheme();
+    public string text { get; set; } = "together.";
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
