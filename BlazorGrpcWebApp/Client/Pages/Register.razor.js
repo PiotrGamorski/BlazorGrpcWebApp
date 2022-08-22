@@ -1,4 +1,4 @@
-﻿export function TurnOffAutoComplete() {
+﻿function TurnOffAutoComplete() {
     const formCollection = document.getElementsByClassName("mud-form");
     const inputCollection = document.querySelectorAll(".mud-input-slot");
     
@@ -10,3 +10,5 @@
         inputCollection.forEach(e => e.setAttribute("autocomplete", "off"));
     }
 }
+
+export { TurnOffAutoComplete }

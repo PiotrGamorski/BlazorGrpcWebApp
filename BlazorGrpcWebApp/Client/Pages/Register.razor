@@ -13,6 +13,7 @@
 @inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
 @inject ICommonDataService CommonData
+@inject IAppSettingsService AppSettings
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
@@ -35,12 +36,15 @@
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
                         Email address
                     </MudText>
-                    <MudTextField T="string" 
-                                InputType="InputType.Email"
-                                Variant="Variant.Outlined"
-                                Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
-                                Class="register-form-item"
-                                @bind-Value="userRegister.Email"/>
+                    <MudTextField T="string"
+                        @ref="emailRef"
+                        InputType="InputType.Email"
+                        Variant="Variant.Outlined"
+                        Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
+                        Class="register-form-item"
+                        Style="font-size:small"
+                        DebounceInterval="@debounceInterval"
+                        @bind-Value="userRegister.Email"/>
                     <br/>
                     @if (isEmailValid)
                     {
@@ -49,12 +53,15 @@
                                 Username
                             </MudText>
                             <MudTextField T="string"
+                                    @ref="usernameRef"
                                     InputType="InputType.Text"
                                     Variant="Variant.Outlined"
                                     Validation="@(new Func<string, IEnumerable<string>>(ValidateUsername))"
                                     Class="register-form-item"
+                                    Style="font-size:small"
+                                    DebounceInterval="@debounceInterval"
                                     @bind-Value="userRegister.Username"/>
-                        <br/>
+                            <br/>
                         </Animate>
                         @if (isUsernameValid)
                         {
@@ -63,10 +70,12 @@
                                     Password
                                 </MudText>
                                 <MudTextField T="string"
+                                    @ref="passwordRef"
                                     Variant="Variant.Outlined"
                                     InputType="InputType.Password"
                                     Validation="@(new Func<string, IEnumerable<string>>(ValidatePassword))"
                                     Class="register-form-item"
+                                    DebounceInterval="@debounceInterval"
                                     @bind-Value="userRegister.Password"/>
                                 <br/>
                             </Animate>
@@ -77,10 +86,12 @@
                                         Confirm Password
                                     </MudText>
                                     <MudTextField T="string"
+                                        @ref="confirmPasswordRef"
                                         Variant="Variant.Outlined"
                                         InputType="InputType.Password"
                                         Validation="@(new Func<string, IEnumerable<string>>(ValidateConfirmPassword))"
                                         Class="register-form-item"
+                                        DebounceInterval="@debounceInterval"
                                         @bind-Value="userRegister.ConfirmPassword"/>
                                     <br/>
                                 </Animate>
@@ -96,6 +107,7 @@
                                             InputType="InputType.Text"
                                             Variant="Variant.Outlined"
                                             Class="register-form-item"
+                                            DebounceInterval="@debounceInterval"
                                             @bind-Value="userRegister.Bio"/>
                                             <br/>
                                         }
@@ -136,6 +148,7 @@
                                             Elevation="1"
                                             Color="Color.Secondary"
                                             Class="register-form-item"
+                                            Style="font-size: small"
                                             @bind-Date="date"/>
                                         <br/>
                                         <MudCheckBox T="bool" 
@@ -146,7 +159,7 @@
                                             </MudText>
                                         </MudCheckBox>
                                         <MudCardActions Style="padding: 0">
-                                            <MudButton OnClick="async () => await HandleRegistrationGrpc(userRegister.StartUnitId)" 
+                                            <MudButton OnClick="async () => await RegisterUser(userRegister.StartUnitId)" 
                                                 Variant="Variant.Filled"
                                                 Class="ml-auto"
                                                 Style="text-transform: none; width: 100%; border-radius: 6px;"
@@ -179,21 +192,37 @@
     .mud-input-outlined-border {
         color: #21262d;
     }
+    .check-circle-turnOff {
+        opacity: 0;
+    }
+    .check-circle-turnOn {
+        animation: fadeIn  0.75s; 
+        opacity: 1;
+    }
 </style>
 
 @code {
+    private bool useGrpc;
     private bool isAdmin = false;
     private bool success = false;
+    private string[] errors = { };
     private bool isEmailValid = false;
     private bool isUsernameValid = false;
     private bool isPasswordValid = false;
     private bool isPasswordConfirmedValid = false;
-    private string[] errors = { };
+
+    private MudTextField<string>? emailRef;
+    private MudTextField<string>? usernameRef;
+    private MudTextField<string>? passwordRef;
+    private MudTextField<string>? confirmPasswordRef;
+
+    private const int debounceInterval = 750;
     private DateTime? date = DateTime.Today;
     private UserRegister userRegister = new UserRegister() { Bananas = 100, IsConfirmed = false, Bio = string.Empty };
-    private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();
-    private int grpcRegisterDeadline { get; set; } = 5000;
+    private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();    
     private IJSObjectReference? module;
+
+    public int grpcRegisterDeadline { get; set; } = 5000;
     public bool AllowSignUp { get { return success && userRegister.IsConfirmed; } }
 
     protected override async Task OnInitializedAsync()
@@ -201,6 +230,7 @@
         if (!string.IsNullOrEmpty(CommonData.EmailAddress))
             userRegister.Email = CommonData.EmailAddress;
 
+        useGrpc = bool.Parse(AppSettings.GetValueFromPagesSec("Register"));
         // await UnitService.LoadUnitsAsync();
         try
         {
@@ -222,33 +252,10 @@
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Register.razor.js");
             if (module != null)
+            { 
                 await module.InvokeAsync<string>("TurnOffAutoComplete");
+            }
         }
-    }
-
-    // uses REST Api
-    private async Task HandleRegistrationRestApi()
-    {
-        var result = await AuthRestService.Register(userRegister);
-        if (result!.Success)
-        {
-            ToastService.ShowSuccess(result.Message);
-            NavigationManager.NavigateTo("/");
-        }
-        else ToastService.ShowError(result.Message);            
-    }
-
-    // uses Grpc Calls
-    private async Task HandleRegistrationGrpc(int startUnitId)
-    {
-        userRegister.DateOfBirth = (DateTime) date!;
-        var result = await GrpcUserService.RegisterWithGrpc(userRegister, startUnitId, grpcRegisterDeadline);
-        if (result.Success)
-        {
-            ToastService.ShowSuccess(result.Message);
-            NavigationManager.NavigateTo("/");
-        }
-        else ToastService.ShowError(result.Message);
     }
 
     #region Validation Methods
@@ -256,48 +263,93 @@
     {
         var emailValidator = new EmailAddressAttribute();
         if (string.IsNullOrEmpty(email))
+        {
+            TurnOffAdorment(emailRef);
             yield return "Email address is required";
+        }
         if (!emailValidator.IsValid(email))
+        {
+            TurnOffAdorment(emailRef);
             yield return "Email address in invalid";
+        }
         if (emailValidator.IsValid(email) && !string.IsNullOrEmpty(email))
+        { 
             isEmailValid = true;
+            TurnOnAdorment(emailRef, "Validate-Email");
+        }
     }
 
     private IEnumerable<string> ValidateUsername(string username)
     {
         if (string.IsNullOrEmpty(username))
+        {
+            TurnOffAdorment(usernameRef);
             yield return "Username is required";
+        }
         if (username.Length > 16)
+        {
+            TurnOffAdorment(usernameRef);
             yield return "Your username is too long (16 characters max)";
-        if(!string.IsNullOrEmpty(username) && !(username.Length > 16))
+        }
+        if (!string.IsNullOrEmpty(username) && !(username.Length > 16))
+        {
+            TurnOnAdorment(usernameRef, "Validate-Username");
             isUsernameValid = true;
+        }
     }
 
     private IEnumerable<string> ValidatePassword(string password)
     {
         if (string.IsNullOrEmpty(password))
+        {
+            TurnOffAdorment(passwordRef);
             yield return "Password is required";
+        }
         if (password.Length < 8)
+        {
+            TurnOffAdorment(passwordRef);
             yield return "Password must be at least of length 8";
+        }
         if (password.Length > 100)
+        {
+            TurnOffAdorment(passwordRef);
             yield return "Password must be at most of length 100";
+        }
         if (!Regex.IsMatch(password, @"[A-Z]"))
+        {
+            TurnOffAdorment(passwordRef);
             yield return "Password must contain at least one capital letter";
+        }
         if (!Regex.IsMatch(password, @"[a-z]"))
+        {
+            TurnOffAdorment(passwordRef);
             yield return "Password must contain at least one lowercase letter";
+        }
         if (!Regex.IsMatch(password, @"[0-9]"))
+        {
+            TurnOffAdorment(passwordRef);
             yield return "Password must contain at least one digit";
+        }
         if (!string.IsNullOrEmpty(password) && !(password.Length < 8) && !(password.Length > 100) &&
             Regex.IsMatch(password, @"[A-Z]") && Regex.IsMatch(password, @"[a-z]") && Regex.IsMatch(password, @"[0-9]"))
+        {
+            TurnOnAdorment(passwordRef, "Validate-Password");
             isPasswordValid = true;   
+        }
     }
 
     private IEnumerable<string> ValidateConfirmPassword(string password)
     {
-        if(password != userRegister.Password)
+        if (password != userRegister.Password)
+        {
+            TurnOffAdorment(confirmPasswordRef);
             yield return "Passwords don't match";
-        if(password == userRegister.Password)
+        }
+        if (password == userRegister.Password)
+        {
+            TurnOnAdorment(confirmPasswordRef, "Vaidate-ConfirmPassword");
             isPasswordConfirmedValid = true;
+        }
     }
 
     private IEnumerable<string> ValidateBananasNumber(int number)
@@ -307,8 +359,55 @@
     }
     #endregion
 
+    #region Private Methods
     private string ConvertToTitle(int id)
     {
         return grpcUnitsResponses.FirstOrDefault(g => g.GrpcUnit.Id == id)!.GrpcUnit.Title;
     }
+
+    private void TurnOnAdorment(MudTextField<string>? reference, string adornmentAriaLabel)
+    {
+        reference.Adornment = Adornment.End;
+        reference.AdornmentIcon = Icons.Filled.CheckCircleOutline;
+        reference.AdornmentColor = Color.Secondary;
+        reference.AdornmentAriaLabel = adornmentAriaLabel;
+    }
+
+    private void TurnOffAdorment(MudTextField<string>? reference)
+    {
+        reference.AdornmentIcon = null;
+    }
+
+
+    private async Task RegisterUser(int startUnitId)
+    {
+        if (useGrpc)
+            await HandleRegistrationGrpc(startUnitId);
+        await HandleRegistrationRestApi(startUnitId);
+    }
+
+    private async Task HandleRegistrationRestApi(int startUnitId)
+    {
+        userRegister.StartUnitId = startUnitId;
+        var result = await AuthRestService.Register(userRegister);
+        if (result!.Success)
+        {
+            ToastService.ShowSuccess(result.Message);
+            NavigationManager.NavigateTo("/");
+        }
+        else ToastService.ShowError(result.Message);
+    }
+
+    private async Task HandleRegistrationGrpc(int startUnitId)
+    {
+        userRegister.DateOfBirth = (DateTime)date!;
+        var result = await GrpcUserService.RegisterWithGrpc(userRegister, startUnitId, grpcRegisterDeadline);
+        if (result.Success)
+        {
+            ToastService.ShowSuccess(result.Message);
+            NavigationManager.NavigateTo("/");
+        }
+        else ToastService.ShowError(result.Message);
+    }
+    #endregion
 }
