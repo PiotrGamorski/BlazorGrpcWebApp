@@ -44,6 +44,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddScoped<IUtilityService, UtilityService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IBattleService, BattleService>();
 

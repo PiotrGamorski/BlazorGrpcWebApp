@@ -17,6 +17,15 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
+<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+    <MudSpacer />
+    <MudText Style="font-size:small">
+        Already have an account? 
+        <a href="/login" style="margin-left:8px; font-weight:600">
+            Sign in <MudIcon Icon="@Icons.Filled.ArrowRightAlt"Size="Size.Small"/>
+        </a> 
+    </MudText>
+</MudAppBar>
 <MudGrid>
     <MudItem lg="12" sm="5">
         <MudContainer Style="align-items:center; justify-content:center; display:flex; flex-direction:column">
@@ -31,7 +40,7 @@
                       Style="margin-bottom:20px; font-weight: 100;">
                       Sign up to Blazor Battles
             </MudText>    
-            <MudCard Style="width: 400px; padding: 16px; border-radius: 6px; border: 1px solid #21262d; background-color:#161b22">
+            <MudCard Style="min-width: 375px; max-width: 450px; padding: 16px; border-radius: 6px; border: 1px solid #21262d; background-color:#161b22; position:relative">
                 <MudForm @bind-IsValid="@success" @bind-Errors="@errors">
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
                         Email address
@@ -46,7 +55,7 @@
                         DebounceInterval="@debounceInterval"
                         @bind-Value="userRegister.Email"/>
                     <br/>
-                    @if (isEmailValid)
+                    @if (isEmailValid || !string.IsNullOrEmpty(CommonData.EmailAddress))
                     {
                         <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
                             <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
@@ -59,7 +68,7 @@
                                     Validation="@(new Func<string, IEnumerable<string>>(ValidateUsername))"
                                     Class="register-form-item"
                                     Style="font-size:small"
-                                    DebounceInterval="@debounceInterval"
+                                    DebounceInterval="@(debounceInterval + 500)"
                                     @bind-Value="userRegister.Username"/>
                             <br/>
                         </Animate>
@@ -75,7 +84,7 @@
                                     InputType="InputType.Password"
                                     Validation="@(new Func<string, IEnumerable<string>>(ValidatePassword))"
                                     Class="register-form-item"
-                                    DebounceInterval="@debounceInterval"
+                                    DebounceInterval="@(debounceInterval + 500)"
                                     @bind-Value="userRegister.Password"/>
                                 <br/>
                             </Animate>
@@ -91,7 +100,7 @@
                                         InputType="InputType.Password"
                                         Validation="@(new Func<string, IEnumerable<string>>(ValidateConfirmPassword))"
                                         Class="register-form-item"
-                                        DebounceInterval="@debounceInterval"
+                                        DebounceInterval="@(debounceInterval + 500)"
                                         @bind-Value="userRegister.ConfirmPassword"/>
                                     <br/>
                                 </Animate>
@@ -150,7 +159,6 @@
                                             Class="register-form-item"
                                             Style="font-size: small"
                                             @bind-Date="date"/>
-                                        <br/>
                                         <MudCheckBox T="bool" 
                                             @bind-Checked="userRegister.IsConfirmed" 
                                             Style="font-family: Roboto-Regular; font-size:smaller">
@@ -175,7 +183,25 @@
                     }
                 </MudForm>
             </MudCard>
-            </MudContainer>
+            @if (isUsernameValid && !isPasswordValid)
+            { 
+                <Animate Animation="Animations.FadeIn" DelayMs="1100" DurationMs="750">
+                    <MudContainer Style="width: 400px; padding: 16px;">
+                        <MudText Style="justify-content:center; font-size: small; color:#989898;">
+                            Make sure it's at most 15 characters AND at least 8 characters including a number and a uppaercase letter.
+                        </MudText>
+                    </MudContainer>
+                </Animate>
+            }
+        </MudContainer>
+    </MudItem>
+    <MudItem lg="12">
+        <MudContainer Style="max-width: 900px; padding: 16px; margin-top: 5px; justify-content:center">
+            <MudText Style="justify-content:center; font-size: smaller; color:#a6a6a6; word-wrap:break-word">
+                By creating an account, you agree to the <a href="#">Terms of Service</a>. For more information about Blazor Battles privacy practices, 
+                see the <a href="#">Blazor Battle Privacy Statement</a>.               
+            </MudText>               
+        </MudContainer>
     </MudItem>
 </MudGrid>
 
@@ -198,6 +224,13 @@
     .check-circle-turnOn {
         animation: fadeIn  0.75s; 
         opacity: 1;
+    }
+    a:hover {
+        color: #165ddb;
+        text-decoration: underline;
+    }
+    .mud-elevation-4 {
+        box-shadow: none;
     }
 </style>
 
@@ -248,6 +281,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!string.IsNullOrEmpty(CommonData.EmailAddress))
+        {
+            TurnOnAdorment(emailRef, "Validate-Email");
+        }
+
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Register.razor.js");
@@ -310,10 +348,10 @@
             TurnOffAdorment(passwordRef);
             yield return "Password must be at least of length 8";
         }
-        if (password.Length > 100)
+        if (password.Length > 15)
         {
             TurnOffAdorment(passwordRef);
-            yield return "Password must be at most of length 100";
+            yield return "Password must be at most of length 15";
         }
         if (!Regex.IsMatch(password, @"[A-Z]"))
         {
@@ -381,7 +419,7 @@
 
     private async Task RegisterUser(int startUnitId)
     {
-        if (useGrpc)
+        if (!useGrpc)
             await HandleRegistrationGrpc(startUnitId);
         await HandleRegistrationRestApi(startUnitId);
     }

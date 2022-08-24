@@ -129,10 +129,6 @@
     private readonly MudTheme _startTheme = ThemesProvider.MudThemeProvider.CreateStartMudTheme();
     public string text { get; set; } = "together.";
 
-    protected override async Task OnInitializedAsync()
-    {
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
