@@ -10,10 +10,10 @@ namespace BlazorGrpcWebApp.Client.Authentication
     {
         private readonly ISessionStorageService _sessionStorageService;
         private readonly HttpClient _httpClient;
-        private readonly AuthServicesProvider _servicesProvider;
+        private readonly IAuthServicesProvider _servicesProvider;
 
         public CustomAuthStateProvider(ISessionStorageService sessionStorageService, HttpClient httpClient, 
-            AuthServicesProvider customAuthServicesProvider)
+            IAuthServicesProvider customAuthServicesProvider)
         {
             _sessionStorageService = sessionStorageService;
             _httpClient = httpClient;
@@ -97,9 +97,9 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
         private async Task ExecuteOnAuthentication(AuthenticationState authState)
         {
-            await _servicesProvider._bananaService.GrpcGetBananas();
-            _servicesProvider._topMenuService.SetProperties(authState);
-            _servicesProvider._userRolesService.SetUserRoles(authState);
+            await _servicesProvider.BananaService.GrpcGetBananas();
+            _servicesProvider.TopMenuService.SetProperties(authState);
+            _servicesProvider.UserRolesService.SetUserRoles(authState);
         }
     }
 }

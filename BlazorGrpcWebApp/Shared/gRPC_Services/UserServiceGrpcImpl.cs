@@ -2,10 +2,12 @@
 using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
+using Dapper;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,6 +16,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 {
     private readonly DataContext _dataContext;
     private readonly IConfiguration _configuration;
+
     public UserServiceGrpcImpl(DataContext dataContext, IConfiguration configuration)
     {
         _dataContext = dataContext;
@@ -36,23 +39,38 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 DateCreated = request.GrpcUser.DateCreated.ToDateTime(),
                 IsConfirmed = request.GrpcUser.IsConfirmed,
                 IsDeleted = request.GrpcUser.IsDeleted,
+                Battles = 0,
+                Defeats = 0,
+                Victories = 0,
             };           
 
             await _dataContext.Users.AddAsync(user);
             await _dataContext.SaveChangesAsync();
 
+            //var userId = await GetUserIdWithDapperBy(request.GrpcUser.Email);
+            //var unitHitPoints = await GetUnitHitpointsWithDapperBy(request.StartUnitId);
+            //using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            //var createUserUnitQuery = @"INSERT INTO [BlazorBattlesDb].[dbo].[UserUnits] (UserId, UnitId, HitPoints) 
+            //                            VALUES(@UserId, @UnitId, @HitPoints)";
+            //await conn.ExecuteAsync(createUserUnitQuery, 
+            //new { 
+            //    UserId = userId, 
+            //    UnitId = request.StartUnitId, 
+            //    HitPoints = unitHitPoints
+            //    });
+
             var startUnit = new UserUnit()
             {
-                UserId = _dataContext.Users.Where(u => u.Email == user.Email).First().Id,
+                UserId = (await _dataContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.GrpcUser.Email.ToLower()))!.Id,
                 UnitId = request.StartUnitId,
-                HitPoints = (await _dataContext.FindAsync<Unit>(request.StartUnitId))!.HitPoints,
+                HitPoints = (await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == request.StartUnitId))!.HitPoints
             };
             await _dataContext.UserUnits.AddAsync(startUnit);
             await _dataContext.SaveChangesAsync();
 
             if (!_dataContext.UserRoles.Any())
             {
-                var roleIds = _dataContext.Roles.Select(r => r.Id).ToList();
+                var roleIds = await _dataContext.Roles.Select(r => r.Id).ToListAsync();
                 if (roleIds.Any())
                 {
                     foreach (var id in roleIds)
@@ -69,7 +87,12 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 await _dataContext.SaveChangesAsync();
             }
 
-            return new RegisterGrpcUserResponse() { Data = request.GrpcUser.Id, Success = true, Message = "Registration successfull!" };
+            return new RegisterGrpcUserResponse() 
+            { 
+                Data = request.GrpcUser.Id, 
+                Success = true, 
+                Message = "Registration successfull!" 
+            };
         }
         catch (RpcException e)
         {
@@ -88,9 +111,9 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.GrpcUser.Email.ToLower());
 
             if (user == null)
-                return new LoginGrpcUserRespone() { Success = false, Message = "User Not Found" };
+                return new LoginGrpcUserRespone() { Success = false, Message = "Invalid email address or password" };
             else if (user != null && !await VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
-                return new LoginGrpcUserRespone() { Success = false, Message = "Wrong password" };
+                return new LoginGrpcUserRespone() { Success = false, Message = "Invalid email address or password" };
             else
             {
                 var userRoles = await _dataContext.UserRoles
@@ -98,7 +121,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                     .Where(ur => ur.UserId == user!.Id)
                     .ToListAsync();
 
-                return new LoginGrpcUserRespone() { Data = await CreateToken(user!, userRoles), Success = true };
+                return new LoginGrpcUserRespone() { Data = await CreateToken(user!, userRoles), Success = true, Message = "AuthTokenCreated" };
             }
         }
         catch (Exception e)
@@ -183,12 +206,21 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
     private Task<string> CreateToken(User user, List<UserRole> userRoles)
     {
-        var claims = UserClaims.CreateClaims(user, userRoles);
-        //List<Claim> claims = new List<Claim>()
-        //{
-        //    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        //    new Claim(ClaimTypes.Name, user.UserName),
-        //};
+        // TODO: Verify if works
+        //var claims = UserClaims.CreateClaims(user, userRoles);
+
+        List<Claim> claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.UserName),
+        };
+        if (userRoles.Any())
+        {
+            foreach (var role in userRoles)
+            { 
+                claims.Add(new Claim($"{role.Role.Name}Role", role.Role.Name));
+            }
+        }
 
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -197,5 +229,22 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
         return Task.FromResult(jwt);
     }
-}
 
+    private async Task<int> GetUserIdWithDapperBy(string email)
+    {
+        using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        string query = "SELECT [Id] FROM [BlazorBattlesDb].[dbo].[Users] WHERE [Email] = @Email";
+        int response = (int)(await conn.ExecuteScalarAsync(query, new { Email = email }));
+
+       return response;
+    }
+
+    private async Task<int> GetUnitHitpointsWithDapperBy(int id)
+    {
+        using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        string query = "SELECT [HitPoints] FROM [BlazorBattlesDb].[dbo].[Units] WHERE [Id] = @UnitId";
+        int response = (int)(await conn.ExecuteScalarAsync(query, new { UnitId = id }));
+
+        return response;
+    }
+}

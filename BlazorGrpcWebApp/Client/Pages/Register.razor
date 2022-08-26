@@ -249,7 +249,7 @@
     private MudTextField<string>? passwordRef;
     private MudTextField<string>? confirmPasswordRef;
 
-    private const int debounceInterval = 750;
+    private const int debounceInterval = 1500;
     private DateTime? date = DateTime.Today;
     private UserRegister userRegister = new UserRegister() { Bananas = 100, IsConfirmed = false, Bio = string.Empty };
     private IList<GrpcUnitResponse> grpcUnitsResponses = new List<GrpcUnitResponse>();    
@@ -431,7 +431,7 @@
         if (result!.Success)
         {
             ToastService.ShowSuccess(result.Message);
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/login");
         }
         else ToastService.ShowError(result.Message);
     }
@@ -443,7 +443,7 @@
         if (result.Success)
         {
             ToastService.ShowSuccess(result.Message);
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/login");
         }
         else ToastService.ShowError(result.Message);
     }

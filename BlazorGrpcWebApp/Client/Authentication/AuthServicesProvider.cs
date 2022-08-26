@@ -3,17 +3,24 @@ using BlazorGrpcWebApp.Client.Interfaces.Shared;
 
 namespace BlazorGrpcWebApp.Client.Authentication
 {
-    public class AuthServicesProvider
+    public interface IAuthServicesProvider 
     {
-        public readonly IBananaService _bananaService;
-        public readonly ITopMenuService _topMenuService;
-        public readonly IUserRolesService _userRolesService;
+        IBananaService BananaService { get; }
+        ITopMenuService TopMenuService { get; }
+        IUserRolesService UserRolesService { get; }
+    }
+
+    public class AuthServicesProvider : IAuthServicesProvider
+    {
+        public IBananaService BananaService { get; }
+        public ITopMenuService TopMenuService { get; }
+        public IUserRolesService UserRolesService { get; }
 
         public AuthServicesProvider(IBananaService bananaService, ITopMenuService topMenuService, IUserRolesService userRolesService)
         {
-            _bananaService = bananaService;
-            _topMenuService = topMenuService;
-            _userRolesService = userRolesService;
+            BananaService = bananaService;
+            TopMenuService = topMenuService;
+            UserRolesService = userRolesService;
         }
     }
 }

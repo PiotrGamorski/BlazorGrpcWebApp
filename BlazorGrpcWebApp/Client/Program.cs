@@ -37,11 +37,11 @@ using var response = await httpClient.GetAsync("appsettings.json");
 using var stream = await response.Content.ReadAsStreamAsync();
 
 builder.Configuration.AddJsonStream(stream);
-builder.Services.AddScoped<AuthServicesProvider>();
+builder.Services.AddTransient<IAuthServicesProvider, AuthServicesProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<IAuthRestService, AuthRestService>();
 builder.Services.AddSingleton<IAppSettingsService, AppSettingsService>();
-builder.Services.AddSingleton<IUserRolesService, UserRolesService>();
+builder.Services.AddTransient<IUserRolesService, UserRolesService>();
 builder.Services.AddSingleton<ITopMenuService, TopMenuService>();
 builder.Services.AddScoped<IArmyGrpcService, ArmyGrpcService>();
 builder.Services.AddScoped<IArmyRestService, ArmyRestService>();

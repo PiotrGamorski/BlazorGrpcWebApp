@@ -82,7 +82,7 @@ namespace BlazorGrpcWebApp.Client.Pages
                     }
                     else
                     {
-                        ToastService.ShowError(result.Message);
+                        ToastService.ShowInfo(result.Message);
                     }
 
                 }
