@@ -48,7 +48,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             return response;
         }
 
-        public async Task<GenericAuthResponse<int>> Register(User user, string password)
+        public async Task<GenericAuthResponse<int>> Register(User user, string password, int startUnitId)
         {
             if (await UserExists(user.Email))
                 return new GenericAuthResponse<int>() { Success = false, Message = "User already exists." };
@@ -80,6 +80,14 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                     await _dataContext.AddAsync(new UserRole() { UserId = user.Id, RoleId = userRole!.Id });
                     await _dataContext.SaveChangesAsync();
                 }
+
+                var userUnit = new UserUnit();
+                userUnit.Id = (await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email))!.Id;
+                userUnit.UnitId = startUnitId;
+                userUnit.HitPoints = (await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == startUnitId))!.HitPoints;
+
+                await _dataContext.UserUnits.AddAsync(userUnit);
+                await _dataContext.SaveChangesAsync();
 
                 return new GenericAuthResponse<int>() { Data = user.Id, Success = true, Message = "Registration successfull!" };
             }

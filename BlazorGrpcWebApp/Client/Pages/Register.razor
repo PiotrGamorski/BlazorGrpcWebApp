@@ -4,6 +4,7 @@
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
 @using BlazorGrpcWebApp.Client.Services
+@using BlazorGrpcWebApp.Shared.Dtos
 @using BlazorGrpcWebApp.Shared.Models.UI_Models
 @using Grpc.Core
 @using System.ComponentModel.DataAnnotations
@@ -426,12 +427,17 @@
 
     private async Task HandleRegistrationRestApi(int startUnitId)
     {
-        userRegister.StartUnitId = startUnitId;
-        var result = await AuthRestService.Register(userRegister);
+        var request = new UserRegisterRequestDto()
+            {
+                UserRegister = userRegister,
+                StartUnitId = startUnitId
+            };
+
+        var result = await AuthRestService.Register(request);
         if (result!.Success)
         {
-            ToastService.ShowSuccess(result.Message);
             NavigationManager.NavigateTo("/login");
+            ToastService.ShowSuccess(result.Message);
         }
         else ToastService.ShowError(result.Message);
     }

@@ -1,4 +1,5 @@
-﻿using BlazorGrpcWebApp.Client.Interfaces;
+﻿using BlazorGrpcWebApp.Client.Authentication;
+using BlazorGrpcWebApp.Client.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorGrpcWebApp.Client.Services
@@ -8,7 +9,7 @@ namespace BlazorGrpcWebApp.Client.Services
         public bool HasAdminRole { get; set; } = false;
         public bool HasUserRole { get; set; } = false;
 
-        public UserRolesService() {}
+        public UserRolesService(){}
 
         public void SetUserRoles(AuthenticationState authState)
         {

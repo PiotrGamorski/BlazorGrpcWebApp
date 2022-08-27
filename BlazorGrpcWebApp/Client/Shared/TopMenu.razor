@@ -24,10 +24,7 @@
                     <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
                 }
             </MudButton>
-            @if (UserRolesService.HasAdminRole)
-            {
-                <AddBananas/>
-            }
+           <AddBananas/>
         </MudCard>
         <MudCard Style="display: flex;">
             <MudButton Variant="Variant.Filled" @onclick="ToggleSettings">
@@ -71,6 +68,7 @@
 @code {
     private bool bananasHaveLoaded = false;
     private bool isExpanded = false;
+    private string adminRole = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {

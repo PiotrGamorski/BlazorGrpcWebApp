@@ -15,7 +15,7 @@
 @attribute [Authorize]
 
 <MudGrid>
-   <MudItem xs="12">
+   <MudItem xs="8">
        <MudCard>
            <MudCardHeader Style="border-bottom-color: white">
                 <MudText Typo="Typo.h5">
@@ -74,10 +74,10 @@
                                            Heal
                                     </MudButton>
                                     <MudButton Variant="Variant.Filled"
-                                           Color="Color.Error"
-                                           OnClick="async () => await ShowDeleteUserUnitDialog(context.UserUnitId)">         
-                                        Delete
-                                        <MudTooltip Placement="Placement.Right" Text="Permanetly deletes the unit.">
+                                        Color="Color.Error"
+                                        OnClick="async () => await ShowDeleteUserUnitDialog(context.UserUnitId)">         
+                                        <MudText Style="text-transform: none;">Delete</MudText>
+                                        <MudTooltip Placement="Placement.Right" Text="Permanetly deletes unit.">
                                             <MudIcon Style="margin-left: 3px;" Icon="@Icons.Filled.Delete"/>
                                         </MudTooltip> 
                                     </MudButton>

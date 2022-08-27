@@ -1,4 +1,5 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces.Rest;
+using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Models;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using System.Net.Http.Json;
@@ -21,9 +22,9 @@ namespace BlazorGrpcWebApp.Client.Services.Rest
             return await result.Content.ReadFromJsonAsync<GenericAuthResponse<string>>();
         }
 
-        public async Task<GenericAuthResponse<int>?> Register(UserRegister userRegister)
+        public async Task<GenericAuthResponse<int>?> Register(UserRegisterRequestDto request)
         {
-            var result = await _httpClient.PostAsJsonAsync("api/auth/register", userRegister);
+            var result = await _httpClient.PostAsJsonAsync("api/auth/register", request);
             return await result.Content.ReadFromJsonAsync<GenericAuthResponse<int>>();
         }
     }

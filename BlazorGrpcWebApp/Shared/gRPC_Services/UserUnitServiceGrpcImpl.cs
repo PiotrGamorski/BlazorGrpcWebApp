@@ -19,7 +19,9 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             var user  = await _dataContext.Users.FirstOrDefaultAsync<User>(u => u.Id == request.UserId);
 
             if (request.Bananas < unit!.BananaCost)
+            { 
                 throw new RpcException(new Status(StatusCode.Unavailable, "Not Enough Bananas"));
+            }
             
             user!.Bananas -= unit.BananaCost;
             var newUserUnit = new UserUnit()
