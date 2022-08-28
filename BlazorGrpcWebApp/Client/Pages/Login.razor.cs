@@ -18,8 +18,13 @@ namespace BlazorGrpcWebApp.Client.Pages
         private async Task HandleLogin()
         {
             if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Login")))
+            {
                 await HandleLoginWithGrpc();
-            else await HandleLoginWithRest();
+            }
+            else
+            {
+                await HandleLoginWithRest();
+            }
         }
 
         private async Task HandleLoginWithRest()

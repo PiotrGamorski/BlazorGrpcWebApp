@@ -47,24 +47,11 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
             await _dataContext.Users.AddAsync(user);
             await _dataContext.SaveChangesAsync();
 
-            //var userId = await GetUserIdWithDapperBy(request.GrpcUser.Email);
-            //var unitHitPoints = await GetUnitHitpointsWithDapperBy(request.StartUnitId);
-            //using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            //var createUserUnitQuery = @"INSERT INTO [BlazorBattlesDb].[dbo].[UserUnits] (UserId, UnitId, HitPoints) 
-            //                            VALUES(@UserId, @UnitId, @HitPoints)";
-            //await conn.ExecuteAsync(createUserUnitQuery, 
-            //new { 
-            //    UserId = userId, 
-            //    UnitId = request.StartUnitId, 
-            //    HitPoints = unitHitPoints
-            //    });
+            var startUnit = new UserUnit();
+            startUnit.UserId = (await _dataContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.GrpcUser.Email.ToLower()))!.Id;
+            startUnit.UnitId = request.StartUnitId;
+            startUnit.HitPoints = (await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == request.StartUnitId))!.HitPoints;
 
-            var startUnit = new UserUnit()
-            {
-                UserId = (await _dataContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.GrpcUser.Email.ToLower()))!.Id,
-                UnitId = request.StartUnitId,
-                HitPoints = (await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == request.StartUnitId))!.HitPoints
-            };
             await _dataContext.UserUnits.AddAsync(startUnit);
             await _dataContext.SaveChangesAsync();
 
@@ -206,21 +193,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
 
     private Task<string> CreateToken(User user, List<UserRole> userRoles)
     {
-        // TODO: Verify if works
-        //var claims = UserClaims.CreateClaims(user, userRoles);
-
-        List<Claim> claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName),
-        };
-        if (userRoles.Any())
-        {
-            foreach (var role in userRoles)
-            { 
-                claims.Add(new Claim($"{role.Role.Name}Role", role.Role.Name));
-            }
-        }
+        var claims = UserClaims.CreateClaims(user, userRoles);
 
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -239,12 +212,31 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
        return response;
     }
 
-    private async Task<int> GetUnitHitpointsWithDapperBy(int id)
+    private async Task<int> GetUnitHitpointsWithDapperBy(int unitId)
     {
         using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         string query = "SELECT [HitPoints] FROM [BlazorBattlesDb].[dbo].[Units] WHERE [Id] = @UnitId";
-        int response = (int)(await conn.ExecuteScalarAsync(query, new { UnitId = id }));
+        int response = (int)(await conn.ExecuteScalarAsync(query, new { UnitId = unitId }));
 
         return response;
+    }
+
+    private async Task CreateStartUnitWithDapper(RegisterGrpcUserRequest request)
+    {
+        var userId = await GetUserIdWithDapperBy(request.GrpcUser.Email);
+        var unitHitPoints = await GetUnitHitpointsWithDapperBy(request.StartUnitId);
+
+        using (var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        { 
+            var createUserUnitQuery = @"INSERT INTO [BlazorBattlesDb].[dbo].[UserUnits] (UserId, UnitId, HitPoints) 
+                                        VALUES(@UserId, @UnitId, @HitPoints)";
+            await conn.ExecuteAsync(createUserUnitQuery,
+            new
+            {
+                UserId = userId,
+                UnitId = request.StartUnitId,
+                HitPoints = unitHitPoints
+            });
+        }
     }
 }

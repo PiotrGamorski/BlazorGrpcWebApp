@@ -29,7 +29,7 @@ namespace BlazorGrpcWebApp.Client.Authentication
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var authToken = await _sessionStorageService.GetItemAsync<string>("authToken");
-            ClaimsIdentity identity = new ClaimsIdentity();
+            ClaimsIdentity identity;
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
@@ -49,7 +49,7 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
         public async Task MarkUserAsAuthenticated(string authToken)
         {
-            ClaimsIdentity identity = new ClaimsIdentity();
+            ClaimsIdentity identity;
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
@@ -68,9 +68,10 @@ namespace BlazorGrpcWebApp.Client.Authentication
 
                 var user = new ClaimsPrincipal(identity);
                 var state = new AuthenticationState(user);
-                _userRolesService.SetUserRoles(state);
-                _topMenuService.SetProperties(state);
+                //_userRolesService.SetUserRoles(state);
+                //_topMenuService.SetProperties(state);
                 await _bananaService.GrpcGetBananas();
+
                 NotifyAuthenticationStateChanged(Task.FromResult(state));
             }
         }

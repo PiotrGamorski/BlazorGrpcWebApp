@@ -24,46 +24,38 @@
              <MudText Typo="Typo.h5" 
                       Color="Color.Tertiary"  
                       Style="margin-bottom:20px; font-weight: 100;">
-                      Sign in to Blazor Battles
+                      Device verification
              </MudText>
              <MudCard Style="width: 300px; padding: 16px; border-radius: 6px; border: 1px solid #21262d; background-color:#161b22">
-                <MudForm Model="@userLogin"
+                <MudForm Model="null"
                          @bind-IsValid="@success">
+                    <MudElement HtmlTag="div" Style="display: flex; flex-direction:column; justify-content: center; align-items:center">
+                        <MudIcon Icon="@Icons.Outlined.Email" Size="Size.Large"/>
+                        <br/>
+                        <MudText Typo="Typo.h5">Email</MudText>
+                    </MudElement>
+                    <br/>
+                    <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px" Class="txt-justify">
+                        We've just sent your authentication code via email to p*******@@wp.pl. The code will expire at ...
+                    </MudText>
+                    <br/>
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
-                        Username or email address
+                        Device Verification Code
                     </MudText>
                     <MudTextField T="string"
-                                  InputType="InputType.Email"
                                   Variant="Variant.Outlined"
-                                  Required="true"
-                                  RequiredError="Email is required!"
-                                  Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
-                                  @bind-Value="userLogin.Email"
+                                  Placeholder="XXXXXX"
+                                  Validation="@(new Func<string, IEnumerable<string>>(ValidateVerificationCode))"
+                                  @bind-Value="VerificationCode"
                                   Style="font-size:small; color:#c9d1d3;"/>
-                    <br/>
-                    <div style="display: flex; align-items:center; justify-content:space-between; padding-bottom:2px">
-                        <MudText Style="font-size:small; color:#c9d1d3">Password</MudText>
-                        <MudLink Href="" 
-                                 Color="Color.Info" 
-                                 Style="text-transform: none; font-size:small;">
-                                 Forgot password?
-                        </MudLink>
-                    </div>
-                    <MudTextField T="string"
-                                  Variant="Variant.Outlined"
-                                  InputType="InputType.Password"
-                                  Required="true" 
-                                  RequiredError="Password is required!"
-                                  @bind-Value="userLogin.Password"
-                                  Style="font-size:small; color:#c9d1d3"/>
                     <br/>
                     <MudButton Variant="Variant.Filled" 
                                Style="text-transform: none; width: 100%; border-radius: 6px"
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
-                               OnClick="async () => await HandleLogin()">
-                               Sign In
+                               OnClick="async () => await Verify()">
+                               Verify
                     </MudButton>
                 </MudForm>
              </MudCard>
@@ -72,21 +64,38 @@
          <MudContainer>
             <div style="display:flex; align-items:center; justify-content:center;">
                 <MudCard Style="width: 300px; padding: 16px; background-color: transparent; border: 1px solid #21262d; border-radius: 6px">
-                    <div style="display: flex; align-items: center; justify-content:center">
-                        <MudText Color="Color.Tertiary" Style="font-size:small; margin-right: 5px">
-                            New to Blazor Battles?
+                    <div style="display: flex; flex-direction:column; justify-content:left">
+                        <MudText Color="Color.Tertiary" Style="font-size:small">
+                            Having trouble verifing via email?
                         </MudText>
-                        <MudLink Href="/register" Color="Color.Info">
-                            <MudText Style="text-transform: none; font-size:small">
-                                Create an account
-                            </MudText>
-                        </MudLink>.
+                        <ul style="list-style-type:disc; padding-left: 15px; color:@Color.Info">
+                            <li style="color:@Color.Info">
+                                <MudLink Href="#" Color="Color.Info">
+                                    <MudText Style="text-transform: none; font-size:small">
+                                        Re-send the authentication code
+                                    </MudText>
+                                </MudLink>
+                            </li>
+                        </ul>    
                     </div>
                 </MudCard>
             </div>
          <br/>
-         <br/>
          </MudContainer>
+         <MudContainer Style="display:flex; justify-content: center">
+            <MudElement HtmlTag="div">
+                <MudCard Style="width: 300px; padding: 16px; background-color: transparent; border-radius: 6px; box-shadow:none">
+                    <MudText Style="font-size:small;" Class="txt-justify">
+                        If you'd like to require verification on every sign in, consider enabling
+                        <MudLink Href="#" Color="Color.Info" Style="text-transform: none; font-size:small">
+                         two-factor authentication
+                        </MudLink>
+                        on your account.
+                    </MudText>
+                </MudCard>
+            </MudElement>
+         </MudContainer>
+         <br/>
             <div style="display:flex; align-items:center; justify-content:center;">
                 <MudCard Style="width: 300px; padding: 16px; background-color: transparent;">
                     <div style="display: flex; align-items: center; justify-content:center">
@@ -116,9 +125,6 @@
                     </div>
                 </MudCard>
             </div>
-         <MudContainer>
-
-         </MudContainer>
      </MudItem>
  </MudGrid>
 
@@ -130,16 +136,32 @@
     .mud-input-outlined-border {
         color: #21262d;
     }
+    li::marker {
+        color: #53a6ff;
+    }
+    .txt-justify {
+        overflow-wrap: break-word;
+        word-wrap: break-word; 
+        -ms-word-break: break-all; 
+        -ms-hyphens: auto; 
+        -moz-hyphens: auto; 
+        -webkit-hyphens: auto; 
+        hyphens: auto;
+    }
  </style>
     
 @code {
     private readonly MudTheme _loginTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
     private bool success = false;
 
-    private IEnumerable<string> ValidateEmail(string email)
+    public string VerificationCode { get; set; }
+
+    private IEnumerable<string> ValidateVerificationCode(string verificationCode)
     {
-        var emailValidator = new EmailAddressAttribute();
-        if (!emailValidator.IsValid(email))
-            yield return "Email adress in invalid!";
+        //TODO: Complete
+        if(string.IsNullOrEmpty(VerificationCode))
+            yield return "Verification code is required";
+        if (!string.IsNullOrEmpty(VerificationCode) && verificationCode.Length != 6)
+            yield return "Verification code must be 6 characters long";
     }
 }

@@ -6,6 +6,7 @@ using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace BlazorGrpcWebApp.Server.Services.ControllersServices
