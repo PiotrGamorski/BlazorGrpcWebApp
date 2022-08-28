@@ -18,7 +18,7 @@
         public int Defeats { get; set; }
         public List<UserRole> Roles { get; set; }
         public string VerificationCode { get; set; }
-        public DateTime VerificationCodeExpireDate = DateTime.Now.AddMinutes(10);
+        public DateTime VerificationCodeExpireDate { get; set; } = DateTime.Now.AddMinutes(10);
         public bool IsVerified { get; set; } = false;
     }
 }
