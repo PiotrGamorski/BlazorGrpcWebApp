@@ -1,6 +1,7 @@
 ﻿using BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces;
 using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,13 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
     {
         private readonly DataContext _dataContext;
         private readonly IConfiguration _configuration;
-        public AuthService(DataContext dataContext, IConfiguration configuration)
+        private readonly IEmailService _emailService;
+
+        public AuthService(DataContext dataContext, IConfiguration configuration, IEmailService emailService)
         {
             _dataContext = dataContext;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<GenericAuthResponse<string>> Login(string email, string password)
@@ -57,11 +61,20 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             try
             {
                 await CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                var verificationCode = GenerateVerificationCode(6);
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
+                user.VerificationCode = verificationCode;
 
                 await _dataContext!.Users.AddAsync(user);
                 await _dataContext.SaveChangesAsync();
+
+                await _emailService.SendEmail(new EmailDto()
+                {
+                    To = user.Email,
+                    Subject = "Blazor Battles Verification Code",
+                    Body = $"<h3>Hi {user.UserName}!</h3><p>Welcome to Blazor Battles. To complete your registration use verification code is: {verificationCode}</p>"
+                });
 
                 if (!_dataContext.UserRoles.Any())
                 {
@@ -140,6 +153,15 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return Task.FromResult(jwt);
+        }
+
+        private string GenerateVerificationCode(int length)
+        {
+            Random random = new Random();
+
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

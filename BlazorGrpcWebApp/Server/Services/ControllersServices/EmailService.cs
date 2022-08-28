@@ -4,6 +4,7 @@ using MailKit.Security;
 using MimeKit.Text;
 using MimeKit;
 using MailKit.Net.Smtp;
+using System.Text;
 
 namespace BlazorGrpcWebApp.Server.Services.ControllersServices
 {
@@ -22,7 +23,9 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             email.From.Add(MailboxAddress.Parse(_configuration.GetSection("EmailUsername").Value));
             email.To.Add(MailboxAddress.Parse(request.To));
             email.Subject = request.Subject;
-            email.Body = new TextPart(TextFormat.Html) { Text =  request.Body};
+            var sb = new StringBuilder();
+            sb.Append($"<h3>Hi {request.To}! </h3><p>{request.Body}</p>");
+            email.Body = new TextPart(TextFormat.Html) { Text =  sb.ToString()};
 
             using (var smtp = new SmtpClient())
             {
