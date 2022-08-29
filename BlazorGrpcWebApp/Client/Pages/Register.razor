@@ -420,9 +420,14 @@
 
     private async Task RegisterUser(int startUnitId)
     {
-        if (!useGrpc)
+        if (useGrpc == true)
+        { 
             await HandleRegistrationGrpc(startUnitId);
+            CommonData.VerificationCodeExpiredDate = DateTime.Now.AddMinutes(10);
+        }
+
         await HandleRegistrationRestApi(startUnitId);
+        CommonData.VerificationCodeExpiredDate = DateTime.Now.AddMinutes(10);
     }
 
     private async Task HandleRegistrationRestApi(int startUnitId)

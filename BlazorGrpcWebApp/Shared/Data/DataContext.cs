@@ -2,6 +2,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorGrpcWebApp.Shared.Data
 {
@@ -49,12 +50,12 @@ namespace BlazorGrpcWebApp.Shared.Data
             //modelBuilder.Entity<GrpcUser>().Property(e => e.DateCreated).HasConversion(converter);
         }
 
-        public DbSet<Unit> Units { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserUnit> UserUnits { get; set; }
-        public DbSet<Battle> Battles { get; set; }
-        public DbSet<BattleLog> BattleLogs { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<Unit> Units { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserUnit> UserUnits { get; set; }
+        public virtual DbSet<Battle> Battles { get; set; }
+        public virtual DbSet<BattleLog> BattleLogs { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<UserRole> UserRoles { get; set; }
     }
 }

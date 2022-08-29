@@ -3,6 +3,8 @@
 @using System.ComponentModel.DataAnnotations
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
+@using BlazorGrpcWebApp.Client.Services
+@using BlazorGrpcWebApp.Shared.Dtos
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -10,6 +12,7 @@
 @inject IAuthRestService AuthRestService
 @inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
+@inject ICommonDataService CommomData
 
 <MudThemeProvider Theme="_loginTheme" />
  <MudGrid>
@@ -36,7 +39,7 @@
                     </MudElement>
                     <br/>
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px" Class="txt-justify">
-                        We've just sent your authentication code via email to p*******@@wp.pl. The code will expire at ...
+                        We've just sent your authentication code via email to @emailAddressHidden. The code will expire at ...
                     </MudText>
                     <br/>
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
@@ -54,7 +57,7 @@
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
-                               OnClick="async () => await Verify()">
+                               OnClick="async () => await Verify(new VerifyCodeRequestDto())">
                                Verify
                     </MudButton>
                 </MudForm>
@@ -153,8 +156,29 @@
 @code {
     private readonly MudTheme _loginTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
     private bool success = false;
+    private string? emailAddressHidden;
 
-    public string VerificationCode { get; set; }
+    public string? VerificationCode { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(CommomData.EmailAddress))
+        {
+            var emailAddress = CommomData.EmailAddress;
+            var indexOfAtSign = emailAddress.IndexOf("@");
+            for (var i = 1; i < indexOfAtSign; i++)
+            {
+                emailAddress.Replace(emailAddress[i], '*');
+            }
+            emailAddressHidden = emailAddress;
+        }
+        else
+        { 
+            // TODO: redirect to error page
+        }
+
+        return Task.CompletedTask;
+    }
 
     private IEnumerable<string> ValidateVerificationCode(string verificationCode)
     {
@@ -163,5 +187,13 @@
             yield return "Verification code is required";
         if (!string.IsNullOrEmpty(VerificationCode) && verificationCode.Length != 6)
             yield return "Verification code must be 6 characters long";
+    }
+
+    private async Task Verify(VerifyCodeRequestDto request)
+    {
+        var result = await AuthRestService.Verify(request);
+        if (result.Success)
+            NavigationManager.NavigateTo("/");
+        ToastService.ShowInfo(result.Message);
     }
 }

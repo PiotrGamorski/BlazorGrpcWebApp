@@ -73,7 +73,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                 {
                     To = user.Email,
                     Subject = "Blazor Battles Verification Code",
-                    Body = $"<h3>Hi {user.UserName}!</h3><p>Welcome to Blazor Battles. To complete your registration use verification code is: {verificationCode}</p>"
+                    Body = $"<h3>Hi {user.UserName}!</h3><p>Welcome to Blazor Battles. To complete your registration use verification code: {verificationCode}</p>"
                 });
 
                 if (!_dataContext.UserRoles.Any())
@@ -96,7 +96,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                 }
 
                 var userUnit = new UserUnit();
-                userUnit.Id = (await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email))!.Id;
+                userUnit.UserId = (await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email))!.Id;
                 userUnit.UnitId = startUnitId;
                 userUnit.HitPoints = (await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == startUnitId))!.HitPoints;
 
@@ -119,6 +119,24 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             return false;
         }
 
+        public async Task<GenericAuthResponse<object>> Verify(VerifyCodeRequestDto request)
+        {
+            var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == request.UserEmail);
+            if (user!.VerificationCodeExpireDate <= DateTime.Now)
+            {
+                if (user.VerificationCode.ToUpper() == request.VerificationCode.ToUpper())
+                {
+                    user.IsVerified = true;
+                    await _dataContext.SaveChangesAsync();
+
+                    return new GenericAuthResponse<object> { Success = true };
+                }
+                else return new GenericAuthResponse<object> { Success = false, Message = "Invalid verification code" };
+            }
+            else return new GenericAuthResponse<object> { Success = false, Message = "Verification code is expired" };
+        }
+
+        #region Private Methods
         private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -163,5 +181,6 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
+        #endregion
     }
 }

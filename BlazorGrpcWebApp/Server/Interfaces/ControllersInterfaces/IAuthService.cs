@@ -1,4 +1,5 @@
-﻿using BlazorGrpcWebApp.Shared.Entities;
+﻿using BlazorGrpcWebApp.Shared.Dtos;
+using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models;
 
 namespace BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces
@@ -8,5 +9,6 @@ namespace BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces
         Task<GenericAuthResponse<int>> Register(User user, string password, int startUnitId);
         Task<GenericAuthResponse<string>> Login(string emial, string password);
         Task<bool> UserExists(string email);
+        Task<GenericAuthResponse<object>> Verify(VerifyCodeRequestDto request);
     }
 }

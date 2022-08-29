@@ -8,5 +8,6 @@ namespace BlazorGrpcWebApp.Client.Interfaces.Rest
     {
         Task<GenericAuthResponse<string>?> Login(UserLogin userLogin);
         Task<GenericAuthResponse<int>?> Register(UserRegisterRequestDto userRegister);
+        Task<GenericAuthResponse<object>> Verify(VerifyCodeRequestDto request);
     }
 }

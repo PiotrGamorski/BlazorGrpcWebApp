@@ -24,7 +24,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             email.To.Add(MailboxAddress.Parse(request.To));
             email.Subject = request.Subject;
             var sb = new StringBuilder();
-            sb.Append($"<h3>Hi {request.To}! </h3><p>{request.Body}</p>");
+            sb.Append($"{request.Body}");
             email.Body = new TextPart(TextFormat.Html) { Text =  sb.ToString()};
 
             using (var smtp = new SmtpClient())

@@ -30,21 +30,29 @@ namespace BlazorGrpcWebApp.Server.Controllers
             request.UserRegister.Password,
             request.StartUnitId);
 
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
-                
-            return Ok(response);
+            if (response.Success)
+                return Ok(response);
+            return BadRequest(response);
+            
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserLogin request)
+        public async Task<IActionResult> Login([FromBody]UserLogin request)
         { 
             var response = await _authService.Login(request.Email, request.Password);
-            if (!response.Success)
-                return BadRequest(response);
-            return Ok(response);
+            if (response.Success)
+                return Ok(response);
+            return BadRequest(response);
+           
+        }
+
+        [HttpPost("verify")]
+        public async Task<IActionResult> Verify([FromBody]VerifyCodeRequestDto request)
+        {
+            var response = await _authService.Verify(request);
+            if(response.Success)
+                return Ok(response.Message);
+            return BadRequest(response.Message);
         }
     }
 }
