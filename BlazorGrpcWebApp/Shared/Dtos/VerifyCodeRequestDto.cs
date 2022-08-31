@@ -2,7 +2,7 @@
 {
     public class VerifyCodeRequestDto
     {
-        public string VerificationCode { get; set; }
-        public string UserEmail { get; set; }
+        public string? VerificationCode { get; set; }
+        public string? UserEmail { get; set; }
     }
 }

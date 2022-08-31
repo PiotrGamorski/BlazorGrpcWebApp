@@ -8,7 +8,8 @@ namespace BlazorGrpcWebApp.Server.Interfaces.ControllersInterfaces
     {
         Task<GenericAuthResponse<int>> Register(User user, string password, int startUnitId);
         Task<GenericAuthResponse<string>> Login(string emial, string password);
-        Task<bool> UserExists(string email);
-        Task<GenericAuthResponse<object>> Verify(VerifyCodeRequestDto request);
+        Task<GenericAuthResponse<bool>> Verify(VerifyCodeRequestDto request);
+        Task<bool> UserEmailExists(string email);
+        Task<bool> UserNameExists(string userName);
     }
 }

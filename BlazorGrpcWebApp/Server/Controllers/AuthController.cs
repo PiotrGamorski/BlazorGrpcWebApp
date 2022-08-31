@@ -2,6 +2,7 @@
 using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorGrpcWebApp.Server.Controllers
@@ -47,12 +48,31 @@ namespace BlazorGrpcWebApp.Server.Controllers
         }
 
         [HttpPost("verify")]
+        [AllowAnonymous]
         public async Task<IActionResult> Verify([FromBody]VerifyCodeRequestDto request)
         {
             var response = await _authService.Verify(request);
-            if(response.Success)
+            if (response.Success)
+            { 
                 return Ok(response.Message);
+            }
             return BadRequest(response.Message);
+        }
+
+        [HttpGet("userEmailExists")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UserEmailExists([FromQuery] string email)
+        { 
+            var response = await _authService.UserEmailExists(email);
+            return Ok(response);
+        }
+
+        [HttpGet("userNameExists")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UserNameExists([FromQuery] string userName)
+        {
+            var response = await _authService.UserNameExists(userName);
+            return Ok(response);
         }
     }
 }

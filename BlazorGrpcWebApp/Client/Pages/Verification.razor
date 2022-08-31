@@ -13,6 +13,8 @@
 @inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
 @inject ICommonDataService CommomData
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService localStorage
 
 <MudThemeProvider Theme="_loginTheme" />
  <MudGrid>
@@ -39,7 +41,8 @@
                     </MudElement>
                     <br/>
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px" Class="txt-justify">
-                        We've just sent your authentication code via email to @emailAddressHidden. The code will expire at ...
+                        We've just sent your authentication code via email to @emailAddressHidden. 
+                        The code will expire at @verificationCodeExpiredDate.
                     </MudText>
                     <br/>
                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
@@ -49,7 +52,7 @@
                                   Variant="Variant.Outlined"
                                   Placeholder="XXXXXX"
                                   Validation="@(new Func<string, IEnumerable<string>>(ValidateVerificationCode))"
-                                  @bind-Value="VerificationCode"
+                                  @bind-Value="verificationCode"
                                   Style="font-size:small; color:#c9d1d3;"/>
                     <br/>
                     <MudButton Variant="Variant.Filled" 
@@ -57,7 +60,7 @@
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
-                               OnClick="async () => await Verify(new VerifyCodeRequestDto())">
+                               OnClick="async () => await Verify()">
                                Verify
                     </MudButton>
                 </MudForm>
@@ -156,44 +159,80 @@
 @code {
     private readonly MudTheme _loginTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
     private bool success = false;
-    private string? emailAddressHidden;
+    private string? emailAddress;
+    public string? emailAddressHidden;
+    private string? verificationCode;
+    private DateTime? verificationCodeExpiredDate;
+    private IJSObjectReference? module;
 
-    public string? VerificationCode { get; set; }
-
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrEmpty(CommomData.EmailAddress))
-        {
-            var emailAddress = CommomData.EmailAddress;
-            var indexOfAtSign = emailAddress.IndexOf("@");
-            for (var i = 1; i < indexOfAtSign; i++)
-            {
-                emailAddress.Replace(emailAddress[i], '*');
-            }
-            emailAddressHidden = emailAddress;
-        }
-        else
-        { 
-            // TODO: redirect to error page
-        }
+        emailAddress = await localStorage.GetItemAsync<string>("email");
+        StateHasChanged();
+        emailAddressHidden = HideEmailAddress(emailAddress);
+        verificationCodeExpiredDate = await localStorage.GetItemAsync<DateTime>("expireDate");
+        StateHasChanged();
 
-        return Task.CompletedTask;
+        if (string.IsNullOrEmpty(emailAddress))
+        { 
+            // redirect to error page
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Verification.razor.js");
+        }
     }
 
     private IEnumerable<string> ValidateVerificationCode(string verificationCode)
     {
         //TODO: Complete
-        if(string.IsNullOrEmpty(VerificationCode))
+        if(string.IsNullOrEmpty(this.verificationCode))
             yield return "Verification code is required";
-        if (!string.IsNullOrEmpty(VerificationCode) && verificationCode.Length != 6)
+        if (!string.IsNullOrEmpty(this.verificationCode) && verificationCode.Length != 6)
             yield return "Verification code must be 6 characters long";
     }
 
-    private async Task Verify(VerifyCodeRequestDto request)
+    private string? HideEmailAddress(string? emailAddress)
     {
-        var result = await AuthRestService.Verify(request);
-        if (result.Success)
-            NavigationManager.NavigateTo("/");
-        ToastService.ShowInfo(result.Message);
+        if (!string.IsNullOrEmpty(emailAddress))
+        {
+            var indexOfAtSign = emailAddress.IndexOf("@");
+            for (var i = 1; i < indexOfAtSign; i++)
+            {
+                emailAddress = emailAddress.Replace(emailAddress[i], '*');
+            }
+
+            return emailAddress;
+        }
+
+        return null;
+    }
+
+    private async Task Verify()
+    {
+        await module!.InvokeAsync<string>("NavigateToLoginPage");
+        var request = new VerifyCodeRequestDto()
+        {
+            UserEmail = await localStorage.GetItemAsync<string>("email"),
+            VerificationCode = verificationCode
+        };
+
+        try
+        {
+            var result = await AuthRestService.Verify(request);
+            if (result != null && result.Success == true && module != null)
+            {
+                await module.InvokeAsync<string>("NavigateToLoginPage");
+                await localStorage.ClearAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError(e.Message);
+        }
     }
 }

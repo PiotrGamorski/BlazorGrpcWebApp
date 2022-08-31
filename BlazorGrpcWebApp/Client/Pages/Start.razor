@@ -1,9 +1,10 @@
 ﻿@page "/start"
 @using BlazorGrpcWebApp.Client.Services
 @layout StartLayout
+@inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject ICommonDataService CommonData
-@inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorage
 
 <MudThemeProvider Theme="_startTheme" />
 <div id="threejscontainer" class="canvas"></div>
@@ -128,6 +129,11 @@
 @code {
     private readonly MudTheme _startTheme = ThemesProvider.MudThemeProvider.CreateStartMudTheme();
     public string text { get; set; } = "together.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await localStorage.ClearAsync();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

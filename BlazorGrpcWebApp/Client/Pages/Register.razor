@@ -9,6 +9,7 @@
 @using Grpc.Core
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
+@inject NavigationManager NavigationManager
 @inject IUnitService UnitService
 @inject IAuthRestService AuthRestService
 @inject IUserGrpcService GrpcUserService
@@ -16,7 +17,7 @@
 @inject ICommonDataService CommonData
 @inject IAppSettingsService AppSettings
 @inject IJSRuntime JSRuntime
-@inject NavigationManager NavigationManager
+@inject ILocalStorageService localStorage
 
 <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
     <MudSpacer />
@@ -50,7 +51,7 @@
                         @ref="emailRef"
                         InputType="InputType.Email"
                         Variant="Variant.Outlined"
-                        Validation="@(new Func<string, IEnumerable<string>>(ValidateEmail))"
+                        Validation="@(new Func<string, Task<string?>> (ValidateEmail))"   
                         Class="register-form-item"
                         Style="font-size:small"
                         DebounceInterval="@debounceInterval"
@@ -66,7 +67,7 @@
                                     @ref="usernameRef"
                                     InputType="InputType.Text"
                                     Variant="Variant.Outlined"
-                                    Validation="@(new Func<string, IEnumerable<string>>(ValidateUsername))"
+                                    Validation="@(new Func<string, Task<string?>>(ValidateUsername))"
                                     Class="register-form-item"
                                     Style="font-size:small"
                                     DebounceInterval="@(debounceInterval + 500)"
@@ -76,15 +77,27 @@
                         @if (isUsernameValid)
                         {
                             <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
-                                <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
-                                    Password
+                                <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px;">
+                                    <span style="align-items: center; display: flex; justify-content:space-between">
+                                        <span>Password</span>
+                                        @if (!string.IsNullOrEmpty(userRegister.Password))
+                                        { 
+                                            <Animate Animation="Animations.FadeIn" DurationMs="500">
+                                                <MudButton OnClick="TogglePasswordVisibility" Style="padding: 0; min-width: 0; margin-right: 15px">
+                                                    <MudIcon Icon="@passwordIcon" Size="Size.Small" Color="Color.Dark"/>
+                                                </MudButton>
+                                            </Animate>
+                                        }
+                                        else { showPassword = false; passwordIcon = @Icons.Filled.VisibilityOff; }
+                                    </span>
                                 </MudText>
                                 <MudTextField T="string"
                                     @ref="passwordRef"
                                     Variant="Variant.Outlined"
-                                    InputType="InputType.Password"
+                                    InputType="@passwordInput"
                                     Validation="@(new Func<string, IEnumerable<string>>(ValidatePassword))"
                                     Class="register-form-item"
+                                    Style="font-size:small"
                                     DebounceInterval="@(debounceInterval + 500)"
                                     @bind-Value="userRegister.Password"/>
                                 <br/>
@@ -93,14 +106,26 @@
                             { 
                                 <Animate Animation="Animations.FadeIn" DelayMs="500" DurationMs="500">
                                     <MudText Style="font-size:small; color:#c9d1d3; padding-bottom:2px">
-                                        Confirm Password
+                                        <span style="align-items: center; display: flex; justify-content:space-between">
+                                            <span>Confirm Password</span>
+                                            @if (!string.IsNullOrEmpty(userRegister.ConfirmPassword))
+                                            { 
+                                                <Animate Animation="Animations.FadeIn" DurationMs="500">
+                                                                    <MudButton OnClick="ToggleConfirmPasswordVisibility" Style="padding: 0; min-width: 0; margin-right: 15px">
+                                                        <MudIcon Icon="@confirmPasswordIcon" Size="Size.Small" Color="Color.Dark"/>
+                                                    </MudButton>
+                                                </Animate>
+                                            }
+                                            else { showConfirmPassword = false; confirmPasswordIcon = @Icons.Filled.VisibilityOff; }
+                                        </span>
                                     </MudText>
                                     <MudTextField T="string"
                                         @ref="confirmPasswordRef"
                                         Variant="Variant.Outlined"
-                                        InputType="InputType.Password"
+                                        InputType="@confirmPasswordInput"
                                         Validation="@(new Func<string, IEnumerable<string>>(ValidateConfirmPassword))"
                                         Class="register-form-item"
+                                        Style="font-size:small"
                                         DebounceInterval="@(debounceInterval + 500)"
                                         @bind-Value="userRegister.ConfirmPassword"/>
                                     <br/>
@@ -244,8 +269,15 @@
     private bool isUsernameValid = false;
     private bool isPasswordValid = false;
     private bool isPasswordConfirmedValid = false;
+    private bool showPassword = false;
+    private bool showConfirmPassword = false;
+    private string passwordIcon = Icons.Filled.VisibilityOff;
+    private string confirmPasswordIcon = Icons.Filled.VisibilityOff;
+    private InputType passwordInput = InputType.Password;
+    private InputType confirmPasswordInput = InputType.Password;
 
-    private MudTextField<string>? emailRef;
+    private MudTextField
+    <string>? emailRef;
     private MudTextField<string>? usernameRef;
     private MudTextField<string>? passwordRef;
     private MudTextField<string>? confirmPasswordRef;
@@ -265,7 +297,7 @@
             userRegister.Email = CommonData.EmailAddress;
 
         useGrpc = bool.Parse(AppSettings.GetValueFromPagesSec("Register"));
-        // await UnitService.LoadUnitsAsync();
+
         try
         {
             grpcUnitsResponses = await UnitService.DoGetGrpcUnits(UnitService.deadline);
@@ -298,43 +330,62 @@
     }
 
     #region Validation Methods
-    private IEnumerable<string> ValidateEmail(string email)
+    private async Task<string?> ValidateEmail(string email)
     {
         var emailValidator = new EmailAddressAttribute();
         if (string.IsNullOrEmpty(email))
         {
             TurnOffAdorment(emailRef);
-            yield return "Email address is required";
+            return "Email address is required";
         }
         if (!emailValidator.IsValid(email))
         {
             TurnOffAdorment(emailRef);
-            yield return "Email address in invalid";
+            return "Email address in invalid";
         }
         if (emailValidator.IsValid(email) && !string.IsNullOrEmpty(email))
         { 
-            isEmailValid = true;
-            TurnOnAdorment(emailRef, "Validate-Email");
+            if (await AuthRestService.UserEmailExists(email))
+            {
+                TurnOffAdorment(emailRef);
+                return "Such email address is already occupied";
+            }
+            else
+            {
+                isEmailValid = true;
+                TurnOnAdorment(emailRef, "Validate-Email");
+                return null;
+            }
         }
+        return null;
     }
 
-    private IEnumerable<string> ValidateUsername(string username)
+    private async Task<string?> ValidateUsername(string username)
     {
         if (string.IsNullOrEmpty(username))
         {
             TurnOffAdorment(usernameRef);
-            yield return "Username is required";
+            return "Username is required";
         }
         if (username.Length > 16)
         {
             TurnOffAdorment(usernameRef);
-            yield return "Your username is too long (16 characters max)";
+            return "Your username is too long (16 characters max)";
         }
         if (!string.IsNullOrEmpty(username) && !(username.Length > 16))
         {
-            TurnOnAdorment(usernameRef, "Validate-Username");
-            isUsernameValid = true;
+            if (await AuthRestService.UserNameExists(username))
+            {
+                return "Such username is already occupied";
+            }
+            else
+            { 
+                TurnOnAdorment(usernameRef, "Validate-Username");
+                isUsernameValid = true;
+                return null;
+            }
         }
+        return null;
     }
 
     private IEnumerable<string> ValidatePassword(string password)
@@ -399,6 +450,38 @@
     #endregion
 
     #region Private Methods
+    private void TogglePasswordVisibility()
+    {
+        if (!showPassword)
+        {
+            passwordInput = InputType.Text;
+            passwordIcon = Icons.Filled.Visibility;
+            showPassword = !showPassword;
+        }
+        else
+        {
+            passwordInput = InputType.Password;
+            passwordIcon = Icons.Filled.VisibilityOff;
+            showPassword = !showPassword;
+        }
+    }
+
+    private void ToggleConfirmPasswordVisibility()
+    { 
+        if (!showConfirmPassword)
+        {
+            confirmPasswordInput = InputType.Text;
+            confirmPasswordIcon = Icons.Filled.Visibility;
+            showConfirmPassword = !showConfirmPassword;
+        }
+        else
+        {
+            confirmPasswordInput = InputType.Password;
+            confirmPasswordIcon = Icons.Filled.VisibilityOff;
+            showConfirmPassword = !showConfirmPassword;
+        }
+    }
+
     private string ConvertToTitle(int id)
     {
         return grpcUnitsResponses.FirstOrDefault(g => g.GrpcUnit.Id == id)!.GrpcUnit.Title;
@@ -417,17 +500,20 @@
         reference.AdornmentIcon = null;
     }
 
-
     private async Task RegisterUser(int startUnitId)
     {
         if (useGrpc == true)
-        { 
+        {
             await HandleRegistrationGrpc(startUnitId);
-            CommonData.VerificationCodeExpiredDate = DateTime.Now.AddMinutes(10);
+        }
+        else
+        {
+            await HandleRegistrationRestApi(startUnitId);
         }
 
-        await HandleRegistrationRestApi(startUnitId);
-        CommonData.VerificationCodeExpiredDate = DateTime.Now.AddMinutes(10);
+        var expireDate = DateTime.Now.AddMinutes(10);
+        await localStorage.SetItemAsync<string>("email", userRegister.Email);
+        await localStorage.SetItemAsync<DateTime>("expireDate", expireDate);
     }
 
     private async Task HandleRegistrationRestApi(int startUnitId)
@@ -441,7 +527,7 @@
         var result = await AuthRestService.Register(request);
         if (result!.Success)
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo("/verification");
             ToastService.ShowSuccess(result.Message);
         }
         else ToastService.ShowError(result.Message);
@@ -454,7 +540,7 @@
         if (result.Success)
         {
             ToastService.ShowSuccess(result.Message);
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo("/verification");
         }
         else ToastService.ShowError(result.Message);
     }

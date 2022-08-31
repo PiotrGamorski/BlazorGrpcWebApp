@@ -28,12 +28,20 @@ namespace BlazorGrpcWebApp.Client.Services.Rest
             return await result.Content.ReadFromJsonAsync<GenericAuthResponse<int>>();
         }
 
-        public async Task<GenericAuthResponse<object>> Verify(VerifyCodeRequestDto request)
+        public async Task<GenericAuthResponse<bool>?> Verify(VerifyCodeRequestDto request)
         {
             var result = await _httpClient.PostAsJsonAsync("api/auth/verify", request);
-            #pragma warning disable CS8603 // Possible null reference return.
-            return await result.Content.ReadFromJsonAsync<GenericAuthResponse<object>>();
-            #pragma warning restore CS8603 // Possible null reference return.
+            return await result.Content.ReadFromJsonAsync<GenericAuthResponse<bool>>();
+        }
+
+        public async Task<bool> UserEmailExists(string email)
+        {
+            return await _httpClient.GetFromJsonAsync<bool>($"api/auth/userEmailExists?email={email}");
+        }
+
+        public async Task<bool> UserNameExists(string userName)
+        {
+            return await _httpClient.GetFromJsonAsync<bool>($"api/auth/userNameExists?userName={userName}");
         }
     }
 }

@@ -19,6 +19,7 @@ using BlazorGrpcWebApp.Client.Services.Grpc;
 using BlazorGrpcWebApp.Client.MappingProfile;
 using BlazorGrpcWebApp.Client.Interfaces.Shared;
 using BlazorGrpcWebApp.Client.Services.Shared;
+using Blazored.LocalStorage;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -61,5 +62,6 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredToast();
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

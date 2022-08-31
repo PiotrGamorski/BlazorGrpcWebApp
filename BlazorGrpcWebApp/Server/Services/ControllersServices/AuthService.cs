@@ -7,7 +7,6 @@ using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace BlazorGrpcWebApp.Server.Services.ControllersServices
@@ -55,7 +54,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
 
         public async Task<GenericAuthResponse<int>> Register(User user, string password, int startUnitId)
         {
-            if (await UserExists(user.Email))
+            if (await UserEmailExists(user.Email))
                 return new GenericAuthResponse<int>() { Success = false, Message = "User already exists." };
 
             try
@@ -111,30 +110,41 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
             }
         }
 
-        public async Task<bool> UserExists(string email)
-        {
-            if (await _dataContext!.Users.AnyAsync(user => user.Email.ToLower() == email.ToLower()))
-                return true;
-
-            return false;
-        }
-
-        public async Task<GenericAuthResponse<object>> Verify(VerifyCodeRequestDto request)
+        public async Task<GenericAuthResponse<bool>> Verify(VerifyCodeRequestDto request)
         {
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == request.UserEmail);
-            if (user!.VerificationCodeExpireDate <= DateTime.Now)
+
+            if (user == null)
+                return new GenericAuthResponse<bool> { Success = false, Message = "User doesn't exist" };
+
+            if (user.IsVerified)
+                return new GenericAuthResponse<bool> { Success = true, Message = "User already veryfied" };
+
+            int dateComparison = DateTime.Compare(user.VerificationCodeExpireDate, DateTime.Now);
+            if (dateComparison > 0)
             {
-                if (user.VerificationCode.ToUpper() == request.VerificationCode.ToUpper())
+                if (user.VerificationCode.ToUpper() == request.VerificationCode!.ToUpper())
                 {
                     user.IsVerified = true;
                     await _dataContext.SaveChangesAsync();
 
-                    return new GenericAuthResponse<object> { Success = true };
+                    return new GenericAuthResponse<bool> { Success = true,  Data = true, Message = "Verification completed" };
                 }
-                else return new GenericAuthResponse<object> { Success = false, Message = "Invalid verification code" };
+                else return new GenericAuthResponse<bool> { Success = false, Message = "Invalid verification code" };
             }
-            else return new GenericAuthResponse<object> { Success = false, Message = "Verification code is expired" };
+            else return new GenericAuthResponse<bool> { Success = false, Message = "Verification code has expired" };
         }
+
+        public async Task<bool> UserEmailExists(string email)
+        {
+            return await _dataContext!.Users.AnyAsync(user => user.Email.ToLower() == email.ToLower());
+        }
+
+        public async Task<bool> UserNameExists(string userName)
+        {
+            return await _dataContext.Users.AnyAsync(u => u.UserName.ToLower() == userName.ToLower());
+        }
+
 
         #region Private Methods
         private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
