@@ -198,8 +198,16 @@
                                                 Class="ml-auto"
                                                 Style="text-transform: none; width: 100%; border-radius: 6px;"
                                                 Color="Color.Secondary" 
-                                                Disabled="@(!AllowSignUp)">
-                                                Sign up
+                                                Disabled="@(!AllowSignUp)"
+                                                id="SignUpBtn">
+                                                @if (!signingUpStarted)
+                                                { 
+                                                    <span>Sign up</span>
+                                                }
+                                                else
+                                                {
+                                                    <MudProgressCircular Size="Size.Small" Color="Color.Dark" Indeterminate="true" />
+                                                }
                                             </MudButton>
                                         </MudCardActions>
                                     </Animate>
@@ -265,6 +273,7 @@
     private bool isAdmin = false;
     private bool success = false;
     private string[] errors = { };
+    private bool signingUpStarted = false;
     private bool isEmailValid = false;
     private bool isUsernameValid = false;
     private bool isPasswordValid = false;
@@ -502,6 +511,9 @@
 
     private async Task RegisterUser(int startUnitId)
     {
+        signingUpStarted = true;
+        if (module != null) await module.InvokeAsync<string>("TurnOffSignUpButton");
+
         if (useGrpc == true)
         {
             await HandleRegistrationGrpc(startUnitId);
@@ -514,6 +526,9 @@
         var expireDate = DateTime.Now.AddMinutes(10);
         await localStorage.SetItemAsync<string>("email", userRegister.Email);
         await localStorage.SetItemAsync<DateTime>("expireDate", expireDate);
+
+        signingUpStarted = false;
+        if (module != null) await module.InvokeAsync<string>("TurnOnSignUpButton");
     }
 
     private async Task HandleRegistrationRestApi(int startUnitId)

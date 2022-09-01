@@ -11,4 +11,14 @@
     }
 }
 
-export { TurnOffAutoComplete }
+function TurnOffSignUpButton() {
+    const btn = document.getElementById("SignUpBtn");
+    btn.disabled = true;
+}
+
+function TurnOnSignUpButton() {
+    const btn = document.getElementById("SignUpBtn");
+    btn.disabled = false;
+}
+
+export { TurnOffAutoComplete, TurnOffSignUpButton, TurnOnSignUpButton }

@@ -10,6 +10,7 @@
 @inject IAuthRestService AuthRestService
 @inject IUserGrpcService GrpcUserService
 @inject IToastService ToastService
+@inject IJSRuntime JSRuntime
 
 <MudThemeProvider Theme="_loginTheme" />
  <MudGrid>
@@ -23,7 +24,7 @@
                        Style="margin-bottom: 35px"/>
              <MudText Typo="Typo.h5" 
                       Color="Color.Tertiary"  
-                      Style="margin-bottom:20px; font-weight: 100;">
+                      Style="margin-bottom:20px; font-weight: 50;">
                       Sign in to Blazor Battles
              </MudText>
              <MudCard Style="width: 300px; padding: 16px; border-radius: 6px; border: 1px solid #21262d; background-color:#161b22">
@@ -62,8 +63,16 @@
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
-                               OnClick="async () => await HandleLogin()">
-                               Sign In
+                               OnClick="async () => await HandleLogin()"
+                               id="SignInBtn">
+                        @if (!signingInStarted)
+                        {
+                            <span>Sign in</span>
+                        }
+                        else
+                        {
+                            <MudProgressCircular Size="Size.Small" Color="Color.Dark" Indeterminate="true" />
+                        }
                     </MudButton>
                 </MudForm>
              </MudCard>
@@ -116,9 +125,6 @@
                     </div>
                 </MudCard>
             </div>
-         <MudContainer>
-
-         </MudContainer>
      </MudItem>
  </MudGrid>
 
@@ -135,6 +141,7 @@
 @code {
     private readonly MudTheme _loginTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
     private bool success = false;
+    private bool signingInStarted = false;
 
     private IEnumerable<string> ValidateEmail(string email)
     {

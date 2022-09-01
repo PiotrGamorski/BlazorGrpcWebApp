@@ -1,6 +1,7 @@
 ﻿using BlazorGrpcWebApp.Client.Authentication;
 using BlazorGrpcWebApp.Shared;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
+using Microsoft.JSInterop;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -8,6 +9,7 @@ namespace BlazorGrpcWebApp.Client.Pages
     {
         private int grpcLoginDeadline { get; set; } = 50000;
         private UserLogin userLogin = new UserLogin();
+        private IJSObjectReference? module;
 
         protected override Task OnInitializedAsync()
         {
@@ -17,6 +19,10 @@ namespace BlazorGrpcWebApp.Client.Pages
 
         private async Task HandleLogin()
         {
+            signingInStarted = true;
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Login.razor.js");
+            if (module != null) await module.InvokeAsync<string>("TurnOffSignInButton");
+
             if (bool.Parse(AppSettingsService.GetValueFromPagesSec("Login")))
             {
                 await HandleLoginWithGrpc();
@@ -25,6 +31,8 @@ namespace BlazorGrpcWebApp.Client.Pages
             {
                 await HandleLoginWithRest();
             }
+            signingInStarted = false;
+            if (module != null) await module.InvokeAsync<string>("TurnOnSignInButton");
         }
 
         private async Task HandleLoginWithRest()

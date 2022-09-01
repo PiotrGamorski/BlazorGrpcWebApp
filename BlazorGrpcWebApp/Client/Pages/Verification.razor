@@ -60,8 +60,16 @@
                                Color="Color.Secondary" 
                                Class="ml-auto"
                                Disabled="@(!success)"
-                               OnClick="async () => await Verify()">
-                               Verify
+                               OnClick="async () => await Verify()"
+                               id="VerifyBtn">
+                        @if (!verificationStarted)
+                        {
+                            <span>Verify</span>
+                        }
+                        else
+                        {
+                            <MudProgressCircular Size="Size.Small" Color="Color.Dark" Indeterminate="true" />
+                        }
                     </MudButton>
                 </MudForm>
              </MudCard>
@@ -159,6 +167,7 @@
 @code {
     private readonly MudTheme _loginTheme = ThemesProvider.MudThemeProvider.CreateLoginMudTheme();
     private bool success = false;
+    private bool verificationStarted = false;
     private string? emailAddress;
     public string? emailAddressHidden;
     private string? verificationCode;
@@ -214,7 +223,8 @@
 
     private async Task Verify()
     {
-        await module!.InvokeAsync<string>("NavigateToLoginPage");
+        verificationStarted = true;
+        if (module != null) await module.InvokeAsync<string>("TurnOffVerifyButton");
         var request = new VerifyCodeRequestDto()
         {
             UserEmail = await localStorage.GetItemAsync<string>("email"),
@@ -226,12 +236,20 @@
             var result = await AuthRestService.Verify(request);
             if (result != null && result.Success == true && module != null)
             {
-                await module.InvokeAsync<string>("NavigateToLoginPage");
+                verificationStarted = false;
+                if (module != null)
+                { 
+                    await module.InvokeAsync<string>("TurnOnVerifyButton");
+                    await module.InvokeAsync<string>("NavigateToLoginPage");
+                }
                 await localStorage.ClearAsync();
             }
         }
         catch (Exception e)
         {
+            verificationStarted = false;
+            if (module != null) await module.InvokeAsync<string>("TurnOnVerifyButton");
+
             ToastService.ShowError(e.Message);
         }
     }

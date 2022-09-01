@@ -3,4 +3,14 @@
     window.location.href = `${origin}/login`;
 }
 
-export { NavigateToLoginPage }
+function TurnOffVerifyButton() {
+    const btn = document.getElementById("VerifyBtn");
+    btn.disabled = true;
+}
+
+function TurnOnVerifyButton() {
+    const btn = document.getElementById("VerifyBtn");
+    btn.disabled = false;
+}
+
+export { NavigateToLoginPage, TurnOffVerifyButton, TurnOnVerifyButton }
