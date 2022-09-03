@@ -14,6 +14,12 @@ namespace BlazorGrpcWebApp.Client.Pages
         private bool useGrpc;
         private int authUserId;
         private string? ImgPath;
+        private int totalArmyUnits;
+        private int totalKnights;
+        private int totalArchers;
+        private int totalMages;
+        public double[]? data = { };
+        public string[] labels = { "Knights", "Archers", "Mages" };
         private IList<UserUnitDto>? UserUnitsDtos { get; set; }
         private IList<ArmyUnit>? ArmyUnits { get; set; }
 
@@ -33,6 +39,11 @@ namespace BlazorGrpcWebApp.Client.Pages
                 UserUnitsDtos = await GetUserUnitsWithRest();
 
             PopulateArmyUnits(UserUnitsDtos);
+            totalArmyUnits = ArmyUnits.Count;
+            totalKnights = ArmyUnits.Select(u => u.Title = "Knight").Count();
+            totalArchers = ArmyUnits.Select(u => u.Title = "Archer").Count();
+            totalMages = ArmyUnits.Select(u => u.Title = "Mage").Count();
+            data = new double[] { totalKnights, totalArchers, totalMages };
             StateHasChanged();
         }
 

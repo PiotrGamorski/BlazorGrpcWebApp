@@ -15,102 +15,127 @@
 @attribute [Authorize]
 
 <MudGrid>
-   <MudItem xs="8">
-       <MudCard>
-           <MudCardHeader Style="border-bottom-color: white">
-                <MudText Typo="Typo.h5">
-                    <MudIcon Icon="@Icons.Filled.PeopleAlt" Size="Size.Medium" Style="margin-right: 5px"/>
-                    My Army
-                </MudText>
-                <MudSpacer/>
-                <MudTextField @bind-Value="ArmySearchString" 
-                              Placeholder="Search" 
-                              Adornment="Adornment.Start" 
-                              AdornmentIcon="@Icons.Material.Filled.Search" 
-                              IconSize="Size.Medium" 
-                              Class="mt-0"/>
-           </MudCardHeader>
-           <MudCardContent>
-                @if (ArmyUnits != null && ArmyUnits.Count > 0)
-                {
-                    <MudTable Items="@ArmyUnits"
-                              Filter="new Func<ArmyUnit, bool>(Filter)"
-                              RowsPerPage="15" 
-                              Hover="true"
-                              Dense="true" 
-                              SortLabel="Sort By">
-                        <HeaderContent>
-                            <MudTh></MudTh>
-                            <MudTh></MudTh>
-                            <MudTh>
-                                <MudTableSortLabel InitialDirection="SortDirection.None" 
-                                                   SortBy="new Func<ArmyUnit, object>(x => x.Title!)">
-                                Title                 
-                                </MudTableSortLabel>
-                            </MudTh>
-                            <MudTh>
-                                <MudTableSortLabel InitialDirection="SortDirection.Descending" 
-                                                   SortBy="new Func<ArmyUnit, object>(x => x.HitPoints!)">
-                                Hit Points                
-                                </MudTableSortLabel>
-                            </MudTh>
-                            <MudTh></MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd></MudTd>
-                            <MudTd DataLabel="Img"><img src=@($"{context.Img}")/></MudTd>
-                            <MudTd DataLabel="Title">@context.Title</MudTd>
-                            <MudTd DataLabel="Hit Points">@context.HitPoints</MudTd>
-                            <MudTd DataLabel="Actions">
-                                <div style="display: flex; justify-content:center">
-                                    <MudButton Variant="Variant.Filled"
-                                           Color="Color.Success"
-                                           Disabled="@(context.HitPoints == 100 ? true : false)"
-                                           Style="margin-right: 5px"
-                                           OnClick="async () => await Heal(context.UserUnitId)">
-                                           <MudTooltip Placement="Placement.Left" Text="Heals the unit to maximum hit points.">
-                                               <MudIcon Style="margin-right: 3px;" Icon="@Icons.Filled.HealthAndSafety"/>
-                                           </MudTooltip>
-                                           Heal
-                                    </MudButton>
-                                    <MudButton Variant="Variant.Filled"
-                                        Color="Color.Error"
-                                        OnClick="async () => await ShowDeleteUserUnitDialog(context.UserUnitId)">         
-                                        <MudText Style="text-transform: none;">Delete</MudText>
-                                        <MudTooltip Placement="Placement.Right" Text="Permanetly deletes unit.">
-                                            <MudIcon Style="margin-left: 3px;" Icon="@Icons.Filled.Delete"/>
-                                        </MudTooltip> 
-                                    </MudButton>
-                                </div>
-                            </MudTd>
-                        </RowTemplate>
-                        <PagerContent>
-                            <MudTablePager />
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Info"
-                                       OnClick="async () => await ShowReviveArmyDialog()">
-                                 <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
-                                    <MudIcon Icon="@Icons.Filled.LocalHospital"
-                                             Style="margin-right: 3px"/>
-                                    </MudTooltip>
-                                    Revive Army          
+    <MudItem xs="8">
+        @if (ArmyUnits != null && ArmyUnits.Count > 0)
+        {
+            <MudTable Items="@ArmyUnits"
+                      Filter="new Func<ArmyUnit, bool>(Filter)"
+                      RowsPerPage="10" 
+                      Hover="true"
+                      Dense="true"
+                      T="ArmyUnit"
+                      Style="background-color:#0d1117; border-radius:6px; border: 0.25px solid #30363d"
+                      SortLabel="Sort By"
+                      OnRowClick="@Temp">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h5">
+                        <MudIcon Icon="@Icons.Filled.PeopleAlt" Size="Size.Medium" Style="margin-right: 5px"/> My Army
+                    </MudText>
+                    <MudSpacer/>
+                    <MudTextField @bind-Value="ArmySearchString" 
+                                  Style="font-size:small; width: 101.5% "
+                                  FullWidth=false
+                                  Placeholder="Search" 
+                                  Adornment="Adornment.Start" 
+                                  AdornmentIcon="@Icons.Material.Filled.Search" 
+                                  IconSize="Size.Medium" 
+                                  Class="mt-0"/>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh/>
+                    <MudTh>
+                        <MudTableSortLabel InitialDirection="SortDirection.None" SortBy="new Func<ArmyUnit, object>(x => x.Title!)">Title</MudTableSortLabel>
+                     </MudTh>
+                     <MudTh>
+                        <MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<ArmyUnit, object>(x => x.HitPoints!)">Hit Points</MudTableSortLabel>
+                     </MudTh>
+                     <MudTh><span style="display:flex; justify-content:center">Actions</span></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Img"><img src=@($"{context.Img}") style="width: 25px; height:25px"/></MudTd>
+                    <MudTd DataLabel="Title">@context.Title</MudTd>
+                    <MudTd DataLabel="Hit Points">@context.HitPoints</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <div style="display: flex; justify-content:center">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Success"
+                                       Disabled="@(context.HitPoints == 100 ? true : false)"
+                                       Style="margin-right: 5px"
+                                       Size="Size.Small"
+                                       OnClick="async () => await Heal(context.UserUnitId)">
+                                <MudTooltip Placement="Placement.Left" Text="Heals the unit to maximum hit points.">
+                                    <MudIcon Icon="@Icons.Filled.HealthAndSafety" Style="width: 20px; height:20px"/>
+                                </MudTooltip>
                             </MudButton>
-                        </PagerContent>
-                    </MudTable>
-               }
-               else
-               {
-                <MudProgressLinear Color="Color.Error" Indeterminate="true" Class="my-7" />       
-               }   
-        </MudCardContent>
-        </MudCard>
-   </MudItem> 
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Error"
+                                       OnClick="async () => await ShowDeleteUserUnitDialog(context.UserUnitId)">         
+                                    <MudTooltip Placement="Placement.Right" Text="Permanetly deletes unit.">
+                                        <MudIcon Icon="@Icons.Filled.Delete" Style="width: 20px; height:20px"/>
+                                    </MudTooltip> 
+                            </MudButton>
+                        </div>
+                    </MudTd>
+                 </RowTemplate>
+                 <PagerContent>
+                    <MudTablePager />
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Info"
+                                   OnClick="async () => await ShowReviveArmyDialog()">
+                            <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
+                                <MudIcon Icon="@Icons.Filled.LocalHospital"
+                                         Style="margin-right: 3px"/>
+                            </MudTooltip>
+                            <MudText Style="text-transform: none; font-size:small">Revive Army</MudText>         
+                         </MudButton>
+                 </PagerContent>
+             </MudTable>
+        }
+        else
+        {
+            <MudProgressLinear Color="Color.Error" Indeterminate="true" Class="my-7" />       
+        }   
+   </MudItem>
+   @*<MudItem xs="4">
+        @if (ArmyUnits != null && ArmyUnits.Count > 0 && data != null && data.Length == 3)
+        { 
+            <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@data" InputLabels="@labels">
+                <CustomGraphics>
+                    <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Roboto-Regular" font-size="2">Total</text>
+                    <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Roboto-Regular" font-size="5">@totalArmyUnits.ToString()</text>
+                </CustomGraphics>
+            </MudChart>
+        }
+    </MudItem>*@
 </MudGrid>
-
+<style>
+    .mud-table-row:hover{
+        background-color:#13233a!important;
+    }
+    .mud-table-row .mud-table-cell {
+        font-size:small;
+        color:#88949E!important;
+    }
+    .mud-table-cell {
+        border-bottom: 1px solid #30363d
+    }
+    .mud-table-pagination-toolbar {
+        border-top: 1px solid #30363d
+    }
+    .mud-input.mud-input-underline:after {
+        border-bottom: 1px solid #30363d
+    }
+    .mud-input.mud-input-underline:before {
+        border-bottom: 1px solid #30363d
+    }
+    .mud-input.mud-input-underline:hover:not(.mud-disabled):before {
+        border-bottom: 1px solid #30363d
+    }
+</style>
 @code
 {
     private string ArmySearchString { get; set; } = string.Empty;
-    
+
     private bool Filter(ArmyUnit armyUnit) => FilterImplementation(armyUnit, ArmySearchString);
     private bool FilterImplementation(ArmyUnit myUnit, string searchString)
     {
@@ -119,4 +144,6 @@
         else if (myUnit.HitPoints.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
         else return false;
     }
+
+    private void Temp(TableRowClickEventArgs<ArmyUnit> armyUnit) { Console.WriteLine("Clicked"); }
 }

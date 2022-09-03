@@ -137,7 +137,6 @@ namespace BlazorGrpcWebApp.Client.ThemesProvider
                     TextSecondary = "#c9d1d3",
                     DrawerText = "#eeee",
                     DrawerIcon = "rgba(255,255,255, 1)",
-                    TableHover = "#aaaf",
                     ActionDefault = "fff7",
                     ActionDisabled = "#fff7",
                     Warning = "#bb8800ff",
