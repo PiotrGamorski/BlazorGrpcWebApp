@@ -97,19 +97,36 @@
         }   
    </MudItem>
     <MudItem xs="3" Class="my-auto">
-        <MudText Style="font-size:small; margin-left: 40px; color:#88949E!important">Latest changes</MudText>
-        <br/>
-        <MudTimeline TimelinePosition="TimelinePosition.Left">
-            <MudTimelineItem Size="Size.Small" Color="Color.Dark">
-                <MudText Align="Align.Start" Style="font-size:small">Item A</MudText>
-            </MudTimelineItem>
-            <MudTimelineItem Size="Size.Small">
-                <MudText Align="Align.Start" Style="font-size:small">Item B</MudText>
-            </MudTimelineItem>
-            <MudTimelineItem Size="Size.Small" Color="Color.Primary">
-                <MudText Align="Align.Start" Style="font-size:small">Item C</MudText>
-            </MudTimelineItem>
-        </MudTimeline>
+        <MudElement HtmlTag="div" Style="display:flex; flex-direction:column; align-items: center; justify-content:center;">
+            <MudContainer Style="display:flex; justify-content:center;">
+                <MudCard  Style="border-radius: 6px; border: 1px solid #21262d; height:235px; width: 302px; position: relative">
+                    <MudImage Src="https://github.githubassets.com/images/modules/dashboard/universe22/bg.jpg" 
+                              Width="302" 
+                              Height="235" 
+                              Elevation="-1" 
+                              Class="rounded"/>
+                    @*<div style="background-image: url(https://github.githubassets.com/images/modules/dashboard/universe22/bg.jpg); 
+                                height: 100%; width: 100%; object-fit:contain; position:relative; background-repeat: no-repeat; ">*@
+                          
+                    @*</div>*@
+                    <div style="position: absolute; left: 0; top:0">Some info container</div>
+                </MudCard>
+            </MudContainer>
+            <br/>
+            <MudText Style="font-size:small; margin-left: 40px; color:#88949E!important">Latest activities</MudText>
+            <br/>
+            <MudTimeline TimelinePosition="TimelinePosition.Left">
+                <MudTimelineItem Size="Size.Small" Color="Color.Dark">
+                    <MudText Align="Align.Start" Style="font-size:small">Item A</MudText>
+                </MudTimelineItem>
+                <MudTimelineItem Size="Size.Small">
+                    <MudText Align="Align.Start" Style="font-size:small">Item B</MudText>
+                </MudTimelineItem>
+                <MudTimelineItem Size="Size.Small" Color="Color.Primary">
+                    <MudText Align="Align.Start" Style="font-size:small">Item C</MudText>
+                </MudTimelineItem>
+            </MudTimeline>
+        </MudElement>
     </MudItem>
 </MudGrid>
 <style>
