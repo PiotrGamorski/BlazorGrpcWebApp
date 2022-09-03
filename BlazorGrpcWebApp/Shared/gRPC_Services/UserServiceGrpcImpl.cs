@@ -73,6 +73,13 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 await _dataContext.SaveChangesAsync();
             }
 
+            var userLastActivity = new UserLastActivitie();
+            userLastActivity.UserId = user.Id;
+            userLastActivity.LastActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Register))!.Id;
+
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+            await _dataContext.SaveChangesAsync();
+
             return new RegisterGrpcUserResponse() 
             { 
                 Data = request.GrpcUser.Id, 
@@ -106,6 +113,26 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                     .Include(ur => ur.Role)
                     .Where(ur => ur.UserId == user!.Id)
                     .ToListAsync();
+
+                var loginActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Login))!.Id;
+                if (!(await _dataContext.UserLastActivities.AnyAsync(a => a.UserId == user!.Id && a.LastActivityId == loginActivityId)))
+                {
+                    var userLastActivity = new UserLastActivitie()
+                    {
+                        ExecutionDate = DateTime.Now,
+                        UserId = user!.Id,
+                        LastActivityId = loginActivityId,
+                    };
+
+                    await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+                    await _dataContext.SaveChangesAsync();
+                }
+                else
+                {
+                    var userLastActivity = await _dataContext.UserLastActivities.FirstOrDefaultAsync(a => a.UserId == user!.Id);
+                    userLastActivity!.ExecutionDate = DateTime.Now;
+                    await _dataContext.SaveChangesAsync();
+                }
 
                 return new LoginGrpcUserRespone() { Data = await CreateToken(user!, userRoles), Success = true, Message = "AuthTokenCreated" };
             }

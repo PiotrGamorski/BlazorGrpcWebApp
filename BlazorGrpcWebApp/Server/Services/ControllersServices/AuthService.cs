@@ -47,6 +47,26 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                     .ToListAsync();
                 response.Data = await CreateToken(user, userRoles);
                 response.Success = true;
+
+                var loginActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Login))!.Id;
+                if (!(await _dataContext.UserLastActivities.AnyAsync(a => a.UserId == user.Id && a.LastActivityId == loginActivityId)))
+                {
+                    var userLastActivity = new UserLastActivitie()
+                    {
+                        ExecutionDate = DateTime.Now,
+                        UserId = user.Id,
+                        LastActivityId = loginActivityId,
+                    };
+
+                    await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+                    await _dataContext.SaveChangesAsync();
+                }
+                else
+                {
+                    var userLastActivity = await _dataContext.UserLastActivities.FindAsync(user);
+                    userLastActivity!.ExecutionDate = DateTime.Now;
+                    await _dataContext.SaveChangesAsync();
+                }
             }
 
             return response;
@@ -102,6 +122,13 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                 await _dataContext.UserUnits.AddAsync(userUnit);
                 await _dataContext.SaveChangesAsync();
 
+                var userLastActivity = new UserLastActivitie();
+                userLastActivity.UserId = user.Id;
+                userLastActivity.LastActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Register))!.Id;
+
+                await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+                await _dataContext.SaveChangesAsync();
+
                 return new GenericAuthResponse<int>() { Data = user.Id, Success = true, Message = "Registration successfull!" };
             }
             catch (Exception e)
@@ -126,6 +153,13 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                 if (user.VerificationCode.ToUpper() == request.VerificationCode!.ToUpper())
                 {
                     user.IsVerified = true;
+                    await _dataContext.SaveChangesAsync();
+
+                    var userLastActivity = new UserLastActivitie();
+                    userLastActivity.UserId = user.Id;
+                    userLastActivity.LastActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Verify))!.Id;
+
+                    await _dataContext.UserLastActivities.AddAsync(userLastActivity);
                     await _dataContext.SaveChangesAsync();
 
                     return new GenericAuthResponse<bool> { Success = true,  Data = true, Message = "Verification completed" };
