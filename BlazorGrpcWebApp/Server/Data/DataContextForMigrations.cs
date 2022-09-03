@@ -40,6 +40,12 @@ namespace BlazorGrpcWebApp.Server
                 .HasOne(b => b.Opponent)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LastActivity>()
+                .Property(e => e.ActivityType)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (Activity)Enum.Parse(typeof(Activity), v));
         }
 
         public DbSet<Unit> Units { get; set; }
@@ -49,5 +55,7 @@ namespace BlazorGrpcWebApp.Server
         public DbSet<BattleLog> BattleLogs { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<LastActivity> LastActivities { get; set; }
+        public DbSet<UserLastActivitie> UserLastActivities { get; set; } 
     }
 }

@@ -42,6 +42,12 @@ namespace BlazorGrpcWebApp.Shared.Data
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<LastActivity>()
+                .Property(e => e.ActivityType)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (Activity)System.Enum.Parse(typeof(Activity), v));
+
             //var converter = new ValueConverter<Timestamp, long >(
             //    v => v.ToDateTime().Ticks,
             //    v => Timestamp.FromDateTime(new DateTime(v, DateTimeKind.Utc)));
@@ -57,5 +63,7 @@ namespace BlazorGrpcWebApp.Shared.Data
         public virtual DbSet<BattleLog> BattleLogs { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<LastActivity> LastActivities { get; set; }
+        public DbSet<UserLastActivitie> UserLastActivities { get; set; }
     }
 }

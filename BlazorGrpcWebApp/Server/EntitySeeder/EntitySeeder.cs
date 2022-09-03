@@ -33,6 +33,13 @@ namespace BlazorGrpcWebApp.Server.EntitySeeder
                     _dBContext.Roles.AddRange(roles);
                     _dBContext.SaveChanges();
                 }
+
+                if (!_dBContext.LastActivities.Any())
+                { 
+                    var lastActivities = GetLastActivities();
+                    _dBContext.LastActivities.AddRange(lastActivities);
+                    _dBContext.SaveChanges();
+                }
             }
         }
 
@@ -74,6 +81,17 @@ namespace BlazorGrpcWebApp.Server.EntitySeeder
                 new Role() { Name = "Admin" },
                 new Role() { Name = "User"}
             };
+        }
+
+        private IEnumerable<LastActivity> GetLastActivities()
+        {
+            var lastActivities = new List<LastActivity>();
+            foreach (var elem in Enum.GetValues(typeof(Activity)))
+            { 
+                lastActivities.Add(new LastActivity() { ActivityType = (Activity)elem });
+            }
+            
+            return lastActivities;
         }
     }
 }
