@@ -15,7 +15,7 @@
 @attribute [Authorize]
 
 <MudGrid>
-    <MudItem xs="8">
+    <MudItem xs="9">
         @if (ArmyUnits != null && ArmyUnits.Count > 0)
         {
             <MudTable Items="@ArmyUnits"
@@ -96,17 +96,21 @@
             <MudProgressLinear Color="Color.Error" Indeterminate="true" Class="my-7" />       
         }   
    </MudItem>
-   @*<MudItem xs="4">
-        @if (ArmyUnits != null && ArmyUnits.Count > 0 && data != null && data.Length == 3)
-        { 
-            <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@data" InputLabels="@labels">
-                <CustomGraphics>
-                    <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Roboto-Regular" font-size="2">Total</text>
-                    <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Roboto-Regular" font-size="5">@totalArmyUnits.ToString()</text>
-                </CustomGraphics>
-            </MudChart>
-        }
-    </MudItem>*@
+    <MudItem xs="3" Class="my-auto">
+        <MudText Style="font-size:small; margin-left: 40px; color:#88949E!important">Latest changes</MudText>
+        <br/>
+        <MudTimeline TimelinePosition="TimelinePosition.Left">
+            <MudTimelineItem Size="Size.Small" Color="Color.Dark">
+                <MudText Align="Align.Start" Style="font-size:small">Item A</MudText>
+            </MudTimelineItem>
+            <MudTimelineItem Size="Size.Small">
+                <MudText Align="Align.Start" Style="font-size:small">Item B</MudText>
+            </MudTimelineItem>
+            <MudTimelineItem Size="Size.Small" Color="Color.Primary">
+                <MudText Align="Align.Start" Style="font-size:small">Item C</MudText>
+            </MudTimelineItem>
+        </MudTimeline>
+    </MudItem>
 </MudGrid>
 <style>
     .mud-table-row:hover{
@@ -130,6 +134,13 @@
     }
     .mud-input.mud-input-underline:hover:not(.mud-disabled):before {
         border-bottom: 1px solid #30363d
+    }
+    .mud-timeline-item-dot.mud-timeline-dot-size-small .mud-timeline-item-dot-inner {
+        height: 10px;
+        width: 10px;
+    }
+    .mud-timeline-vertical::before {
+        width: 1px;
     }
 </style>
 @code
