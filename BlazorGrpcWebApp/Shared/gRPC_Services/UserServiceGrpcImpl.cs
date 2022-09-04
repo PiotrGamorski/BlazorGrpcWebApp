@@ -2,6 +2,7 @@
 using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 using Dapper;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;

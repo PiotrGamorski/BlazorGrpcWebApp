@@ -1,4 +1,6 @@
 ﻿using BlazorGrpcWebApp.Shared.Data;
+using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,6 +48,31 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
 
             authUser.Bananas -= bananasCost;
             await _dataContext.SaveChangesAsync();
+
+            var healUnitActivity = new Activity();
+            switch (unit.Title)
+            {
+                case "Knight":
+                    healUnitActivity = Activity.HealKnight;
+                    break;
+                case "Archer":
+                    healUnitActivity = Activity.HealArcher;
+                    break;
+                case "Mage":
+                    healUnitActivity = Activity.HealMage;
+                    break;
+                default: break;
+            }
+            var healUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == healUnitActivity))!.Id;
+            var userLastActivity = new UserLastActivitie()
+            {
+                UserId = authUser.Id,
+                ExecutionDate = DateTime.Now,
+                LastActivityId = healUnitActivityId,
+            };
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+            await _dataContext.SaveChangesAsync();
+
             return new GrpcHealUnitResponse()
             {
                 Success = true,
@@ -92,6 +119,17 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
 
             authUser.Bananas -= bananasCost;
             await _dataContext.SaveChangesAsync();
+
+            var reviveArmyActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.ReviveArmy))!.Id;
+            var userLastActivity = new UserLastActivitie()
+            {
+                UserId = authUser.Id,
+                ExecutionDate = DateTime.Now,
+                LastActivityId = reviveArmyActivityId,
+            };
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+            await _dataContext.SaveChangesAsync();
+
             return new GrpcReviveArmyResponse()
             {
                 Success = true,

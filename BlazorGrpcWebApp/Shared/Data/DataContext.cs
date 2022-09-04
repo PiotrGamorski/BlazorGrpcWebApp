@@ -1,4 +1,5 @@
 ﻿using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

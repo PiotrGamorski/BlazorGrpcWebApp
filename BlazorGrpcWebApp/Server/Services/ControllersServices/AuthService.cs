@@ -3,6 +3,7 @@ using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 using BlazorGrpcWebApp.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

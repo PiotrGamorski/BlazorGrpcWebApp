@@ -105,11 +105,29 @@
                               Height="235" 
                               Elevation="-1" 
                               Class="rounded"/>
-                    @*<div style="background-image: url(https://github.githubassets.com/images/modules/dashboard/universe22/bg.jpg); 
-                                height: 100%; width: 100%; object-fit:contain; position:relative; background-repeat: no-repeat; ">*@
-                          
-                    @*</div>*@
-                    <div style="position: absolute; left: 0; top:0">Some info container</div>
+                    <div style="position: absolute; left: 0; top:0">
+                        <div style="display:flex; flex-direction:column; justify-content:center; padding: 16px; position: relative">
+                            <div style="display:flex; align-items: center; justify-content:space-between;">
+                                <div style="display: flex; align-items: center">
+                                    <MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="Size.Medium" Style="margin-right: 5px;"/>
+                                    <MudText Style="font-size: 25px">Universe 2002</MudText>
+                                </div>
+                                <div style="margin-left: 55px">
+                                    <MudIcon Icon="@Icons.Filled.Close" Size="Size.Small" />
+                                </div>
+                            </div>
+                            <br/>
+                            <MudText Style="font-size:small; font-weight:bold">Let's build from here</MudText>
+                            <MudText Style="font-size:small">
+                                Join the global developer event for cloud, security, community, and AI.
+                                Register today and get a 20% off early bird discount.
+                            </MudText>
+                            <br/>
+                            <MudButton Variant="Variant.Outlined">
+                                <span style="color: white!important;text-transform:none; font-weight:bold;">Register now</span>
+                            </MudButton>
+                        </div>
+                    </div>
                 </MudCard>
             </MudContainer>
             <br/>

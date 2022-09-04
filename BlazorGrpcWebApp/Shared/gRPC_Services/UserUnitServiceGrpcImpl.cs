@@ -2,6 +2,7 @@
 using BlazorGrpcWebApp.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 
 namespace BlazorGrpcWebApp.Shared.gRPC_Services
 {
@@ -31,6 +32,30 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
                 HitPoints = unit.HitPoints,
             };
             await _dataContext.UserUnits.AddAsync(newUserUnit);
+            await _dataContext.SaveChangesAsync();
+
+            var buildUnitActivity = new Activity();
+            switch (unit!.Title)
+            {
+                case "Knight":
+                    buildUnitActivity = Activity.BuildKnight;
+                    break;
+                case "Archer":
+                    buildUnitActivity = Activity.BuildArcher;
+                    break;
+                case "Mage":
+                    buildUnitActivity = Activity.BuildMage;
+                    break;
+                default: break;
+            }
+            var buildUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == buildUnitActivity))!.Id;
+            var userLastActivity = new UserLastActivitie()
+            {
+                UserId = user.Id,
+                ExecutionDate = DateTime.Now,
+                LastActivityId = buildUnitActivityId,
+            };
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
             await _dataContext.SaveChangesAsync();
 
             return new GrpcUserUnitResponse()
@@ -68,11 +93,36 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             var authUser = await _dataContext.FindAsync<User>(request.AuthUserId);
             var userUnitToDelete = await _dataContext.UserUnits.FindAsync(request.UserUnitId);
             int bananasReward = userUnitToDelete!.HitPoints;
+            var unit = await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == userUnitToDelete.Id);
 
             if (userUnitToDelete!.UserId == request.AuthUserId)
             {
                 _dataContext.UserUnits.Remove(userUnitToDelete!);
                 authUser!.Bananas += bananasReward;
+                await _dataContext.SaveChangesAsync();
+
+                var deleteUnitActivity = new Activity();
+                switch (unit!.Title)
+                {
+                    case "Knight":
+                        deleteUnitActivity = Activity.DeleteKnight;
+                        break;
+                    case "Archer":
+                        deleteUnitActivity = Activity.DeleteArcher;
+                        break;
+                    case "Mage":
+                        deleteUnitActivity = Activity.DeleteMage;
+                        break;
+                    default: break;
+                }
+                var deleteUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == deleteUnitActivity))!.Id;
+                var userLastActivity = new UserLastActivitie()
+                {
+                    UserId = authUser.Id,
+                    ExecutionDate = DateTime.Now,
+                    LastActivityId = deleteUnitActivityId,
+                };
+                await _dataContext.UserLastActivities.AddAsync(userLastActivity);
                 await _dataContext.SaveChangesAsync();
 
                 return new DeleteGrpcUserUnitResponse()

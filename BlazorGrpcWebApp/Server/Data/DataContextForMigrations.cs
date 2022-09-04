@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 
 namespace BlazorGrpcWebApp.Server
 {

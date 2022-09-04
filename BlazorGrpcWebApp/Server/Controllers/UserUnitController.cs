@@ -2,7 +2,9 @@
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
+using BlazorGrpcWebApp.Shared.Enums;
 using BlazorGrpcWebApp.Shared.Models;
+using BlazorGrpcWebApp.Shared.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -59,6 +61,32 @@ namespace BlazorGrpcWebApp.Server.Controllers
             await _dataContext.UserUnits.AddAsync(newUserUnit);
             await _dataContext.SaveChangesAsync();
 
+            var buildUnitActivity = new Activity();
+            switch (unit!.Title)
+            {
+                case "Knight":
+                    buildUnitActivity = Activity.BuildKnight;
+                    break;
+                case "Archer":
+                    buildUnitActivity = Activity.BuildArcher;
+                    break;
+                case "Mage":
+                    buildUnitActivity = Activity.BuildMage;
+                    break;
+                default: break;
+            }
+            var buildUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == buildUnitActivity))!.Id;
+            var userLastActivity = new UserLastActivitie()
+            {
+                UserId = user.Id,
+                ExecutionDate = DateTime.Now,
+                LastActivityId = buildUnitActivityId,
+            };
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+            await _dataContext.SaveChangesAsync();
+
+            await DeleteActivityService.DeleteOldestActivity(_dataContext, user.Id, ActivitySimplified.Build);
+
             return Ok(newUserUnit);
         }
 
@@ -69,6 +97,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             var authUser = await _dataContext.Users.FindAsync(authUserId);
             var userUnit = await _dataContext.UserUnits
                 .FirstOrDefaultAsync(u => u.Id == userUnitId && u.UserId == authUserId);
+            var unit = await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == userUnit!.UnitId);
             var bananasReward = userUnit!.HitPoints;
 
             if(userUnit == null)
@@ -77,6 +106,32 @@ namespace BlazorGrpcWebApp.Server.Controllers
             _dataContext.UserUnits.Remove(userUnit);
             authUser!.Bananas += bananasReward;
             await _dataContext.SaveChangesAsync();
+
+            var deleteUnitActivity = new Activity();
+            switch (unit!.Title)
+            {
+                case "Knight":
+                    deleteUnitActivity = Activity.DeleteKnight;
+                    break;
+                case "Archer":
+                    deleteUnitActivity = Activity.DeleteArcher;
+                    break;
+                case "Mage":
+                    deleteUnitActivity = Activity.DeleteMage;
+                    break;
+                default: break;
+            }
+            var deleteUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == deleteUnitActivity))!.Id;
+            var userLastActivity = new UserLastActivitie()
+            {
+                UserId = authUser.Id,
+                ExecutionDate = DateTime.Now,
+                LastActivityId = deleteUnitActivityId,
+            };
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+            await _dataContext.SaveChangesAsync();
+
+            await DeleteActivityService.DeleteOldestActivity(_dataContext, authUser.Id, ActivitySimplified.Delete);
 
             return Ok();
         }
@@ -99,6 +154,32 @@ namespace BlazorGrpcWebApp.Server.Controllers
                 authUser.Bananas -= bananasCost;
                 userUnit.HitPoints = userUnit.HitPoints;
                 await _dataContext.SaveChangesAsync();
+
+                var healUnitActivity = new Activity();
+                switch (unit.Title)
+                {
+                    case "Knight":
+                        healUnitActivity = Activity.HealKnight;
+                        break;
+                    case "Archer":
+                        healUnitActivity = Activity.HealArcher;
+                        break;
+                    case "Mage":
+                        healUnitActivity = Activity.HealMage;
+                        break;
+                    default: break;
+                }
+                var healUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == healUnitActivity))!.Id;
+                var userLastActivity = new UserLastActivitie()
+                {
+                    UserId = authUser.Id,
+                    ExecutionDate = DateTime.Now,
+                    LastActivityId = healUnitActivityId,
+                };
+                await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+                await _dataContext.SaveChangesAsync();
+
+                await DeleteActivityService.DeleteOldestActivity(_dataContext, authUser.Id, ActivitySimplified.Heal);
 
                 return Ok(new GenericAuthResponse<UserUnit>() { Message = "Your unit has been healed.", Success = true });
             }
@@ -132,6 +213,19 @@ namespace BlazorGrpcWebApp.Server.Controllers
 
             user.Bananas -= bananasCost;
             await _dataContext.SaveChangesAsync();
+
+            var reviveArmyActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.ReviveArmy))!.Id;
+            var userLastActivity = new UserLastActivitie()
+            {
+                UserId = user.Id,
+                ExecutionDate = DateTime.Now,
+                LastActivityId = reviveArmyActivityId,
+            };
+            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
+            await _dataContext.SaveChangesAsync();
+
+            await DeleteActivityService.DeleteOldestActivity(_dataContext, user.Id, Activity.ReviveArmy);
+
             return Ok("Army revived!");
         }
     }
