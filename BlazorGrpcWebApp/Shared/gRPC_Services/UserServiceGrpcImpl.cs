@@ -3,6 +3,7 @@ using BlazorGrpcWebApp.Shared.Claims;
 using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Enums;
+using BlazorGrpcWebApp.Shared.Services.Static;
 using Dapper;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
         _configuration = configuration;
     }
 
+    #region Public Methods
     public override async Task<RegisterGrpcUserResponse> GrpcUserRegister(RegisterGrpcUserRequest request, ServerCallContext context)
     {
         try
@@ -118,15 +120,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 var loginActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Login))!.Id;
                 if (!(await _dataContext.UserLastActivities.AnyAsync(a => a.UserId == user!.Id && a.LastActivityId == loginActivityId)))
                 {
-                    var userLastActivity = new UserLastActivitie()
-                    {
-                        ExecutionDate = DateTime.Now,
-                        UserId = user!.Id,
-                        LastActivityId = loginActivityId,
-                    };
-
-                    await _dataContext.UserLastActivities.AddAsync(userLastActivity);
-                    await _dataContext.SaveChangesAsync();
+                    await CreateUserActivityService.CreateAuthActivity(_dataContext, user!.Id, Activity.Login);
                 }
                 else
                 {
@@ -189,7 +183,9 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
             });
         }
     }
+    #endregion
 
+    #region Private Methods
     private Task CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
 #pragma warning disable CA1416 // Validate platform compatibility
@@ -266,4 +262,5 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
             });
         }
     }
+    #endregion
 }

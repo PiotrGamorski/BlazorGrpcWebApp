@@ -2,9 +2,9 @@
 using BlazorGrpcWebApp.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlazorGrpcWebApp.Shared.Services
+namespace BlazorGrpcWebApp.Shared.Services.Static
 {
-    public static class DeleteActivityService
+    public static class DeleteUserActivityService
     {
         private static async Task DeleteOldestActivity(DataContext dataContext, int userId, List<int> activitiesIds)
         {
@@ -22,6 +22,7 @@ namespace BlazorGrpcWebApp.Shared.Services
                 }
             }
         }
+
         public static async Task DeleteOldestActivity(DataContext dataContext, int userId, ActivitySimplified lastActivity)
         {
             if (lastActivity == ActivitySimplified.Heal)
@@ -54,6 +55,7 @@ namespace BlazorGrpcWebApp.Shared.Services
                 await DeleteOldestActivity(dataContext, userId, deleteActivitiesIds);
             }
         }
+
         public static async Task DeleteOldestActivity(DataContext dataContext, int userId, Activity lastActivity)
         {
             var lastActivityId = (await dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == lastActivity))!.Id;

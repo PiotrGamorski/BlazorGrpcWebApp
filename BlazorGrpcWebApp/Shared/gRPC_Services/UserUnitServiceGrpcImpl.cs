@@ -3,6 +3,7 @@ using BlazorGrpcWebApp.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Enums;
+using BlazorGrpcWebApp.Shared.Services.Static;
 
 namespace BlazorGrpcWebApp.Shared.gRPC_Services
 {
@@ -12,60 +13,6 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
         public UserUnitServiceGrpcImpl(DataContext dataContext)
         {
             _dataContext = dataContext;
-        }
-
-        public override async Task<GrpcUserUnitResponse> BuildUserUnit(GrpcUserUnitRequest request, ServerCallContext context)
-        {
-            var unit = await _dataContext.Units.FirstOrDefaultAsync<Unit>(u => u.Id == request.UnitId);
-            var user  = await _dataContext.Users.FirstOrDefaultAsync<User>(u => u.Id == request.UserId);
-
-            if (request.Bananas < unit!.BananaCost)
-            { 
-                throw new RpcException(new Status(StatusCode.Unavailable, "Not Enough Bananas"));
-            }
-            
-            user!.Bananas -= unit.BananaCost;
-            var newUserUnit = new UserUnit()
-            {
-                UnitId = unit.Id,
-                UserId = request.UserId,
-                HitPoints = unit.HitPoints,
-            };
-            await _dataContext.UserUnits.AddAsync(newUserUnit);
-            await _dataContext.SaveChangesAsync();
-
-            var buildUnitActivity = new Activity();
-            switch (unit!.Title)
-            {
-                case "Knight":
-                    buildUnitActivity = Activity.BuildKnight;
-                    break;
-                case "Archer":
-                    buildUnitActivity = Activity.BuildArcher;
-                    break;
-                case "Mage":
-                    buildUnitActivity = Activity.BuildMage;
-                    break;
-                default: break;
-            }
-            var buildUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == buildUnitActivity))!.Id;
-            var userLastActivity = new UserLastActivitie()
-            {
-                UserId = user.Id,
-                ExecutionDate = DateTime.Now,
-                LastActivityId = buildUnitActivityId,
-            };
-            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
-            await _dataContext.SaveChangesAsync();
-
-            return new GrpcUserUnitResponse()
-            {
-                UnitId = unit.Id,
-                UserId = request.UserId,
-                HitPoints = unit.HitPoints,
-                Success = true,
-                Message = $"Your {unit.Title} has been built!"
-            };
         }
 
         public override async Task GetUserUnits(GrpcGetUserUnitRequest request, IServerStreamWriter<GrpcGetUserUnitResponse> responseStream, ServerCallContext context)
@@ -88,6 +35,39 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             else await responseStream.WriteAsync(new GrpcGetUserUnitResponse());
         }
 
+        public override async Task<GrpcUserUnitResponse> BuildUserUnit(GrpcUserUnitRequest request, ServerCallContext context)
+        {
+            var unit = await _dataContext.Units.FirstOrDefaultAsync<Unit>(u => u.Id == request.UnitId);
+            var user  = await _dataContext.Users.FirstOrDefaultAsync<User>(u => u.Id == request.UserId);
+
+            if (request.Bananas < unit!.BananaCost)
+            { 
+                throw new RpcException(new Status(StatusCode.Unavailable, "Not Enough Bananas"));
+            }
+            
+            user!.Bananas -= unit.BananaCost;
+            var newUserUnit = new UserUnit()
+            {
+                UnitId = unit.Id,
+                UserId = request.UserId,
+                HitPoints = unit.HitPoints,
+            };
+            await _dataContext.UserUnits.AddAsync(newUserUnit);
+            await _dataContext.SaveChangesAsync();
+
+            await CreateUserActivityService.CreateBuildActivity(_dataContext, user.Id, unit.Title);
+            await DeleteUserActivityService.DeleteOldestActivity(_dataContext, user.Id, ActivitySimplified.Build);
+
+            return new GrpcUserUnitResponse()
+            {
+                UnitId = unit.Id,
+                UserId = request.UserId,
+                HitPoints = unit.HitPoints,
+                Success = true,
+                Message = $"Your {unit.Title} has been built!"
+            };
+        }
+
         public override async Task<DeleteGrpcUserUnitResponse> DeleteGrpcUserUnit(DeleteGrpcUserUnitRequest request, ServerCallContext context)
         {
             var authUser = await _dataContext.FindAsync<User>(request.AuthUserId);
@@ -101,29 +81,8 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
                 authUser!.Bananas += bananasReward;
                 await _dataContext.SaveChangesAsync();
 
-                var deleteUnitActivity = new Activity();
-                switch (unit!.Title)
-                {
-                    case "Knight":
-                        deleteUnitActivity = Activity.DeleteKnight;
-                        break;
-                    case "Archer":
-                        deleteUnitActivity = Activity.DeleteArcher;
-                        break;
-                    case "Mage":
-                        deleteUnitActivity = Activity.DeleteMage;
-                        break;
-                    default: break;
-                }
-                var deleteUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == deleteUnitActivity))!.Id;
-                var userLastActivity = new UserLastActivitie()
-                {
-                    UserId = authUser.Id,
-                    ExecutionDate = DateTime.Now,
-                    LastActivityId = deleteUnitActivityId,
-                };
-                await _dataContext.UserLastActivities.AddAsync(userLastActivity);
-                await _dataContext.SaveChangesAsync();
+                await CreateUserActivityService.CreateDeleteActivity(_dataContext, authUser.Id, unit!.Title);
+                await DeleteUserActivityService.DeleteOldestActivity(_dataContext, authUser.Id, ActivitySimplified.Delete);
 
                 return new DeleteGrpcUserUnitResponse()
                 {
