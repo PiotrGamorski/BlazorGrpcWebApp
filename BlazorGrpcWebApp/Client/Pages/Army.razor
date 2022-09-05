@@ -25,8 +25,7 @@
                       Dense="true"
                       T="ArmyUnit"
                       Style="background-color:#0d1117; border-radius:6px; border: 0.25px solid #30363d"
-                      SortLabel="Sort By"
-                      OnRowClick="@Temp">
+                      SortLabel="Sort By">
                 <ToolBarContent>
                     <MudText Typo="Typo.h5">
                         <MudIcon Icon="@Icons.Filled.PeopleAlt" Size="Size.Medium" Style="margin-right: 5px"/> My Army
@@ -190,6 +189,4 @@
         else if (myUnit.HitPoints.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
         else return false;
     }
-
-    private void Temp(TableRowClickEventArgs<ArmyUnit> armyUnit) { Console.WriteLine("Clicked"); }
 }

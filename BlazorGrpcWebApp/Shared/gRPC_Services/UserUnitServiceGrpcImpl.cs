@@ -73,7 +73,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             var authUser = await _dataContext.FindAsync<User>(request.AuthUserId);
             var userUnitToDelete = await _dataContext.UserUnits.FindAsync(request.UserUnitId);
             int bananasReward = userUnitToDelete!.HitPoints;
-            var unit = await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == userUnitToDelete.Id);
+            var unit = await _dataContext.Units.FirstOrDefaultAsync(u => u.Id == userUnitToDelete.UnitId);
 
             if (userUnitToDelete!.UserId == request.AuthUserId)
             {
