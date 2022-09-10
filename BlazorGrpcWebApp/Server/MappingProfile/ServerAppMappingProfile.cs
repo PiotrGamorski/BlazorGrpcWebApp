@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BlazorGrpcWebApp.Shared;
+using BlazorGrpcWebApp.Shared.Dtos;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Models.UI_Models;
 
@@ -23,6 +24,10 @@ namespace BlazorGrpcWebApp.Server.MappingProfile
                 .ForMember(m => m.Victories, c => c.MapFrom(c => c.Victories))
                 .ForMember(m => m.Defeats, c => c.MapFrom(c => c.Defeats))
                 .ForMember(m => m.Battles, c => c.MapFrom(c => c.Battles));
+
+            CreateMap<UserLastActivitie, UserLastActivityDto>()
+                .ForMember(m => m.LastActivity, c => c.MapFrom(c => c.LastActivity.ActivityType))
+                .ForMember(m => m.ExecutionDate, c => c.MapFrom(c => c.ExecutionDate));
         }
     }
 }

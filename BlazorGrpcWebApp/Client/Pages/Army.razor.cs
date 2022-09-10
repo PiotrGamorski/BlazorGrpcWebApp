@@ -6,6 +6,7 @@ using BlazorGrpcWebApp.Shared.Models.UI_Models;
 using MudBlazor;
 using BlazorGrpcWebApp.Client.Authentication;
 using System.Security.Claims;
+using Microsoft.JSInterop;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -14,8 +15,12 @@ namespace BlazorGrpcWebApp.Client.Pages
         private bool useGrpc;
         private int authUserId;
         private string? ImgPath;
+        private IJSObjectReference? module;
+        private string? res;
+        public string? FooterPaddingTop { get; set; } = "0px";
         private IList<UserUnitDto>? UserUnitsDtos { get; set; }
         private IList<ArmyUnit>? ArmyUnits { get; set; }
+        private IList<UserLastActivityDto>? LastActivities { get; set; }
 
 
         protected override async Task OnInitializedAsync()
@@ -33,6 +38,12 @@ namespace BlazorGrpcWebApp.Client.Pages
                 UserUnitsDtos = await GetUserUnitsWithRest();
 
             PopulateArmyUnits(UserUnitsDtos);
+            StateHasChanged();
+
+            await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 6);
+            StateHasChanged();
+
+            await SetFooterPaddingTop();
             StateHasChanged();
         }
 
@@ -78,6 +89,16 @@ namespace BlazorGrpcWebApp.Client.Pages
                 }
             }
         }
+
+        public async Task GetUserLastActivities(int userId, BlazorGrpcWebApp.Shared.Enums.Page page, int activitiesNumber)
+        {
+            LastActivities = new List<UserLastActivityDto>();
+            var respone = await ArmyRestService.GetUserLastActivities(userId, page, activitiesNumber);
+            if (respone != null && respone.Data != null)
+            {
+                LastActivities = respone.Data;
+            }
+        }
         #endregion
 
         #region Dialogs
@@ -108,18 +129,51 @@ namespace BlazorGrpcWebApp.Client.Pages
         {
             if (useGrpc) await HealUserUnitWithGrpc(userUnitId);
             else await HealUserUnitWithRest(userUnitId);
+
+            await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 6);
+            StateHasChanged();
         }
 
         public async Task ReviveArmy()
         {
             if (useGrpc) await ReviveArmyWithGrpc();
             else await ReviveArmyWithRest();
+
+            await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 6);
+            StateHasChanged();
         }
 
         public async Task Delete(int userUnitId)
         {
             if (useGrpc) await DeleteUserUnitGrpc(userUnitId);
             else await DeleteUserUnitWithRest(userUnitId);
+
+            await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 6);
+            StateHasChanged();
+        }
+        #endregion
+
+        #region Private Methods
+        private string CalcuteTime(DateTime lastActivityExecutionDate)
+        {
+            var time = DateTime.Now - lastActivityExecutionDate;
+
+            if (time.TotalSeconds < 2) return ((int)time.TotalSeconds + 1).ToString() + " second ago";
+            if (time.TotalSeconds >= 2 && time.TotalSeconds < 60) return ((int)time.TotalSeconds + 1).ToString() + " seconds ago";
+            if (time.TotalMinutes < 60) return ((int)time.TotalMinutes).ToString() + " minutes ago";
+            if (time.TotalHours < 24) return ((int)time.TotalHours).ToString() + " hours ago";
+            if (time.TotalDays < 356) return ((int)time.TotalDays).ToString() + " days ago";
+
+            return "Over a year ago";
+        }
+
+        public async Task SetFooterPaddingTop()
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Army.razor.js");
+            if (module != null)
+            {
+                await module.InvokeAsync<string?>("GetPositionBottom");
+            }
         }
         #endregion
 

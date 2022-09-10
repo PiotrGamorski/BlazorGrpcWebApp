@@ -118,7 +118,7 @@ namespace BlazorGrpcWebApp.Client.ThemesProvider
                     // Box Lines + Font
                     Primary = "#ffff",
                     Secondary = "#238636",
-                    Tertiary = "#ff4081ff",
+                    Tertiary = "#88949E",
 
                     // Main Background
                     Background = "#010409",

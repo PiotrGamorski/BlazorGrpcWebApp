@@ -1,6 +1,8 @@
 ﻿@page "/army"
 @using BlazorGrpcWebApp.Client.Interfaces.Grpc
 @using BlazorGrpcWebApp.Client.Interfaces.Rest
+@using BlazorGrpcWebApp.Shared.Dictionaries
+@using BlazorGrpcWebApp.Shared.Enums
 @using BlazorGrpcWebApp.Shared.Models.UI_Models
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAppSettingsService AppSettingsService
@@ -12,12 +14,15 @@
 @inject IBananaRestService BananaRestService
 @inject IToastService ToastService
 @inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
-<MudGrid>
-    <MudItem xs="9">
+<br/>
+<MudGrid id="table-grid">
+    <MudItem xs="8" Style="padding-left:40px;">
         @if (ArmyUnits != null && ArmyUnits.Count > 0)
         {
+            <Animate Animation="Animations.FadeIn" DurationMs="500">
             <MudTable Items="@ArmyUnits"
                       Filter="new Func<ArmyUnit, bool>(Filter)"
                       RowsPerPage="10" 
@@ -77,26 +82,30 @@
                     </MudTd>
                  </RowTemplate>
                  <PagerContent>
-                    <MudTablePager />
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Info"
-                                   OnClick="async () => await ShowReviveArmyDialog()">
-                            <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
-                                <MudIcon Icon="@Icons.Filled.LocalHospital"
-                                         Style="margin-right: 3px"/>
-                            </MudTooltip>
-                            <MudText Style="text-transform: none; font-size:small">Revive Army</MudText>         
-                         </MudButton>
+                    <MudTablePager Style="color: #88949E; font-size: small" PageSizeOptions="new int[] {10, 15, 20}"/>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               OnClick="async () => await ShowReviveArmyDialog()">
+                        <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
+                            <MudIcon Icon="@Icons.Filled.LocalHospital"
+                                     Style="margin-right: 3px"/>
+                        </MudTooltip>        
+                        <MudText Style="text-transform: none; font-size:small">Revive Army</MudText>         
+                    </MudButton>    
                  </PagerContent>
              </MudTable>
+             </Animate>
         }
         else
         {
-            <MudProgressLinear Color="Color.Error" Indeterminate="true" Class="my-7" />       
-        }   
+            <MudElement HtmlTag="div" Style="position:absolute; top:50%; right: 50%; transform:translate(50%, -50%);">
+                <MudProgressCircular Color="Color.Dark" Indeterminate="true" Style="margin-top: 50vh"/>
+            </MudElement>      
+        }
    </MudItem>
-    <MudItem xs="3" Class="my-auto">
-        <MudElement HtmlTag="div" Style="display:flex; flex-direction:column; align-items: center; justify-content:center;">
+    <MudItem xs="4" Class="my-auto">
+        <MudElement HtmlTag="div" Style="display:flex; flex-direction:column; align-items: flex-start; justify-content:center;">
+            <Animate Animation="Animations.FadeIn" DurationMs="500">
             <MudContainer Style="display:flex; justify-content:center;">
                 <MudCard  Style="border-radius: 6px; border: 1px solid #21262d; height:235px; width: 302px; position: relative">
                     <MudImage Src="https://github.githubassets.com/images/modules/dashboard/universe22/bg.jpg" 
@@ -129,24 +138,48 @@
                     </div>
                 </MudCard>
             </MudContainer>
+            </Animate>
             <br/>
-            <MudText Style="font-size:small; margin-left: 40px; color:#88949E!important">Latest activities</MudText>
-            <br/>
-            <MudTimeline TimelinePosition="TimelinePosition.Left">
-                <MudTimelineItem Size="Size.Small" Color="Color.Dark">
-                    <MudText Align="Align.Start" Style="font-size:small">Item A</MudText>
-                </MudTimelineItem>
-                <MudTimelineItem Size="Size.Small">
-                    <MudText Align="Align.Start" Style="font-size:small">Item B</MudText>
-                </MudTimelineItem>
-                <MudTimelineItem Size="Size.Small" Color="Color.Primary">
-                    <MudText Align="Align.Start" Style="font-size:small">Item C</MudText>
-                </MudTimelineItem>
-            </MudTimeline>
+            @if (LastActivities != null && LastActivities.Count() > 0)
+            { 
+                <MudText Style="font-size:small; margin-left: -140px; font-weight: bold">Latest activities</MudText>
+                <Animate Animation="Animations.FadeIn" DurationMs="500">
+                <MudTimeline TimelinePosition="TimelinePosition.Left">
+                    @foreach (var activity in LastActivities!)
+                    {
+                        <MudTimelineItem Size="Size.Small" Color="Color.Dark">
+                            <ItemContent>
+                                <MudPaper>
+                                    <MudText Align="Align.Start" Style="font-size:small; color:#88949E" GutterBottom="true">
+                                        @CalcuteTime(activity.ExecutionDate)
+                                    </MudText>
+                                    <MudText Align="Align.Start" Style="font-size:small;">
+                                        @ActivitiesDictionary.LastActivityText.GetValueOrDefault(activity.LastActivity)
+                                    </MudText>
+                                </MudPaper>
+                            </ItemContent>
+                        </MudTimelineItem>        
+                    }
+                </MudTimeline>
+                </Animate>
+            }
         </MudElement>
     </MudItem>
 </MudGrid>
+@if (LastActivities != null && LastActivities.Count() > 0)
+{
+    <Animate Animation="Animations.FadeIn" DurationMs="500">
+        <div id="footer-container">
+            <Footer PaddingTop="@FooterPaddingTop" />
+        </div>
+    </Animate>
+}
+
 <style>
+    .txt-size-color {
+        font-size: small;
+        color: #88949E;
+    }
     .mud-table-row:hover{
         background-color:#13233a!important;
     }
@@ -175,6 +208,20 @@
     }
     .mud-timeline-vertical::before {
         width: 1px;
+        background: #30363d;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .mud-timeline-vertical.mud-timeline-position-start::before {
+        top: 40px;
+        height: 80%;
+    }
+    .mud-select .mud-select-input .mud-input-slot {
+        font-size: small;
+        color: #88949E;
+    }
+    Footer {
+        padding-top: 10px;
     }
 </style>
 @code

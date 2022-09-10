@@ -1,5 +1,7 @@
 ﻿using BlazorGrpcWebApp.Client.Interfaces.Rest;
 using BlazorGrpcWebApp.Shared.Dtos;
+using BlazorGrpcWebApp.Shared.Enums;
+using BlazorGrpcWebApp.Shared.Models;
 using System.Net.Http.Json;
 
 namespace BlazorGrpcWebApp.Client.Services.Rest
@@ -36,6 +38,20 @@ namespace BlazorGrpcWebApp.Client.Services.Rest
         {
             var result = await _httpClient.DeleteAsync($"api/userunit/{userUnitId}");
             return result;
+        }
+
+        public async Task<GenericAuthResponse<IList<UserLastActivityDto>>?> GetUserLastActivities(int userId, Page page, int activitiesNumber)
+        {
+            var request = new UserLastActivitiesRequestDto() 
+            { 
+                UserId = userId,
+                Page = page,
+                ActivitiesNumber = activitiesNumber,
+            };
+
+            var reponse = await _httpClient.PostAsJsonAsync<UserLastActivitiesRequestDto>("api/userlastactivity/getUserActivities", request);
+            return await reponse.Content.ReadFromJsonAsync<GenericAuthResponse<IList<UserLastActivityDto>>>();
+            
         }
     }
 }

@@ -1,0 +1,117 @@
+﻿<MudContainer id="footer" Style="display: flex; flex-direction:column">
+    <MudGrid>
+        <MudItem xs="10">
+            <hr style="border: 1px solid #30363d"/>
+        </MudItem>
+    </MudGrid>
+    <MudElement HtmlTag="div" Style="display: flex">
+        <MudGrid>
+            <MudItem lg="4">
+                <MudElement HtmlTag="div" Style="display: flex; align-items: center;">
+                    <MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="Size.Medium" Style="color:#88949E"/>
+                    <MudText Style="font-size:small; margin-left: 20px; color: #88949E">&copy; @DateTime.Now.Year.ToString(), Blazor Battles, Inc.</MudText>
+                </MudElement>
+            </MudItem>
+            <MudItem lg="8">
+                <MudGrid>
+                    <MudItem xs="3">
+                        <MudElement HtmlTag="div" Style="display: flex; flex-direction: column; justify-content:left">
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Blog
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    About
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Shop
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Contact Blazor Battles
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Pricing
+                                </MudText>
+                            </MudLink>
+                        </MudElement>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudElement HtmlTag="div" Style="display: flex; flex-direction: column; justify-content:left">
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    API
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Training
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Status
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Security
+                                </MudText>
+                            </MudLink>  
+                        </MudElement>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudElement HtmlTag="div" Style="display: flex; flex-direction: column; justify-content:left">
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Terms
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Privacy
+                                </MudText>
+                            </MudLink>
+                            <MudLink Href="" Color="Color.Tertiary">
+                                <MudText Style="text-transform: none; font-size:12px">
+                                    Docs
+                                </MudText>
+                            </MudLink>
+                        </MudElement>
+                    </MudItem>
+                    </MudGrid>
+                </MudItem>
+            </MudGrid>
+    </MudElement>
+</MudContainer>
+
+<style>
+    :root {
+        --section-diff: calc(calc(calc(100vw - 16px)*.106) + calc(128*1px) - .106*calc(calc(100vw - 15px)/2 - 1080px/2));
+    }
+    #footer {
+        width: 100%; 
+        display: block; 
+        box-sizing: border-box; 
+        margin-left:20px; 
+        margin-right:auto; 
+        position: relative; 
+        /*padding-top: var(--section-diff);*/
+        padding-top: @PaddingTop;
+    }
+    a:hover {
+        color: #53a6ff!important;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string PaddingTop { get; set; }
+}
