@@ -7,12 +7,30 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
 {
     public static class CreateUserActivityService
     {
-        private static async Task CreateActivity(DataContext dataContext, int userId, Activity activity)
+        private static async Task CreateActivity(DataContext dataContext, int userId, Activity activity, int? bananasSpent = null, int? bananasGained = null)
         {
             var userLastActivity = new UserLastActivity();
             userLastActivity.UserId = userId;
             userLastActivity.ExecutionDate = DateTime.Now;
             userLastActivity.LastActivityId = (await dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == activity))!.Id;
+            userLastActivity.UserBananasTotal = (await dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId))!.Bananas;
+
+            if (bananasSpent != null)
+            {
+                if (activity == Activity.BuildKnight || activity == Activity.BuildArcher || activity == Activity.BuildMage ||
+                    activity == Activity.HealKnight || activity == Activity.HealArcher || activity == Activity.HealMage)
+                {
+                    userLastActivity.UserBananasSpent = bananasSpent;
+                }
+            }
+
+            if (bananasGained != null)
+            {
+                if (activity == Activity.DeleteKnight || activity == Activity.DeleteArcher || activity == Activity.DeleteMage)
+                {
+                    userLastActivity.UserBananasGained = bananasGained;
+                }
+            }
 
             await dataContext.UserLastActivities.AddAsync(userLastActivity);
             await dataContext.SaveChangesAsync();
