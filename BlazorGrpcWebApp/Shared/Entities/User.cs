@@ -20,6 +20,6 @@
         public string VerificationCode { get; set; }
         public DateTime VerificationCodeExpireDate { get; set; } = DateTime.Now.AddMinutes(10);
         public bool IsVerified { get; set; } = false;
-        public List<UserLastActivitie> LastActivities { get; set; }
+        public List<UserLastActivity> LastActivities { get; set; }
     }
 }

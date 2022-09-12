@@ -76,7 +76,7 @@ public class UserServiceGrpcImpl : UserServiceGrpc.UserServiceGrpcBase
                 await _dataContext.SaveChangesAsync();
             }
 
-            var userLastActivity = new UserLastActivitie();
+            var userLastActivity = new UserLastActivity();
             userLastActivity.UserId = user.Id;
             userLastActivity.LastActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Register))!.Id;
 

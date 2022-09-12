@@ -57,6 +57,6 @@ namespace BlazorGrpcWebApp.Server
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<LastActivity> LastActivities { get; set; }
-        public DbSet<UserLastActivitie> UserLastActivities { get; set; } 
+        public DbSet<UserLastActivity> UserLastActivities { get; set; } 
     }
 }

@@ -4,6 +4,7 @@ using BlazorGrpcWebApp.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorGrpcWebApp.Server.Migrations
 {
     [DbContext(typeof(DataContextForMigrations))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220912084330_UpdateLastActivityTable")]
+    partial class UpdateLastActivityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,7 +218,7 @@ namespace BlazorGrpcWebApp.Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserLastActivity", b =>
+            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserLastActivitie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -357,7 +359,7 @@ namespace BlazorGrpcWebApp.Server.Migrations
                     b.Navigation("Opponent");
                 });
 
-            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserLastActivity", b =>
+            modelBuilder.Entity("BlazorGrpcWebApp.Shared.Entities.UserLastActivitie", b =>
                 {
                     b.HasOne("BlazorGrpcWebApp.Shared.Entities.LastActivity", "LastActivity")
                         .WithMany()

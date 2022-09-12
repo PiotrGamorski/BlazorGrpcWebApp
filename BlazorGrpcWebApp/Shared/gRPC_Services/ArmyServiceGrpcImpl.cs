@@ -64,7 +64,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
                 default: break;
             }
             var healUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == healUnitActivity))!.Id;
-            var userLastActivity = new UserLastActivitie()
+            var userLastActivity = new UserLastActivity()
             {
                 UserId = authUser.Id,
                 ExecutionDate = DateTime.Now,
@@ -121,7 +121,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             await _dataContext.SaveChangesAsync();
 
             var reviveArmyActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.ReviveArmy))!.Id;
-            var userLastActivity = new UserLastActivitie()
+            var userLastActivity = new UserLastActivity()
             {
                 UserId = authUser.Id,
                 ExecutionDate = DateTime.Now,

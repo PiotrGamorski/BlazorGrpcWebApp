@@ -9,7 +9,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
     {
         private static async Task CreateActivity(DataContext dataContext, int userId, Activity activity)
         {
-            var userLastActivity = new UserLastActivitie();
+            var userLastActivity = new UserLastActivity();
             userLastActivity.UserId = userId;
             userLastActivity.ExecutionDate = DateTime.Now;
             userLastActivity.LastActivityId = (await dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == activity))!.Id;

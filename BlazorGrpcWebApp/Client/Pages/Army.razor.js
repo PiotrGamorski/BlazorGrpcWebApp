@@ -1,6 +1,6 @@
 ﻿function GetPositionBottom() {
     const scrollHeight = document.body.scrollHeight;
-    const footerHeight = 125;
+    const footerHeight = 102;
     const tableBottom = document.querySelector("#table-grid").getBoundingClientRect().bottom;
 
     let paddingTop = scrollHeight - tableBottom - footerHeight;

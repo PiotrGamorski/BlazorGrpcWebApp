@@ -52,7 +52,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                 var loginActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Login))!.Id;
                 if (!(await _dataContext.UserLastActivities.AnyAsync(a => a.UserId == user.Id && a.LastActivityId == loginActivityId)))
                 {
-                    var userLastActivity = new UserLastActivitie()
+                    var userLastActivity = new UserLastActivity()
                     {
                         ExecutionDate = DateTime.Now,
                         UserId = user.Id,
@@ -123,7 +123,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                 await _dataContext.UserUnits.AddAsync(userUnit);
                 await _dataContext.SaveChangesAsync();
 
-                var userLastActivity = new UserLastActivitie();
+                var userLastActivity = new UserLastActivity();
                 userLastActivity.UserId = user.Id;
                 userLastActivity.LastActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Register))!.Id;
 
@@ -156,7 +156,7 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                     user.IsVerified = true;
                     await _dataContext.SaveChangesAsync();
 
-                    var userLastActivity = new UserLastActivitie();
+                    var userLastActivity = new UserLastActivity();
                     userLastActivity.UserId = user.Id;
                     userLastActivity.LastActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == Activity.Verify))!.Id;
 
