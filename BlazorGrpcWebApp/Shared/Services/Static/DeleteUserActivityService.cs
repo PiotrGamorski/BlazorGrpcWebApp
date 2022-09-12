@@ -6,7 +6,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
 {
     public static class DeleteUserActivityService
     {
-        private static async Task DeleteOldestActivity(DataContext dataContext, int userId, List<int> activitiesIds)
+        private static async Task DeleteOldActivities(DataContext dataContext, int userId, List<int> activitiesIds)
         {
             if (activitiesIds != null && activitiesIds.Count() == 3)
             {
@@ -23,7 +23,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
             }
         }
 
-        public static async Task DeleteOldestActivity(DataContext dataContext, int userId, ActivitySimplified lastActivity)
+        public static async Task DeleteOldActivities(DataContext dataContext, int userId, ActivitySimplified lastActivity)
         {
             if (lastActivity == ActivitySimplified.Heal)
             {
@@ -32,7 +32,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
                     .Select(a => a.Id)
                     .ToListAsync();
 
-                await DeleteOldestActivity(dataContext, userId, healActivitiesIds);
+                await DeleteOldActivities(dataContext, userId, healActivitiesIds);
             }
 
             if (lastActivity == ActivitySimplified.Build)
@@ -42,7 +42,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
                     .Select(a => a.Id)
                     .ToListAsync();
 
-                await DeleteOldestActivity(dataContext, userId, buildActivitiesIds);
+                await DeleteOldActivities(dataContext, userId, buildActivitiesIds);
             }
 
             if (lastActivity == ActivitySimplified.Delete)
@@ -52,11 +52,11 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
                     .Select(a => a.Id)
                     .ToListAsync();
 
-                await DeleteOldestActivity(dataContext, userId, deleteActivitiesIds);
+                await DeleteOldActivities(dataContext, userId, deleteActivitiesIds);
             }
         }
 
-        public static async Task DeleteOldestActivity(DataContext dataContext, int userId, Activity lastActivity)
+        public static async Task DeleteOldActivities(DataContext dataContext, int userId, Activity lastActivity)
         {
             var lastActivityId = (await dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == lastActivity))!.Id;
             var userLastActivities = await dataContext.UserLastActivities

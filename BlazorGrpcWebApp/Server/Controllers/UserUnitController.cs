@@ -62,7 +62,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             await _dataContext.SaveChangesAsync();
 
             await CreateUserActivityService.CreateBuildActivity(_dataContext, user.Id, unit.Title, unit.BananaCost);
-            await DeleteUserActivityService.DeleteOldestActivity(_dataContext, user.Id, ActivitySimplified.Build);
+            await DeleteUserActivityService.DeleteOldActivities(_dataContext, user.Id, ActivitySimplified.Build);
 
             return Ok(newUserUnit);
         }
@@ -85,7 +85,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             await _dataContext.SaveChangesAsync();
 
             await CreateUserActivityService.CreateDeleteActivity(_dataContext, authUser.Id, unit!.Title, bananasReward);
-            await DeleteUserActivityService.DeleteOldestActivity(_dataContext, authUser.Id, ActivitySimplified.Delete);
+            await DeleteUserActivityService.DeleteOldActivities(_dataContext, authUser.Id, ActivitySimplified.Delete);
 
             return Ok();
         }
@@ -110,7 +110,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
                 await _dataContext.SaveChangesAsync();
 
                 await CreateUserActivityService.CreateHealActivity(_dataContext, authUser.Id, unit.Title, bananasCost);
-                await DeleteUserActivityService.DeleteOldestActivity(_dataContext, authUser.Id, ActivitySimplified.Heal);
+                await DeleteUserActivityService.DeleteOldActivities(_dataContext, authUser.Id, ActivitySimplified.Heal);
 
                 return Ok(new GenericAuthResponse<UserUnit>() { Message = "Your unit has been healed.", Success = true });
             }
@@ -146,7 +146,7 @@ namespace BlazorGrpcWebApp.Server.Controllers
             await _dataContext.SaveChangesAsync();
 
             await CreateUserActivityService.CreateReviveArmyActivity(_dataContext, user.Id);
-            await DeleteUserActivityService.DeleteOldestActivity(_dataContext, user.Id, Activity.ReviveArmy);
+            await DeleteUserActivityService.DeleteOldActivities(_dataContext, user.Id, Activity.ReviveArmy);
 
             return Ok("Army revived!");
         }

@@ -56,7 +56,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             await _dataContext.SaveChangesAsync();
 
             await CreateUserActivityService.CreateBuildActivity(_dataContext, user.Id, unit.Title, unit.BananaCost);
-            await DeleteUserActivityService.DeleteOldestActivity(_dataContext, user.Id, ActivitySimplified.Build);
+            await DeleteUserActivityService.DeleteOldActivities(_dataContext, user.Id, ActivitySimplified.Build);
 
             return new GrpcUserUnitResponse()
             {
@@ -82,7 +82,7 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
                 await _dataContext.SaveChangesAsync();
 
                 await CreateUserActivityService.CreateDeleteActivity(_dataContext, authUser.Id, unit!.Title, bananasReward);
-                await DeleteUserActivityService.DeleteOldestActivity(_dataContext, authUser.Id, ActivitySimplified.Delete);
+                await DeleteUserActivityService.DeleteOldActivities(_dataContext, authUser.Id, ActivitySimplified.Delete);
 
                 return new DeleteGrpcUserUnitResponse()
                 {

@@ -18,7 +18,8 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
             if (bananasSpent != null)
             {
                 if (activity == Activity.BuildKnight || activity == Activity.BuildArcher || activity == Activity.BuildMage ||
-                    activity == Activity.HealKnight || activity == Activity.HealArcher || activity == Activity.HealMage)
+                    activity == Activity.HealKnight || activity == Activity.HealArcher || activity == Activity.HealMage ||
+                    activity == Activity.ReviveArmy)
                 {
                     userLastActivity.UserBananasSpent = bananasSpent;
                 }
@@ -46,9 +47,9 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
 
         }
 
-        public static async Task CreateReviveArmyActivity(DataContext dataContext, int userId)
+        public static async Task CreateReviveArmyActivity(DataContext dataContext, int userId, int? bananasSpent = 1000)
         {
-            await CreateActivity(dataContext, userId, Activity.ReviveArmy);
+            await CreateActivity(dataContext, userId, Activity.ReviveArmy, bananasSpent);
         }
 
         public static async Task CreateWinAFightActivity(DataContext dataContext, int userId)

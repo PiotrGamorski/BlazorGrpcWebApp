@@ -1,6 +1,7 @@
 ﻿using BlazorGrpcWebApp.Shared.Data;
 using BlazorGrpcWebApp.Shared.Entities;
 using BlazorGrpcWebApp.Shared.Enums;
+using BlazorGrpcWebApp.Shared.Services.Static;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,29 +50,8 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             authUser.Bananas -= bananasCost;
             await _dataContext.SaveChangesAsync();
 
-            var healUnitActivity = new Activity();
-            switch (unit.Title)
-            {
-                case "Knight":
-                    healUnitActivity = Activity.HealKnight;
-                    break;
-                case "Archer":
-                    healUnitActivity = Activity.HealArcher;
-                    break;
-                case "Mage":
-                    healUnitActivity = Activity.HealMage;
-                    break;
-                default: break;
-            }
-            var healUnitActivityId = (await _dataContext.LastActivities.FirstOrDefaultAsync(a => a.ActivityType == healUnitActivity))!.Id;
-            var userLastActivity = new UserLastActivity()
-            {
-                UserId = authUser.Id,
-                ExecutionDate = DateTime.Now,
-                LastActivityId = healUnitActivityId,
-            };
-            await _dataContext.UserLastActivities.AddAsync(userLastActivity);
-            await _dataContext.SaveChangesAsync();
+            await CreateUserActivityService.CreateHealActivity(_dataContext, authUser.Id, unit.Title, bananasCost);
+            await DeleteUserActivityService.DeleteOldActivities(_dataContext, authUser.Id, ActivitySimplified.Heal);
 
             return new GrpcHealUnitResponse()
             {
@@ -129,6 +109,9 @@ namespace BlazorGrpcWebApp.Shared.gRPC_Services
             };
             await _dataContext.UserLastActivities.AddAsync(userLastActivity);
             await _dataContext.SaveChangesAsync();
+
+            await CreateUserActivityService.CreateReviveArmyActivity(_dataContext, authUser.Id);
+            await DeleteUserActivityService.DeleteOldActivities(_dataContext, authUser.Id, Activity.ReviveArmy);
 
             return new GrpcReviveArmyResponse()
             {
