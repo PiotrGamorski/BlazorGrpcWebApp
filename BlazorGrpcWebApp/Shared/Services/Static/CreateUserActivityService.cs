@@ -61,7 +61,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
             await CreateActivity(dataContext, userId, Activity.LostAFight);
         }
 
-        public static async Task CreateHealActivity(DataContext dataContext, int userId, string? unitTitle)
+        public static async Task CreateHealActivity(DataContext dataContext, int userId, string? unitTitle, int? bananasSpent = null)
         {
             var activity = new Activity();
             switch (unitTitle)
@@ -78,10 +78,10 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
                 default: break;
             }
 
-            await CreateActivity(dataContext, userId, activity);
+            await CreateActivity(dataContext, userId, activity, bananasSpent, null);
         }
 
-        public static async Task CreateBuildActivity(DataContext dataContext, int userId, string? unitTitle)
+        public static async Task CreateBuildActivity(DataContext dataContext, int userId, string? unitTitle, int? bananasSpent = null)
         {
             var activity = new Activity();
             switch (unitTitle)
@@ -98,10 +98,10 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
                 default: break;
             }
 
-            await CreateActivity(dataContext, userId, activity);
+            await CreateActivity(dataContext, userId, activity, bananasSpent);
         }
 
-        public static async Task CreateDeleteActivity(DataContext dataContext, int userId, string? unitTitle)
+        public static async Task CreateDeleteActivity(DataContext dataContext, int userId, string? unitTitle, int? bananasGained = null)
         {
             var activity = new Activity();
             switch (unitTitle)
@@ -118,7 +118,7 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
                 default: break;
             }
 
-            await CreateActivity(dataContext, userId, activity);
+            await CreateActivity(dataContext, userId, activity, null, bananasGained);
         }
     }
 }
