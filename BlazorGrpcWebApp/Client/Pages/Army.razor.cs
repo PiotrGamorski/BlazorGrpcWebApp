@@ -7,6 +7,7 @@ using MudBlazor;
 using BlazorGrpcWebApp.Client.Authentication;
 using System.Security.Claims;
 using Microsoft.JSInterop;
+using BlazorGrpcWebApp.Shared.Enums;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -167,7 +168,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             return "Over a year ago";
         }
 
-        public async Task SetFooterPaddingTop()
+        private async Task SetFooterPaddingTop()
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Army.razor.js");
             if (module != null)

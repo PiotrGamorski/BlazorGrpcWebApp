@@ -4,7 +4,7 @@ namespace BlazorGrpcWebApp.Shared.Dictionaries
 {
     public static class ActivitiesDictionary
     {
-        public static Dictionary<Activity, string> LastActivityText = new Dictionary<Activity, string>()
+        public static Dictionary<Activity, string> LastActivityDic = new Dictionary<Activity, string>()
         {
             { Activity.Register, ""},
             { Activity.Verify, ""},
