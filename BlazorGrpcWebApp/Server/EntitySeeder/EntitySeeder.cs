@@ -59,7 +59,7 @@ namespace BlazorGrpcWebApp.Server.EntitySeeder
                 new Unit()
                 {
                     Title = "Archer",
-                    BananaCost = 150,
+                    BananaCost = 100,
                     HitPoints = 100,
                     Attack = 15,
                     Defense = 15,
@@ -67,7 +67,7 @@ namespace BlazorGrpcWebApp.Server.EntitySeeder
                 new Unit()
                 {
                     Title = "Mage",
-                    BananaCost = 200,
+                    BananaCost = 100,
                     HitPoints = 100,
                     Attack = 20,
                     Defense = 1,
