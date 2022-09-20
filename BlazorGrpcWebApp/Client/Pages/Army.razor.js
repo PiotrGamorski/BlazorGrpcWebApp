@@ -1,12 +1,22 @@
 ﻿function GetPositionBottom() {
-    const scrollHeight = document.body.scrollHeight;
+    const minPaddingTop = 21.72;
     const footerHeight = 102;
-    const tableBottom = document.querySelector("#table-grid").getBoundingClientRect().bottom;
+    const scrollHeight = document.body.scrollHeight;
+    const tableElem = document.querySelector("#table-grid");
 
-    let paddingTop = scrollHeight - tableBottom - footerHeight;
-    console.log(paddingTop + "px");
+    if (typeof tableElem !== 'undefined' && tableElem != null) {
+        const tableBottom = tableElem.getBoundingClientRect().bottom;
+        let paddingTop = scrollHeight - tableBottom - footerHeight;
 
-    document.getElementById("footer-container").style.paddingTop = paddingTop + "px";
+        if (paddingTop <= minPaddingTop) {
+            paddingTop = minPaddingTop;
+        }
+
+        const footerElem = document.getElementById("footer-container");
+        if (typeof footerElem !== 'undefined' && footerElem != null) {
+            footerElem.style.paddingTop = paddingTop + "px";
+        }
+    }
 }
 
 export { GetPositionBottom }

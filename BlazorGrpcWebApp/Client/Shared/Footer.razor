@@ -1,20 +1,20 @@
 ﻿<MudContainer id="footer" Style="display: flex; flex-direction:column">
     <MudGrid>
-        <MudItem xs="10">
-            <hr style="border: 1px solid #30363d"/>
+        <MudItem xs="12">
+            <hr id="footer-hr" style="border: 1px solid #30363d"/>
         </MudItem>
     </MudGrid>
     <MudElement HtmlTag="div" Style="display: flex">
         <MudGrid>
-            <MudItem lg="4">
+            <MudItem xs="3">
                 <MudElement HtmlTag="div" Style="display: flex; align-items: center;">
                     <MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="Size.Medium" Style="color:#88949E"/>
                     <MudText Style="font-size:small; margin-left: 20px; color: #88949E">&copy; @DateTime.Now.Year.ToString(), Blazor Battles, Inc.</MudText>
                 </MudElement>
             </MudItem>
-            <MudItem lg="8">
+            <MudItem xs="5">
                 <MudGrid>
-                    <MudItem xs="3">
+                    <MudItem xs="4">
                         <MudElement HtmlTag="div" Style="display: flex; flex-direction: column; justify-content:left">
                             <MudLink Href="" Color="Color.Tertiary">
                                 <MudText Style="text-transform: none; font-size:12px">
@@ -43,7 +43,7 @@
                             </MudLink>
                         </MudElement>
                     </MudItem>
-                    <MudItem xs="3">
+                    <MudItem xs="4">
                         <MudElement HtmlTag="div" Style="display: flex; flex-direction: column; justify-content:left">
                             <MudLink Href="" Color="Color.Tertiary">
                                 <MudText Style="text-transform: none; font-size:12px">
@@ -67,7 +67,7 @@
                             </MudLink>  
                         </MudElement>
                     </MudItem>
-                    <MudItem xs="3">
+                    <MudItem xs="4">
                         <MudElement HtmlTag="div" Style="display: flex; flex-direction: column; justify-content:left">
                             <MudLink Href="" Color="Color.Tertiary">
                                 <MudText Style="text-transform: none; font-size:12px">
@@ -100,7 +100,7 @@
         width: 100%; 
         display: block; 
         box-sizing: border-box; 
-        margin-left:20px; 
+        margin-left:0px; 
         margin-right:auto; 
         position: relative; 
         /*padding-top: var(--section-diff);*/
@@ -114,4 +114,10 @@
 @code {
     [Parameter]
     public string PaddingTop { get; set; }
+
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
 }
