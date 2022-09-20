@@ -1,6 +1,8 @@
-﻿<MudContainer id="footer" Style="display: flex; flex-direction:column">
+﻿@inject IJSRuntime JSRuntime
+
+<MudContainer id="footer" Style="display: flex; flex-direction:column">
     <MudGrid>
-        <MudItem xs="12">
+        <MudItem xs="@xs">
             <hr id="footer-hr" style="border: 1px solid #30363d"/>
         </MudItem>
     </MudGrid>
@@ -114,10 +116,25 @@
 @code {
     [Parameter]
     public string PaddingTop { get; set; }
+    [Parameter]
+    public int xs { get; set; }
 
+    private IJSObjectReference? module;
 
-    protected override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        return base.OnInitializedAsync();
+        if (xs == 0)
+        {
+            xs = 12;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Shared/Footer.razor.js");
+        if (module != null)
+        {
+            await module.InvokeAsync<string?>("SetFooterHorizontalLine", "army-table");
+        }
     }
 }

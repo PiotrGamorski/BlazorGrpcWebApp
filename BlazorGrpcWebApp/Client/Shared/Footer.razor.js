@@ -5,7 +5,7 @@
         const hr = document.getElementById('footer-hr');
 
         if (typeof hr !== 'undefined' && hr != null) {
-            hr.style.width = elem.clientWidth;
+            hr.style.width = elem.clientWidth + "px";
         }
     }
 }
