@@ -11,28 +11,35 @@ namespace BlazorGrpcWebApp.Shared.Services.Static
             switch (request.LastActivity)
             {
                 case Activity.BuildKnight:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.BuildKnight] +
+                        $". You spent {request.UserBananasSpent} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.BuildArcher:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.BuildArcher] +
+                        $". You spent {request.UserBananasSpent} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.BuildMage:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.BuildMage] +
+                        $". You spent {request.UserBananasSpent} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.DeleteKnight:
-                    return ActivitiesDictionary.LastActivityDic[Activity.BuildKnight] + 
-                        $". You gained {request.UserBananasGained} coins. Your total coins was {request.UserBananasTotal}.";
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.DeleteKnight] + 
+                        $". You gained {request.UserBananasGained} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.DeleteArcher:
-                    return ActivitiesDictionary.LastActivityDic[Activity.DeleteArcher] +
-                        $". You gained {request.UserBananasGained} coins. Your total coins was {request.UserBananasTotal}.";
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.DeleteArcher] +
+                        $". You gained {request.UserBananasGained} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.DeleteMage:
-                    return ActivitiesDictionary.LastActivityDic[Activity.DeleteMage] +
-                        $". You gained {request.UserBananasGained} coins. Your total coins was {request.UserBananasTotal}.";
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.DeleteMage] +
+                        $". You gained {request.UserBananasGained} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.HealKnight:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.HealKnight] +
+                        $". You spent {request.UserBananasSpent} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.HealArcher:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.HealArcher] +
+                        $". You spent {request.UserBananasSpent} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.HealMage:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.HealMage] +
+                        $". You spent {request.UserBananasSpent} coins and {request.UserBananasTotal} coins were left.";
                 case Activity.ReviveArmy:
-                    return string.Empty;
+                    return ActivitiesBasicDictionary.LastActivityDic[Activity.ReviveArmy] +
+                        $" and {request.UserBananasTotal} coins were left.";
                 case Activity.WinAFight:
                     return string.Empty;
                 case Activity.LostAFight:

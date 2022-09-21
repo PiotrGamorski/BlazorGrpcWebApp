@@ -4,6 +4,7 @@
 @using BlazorGrpcWebApp.Shared.Dictionaries
 @using BlazorGrpcWebApp.Shared.Enums
 @using BlazorGrpcWebApp.Shared.Models.UI_Models
+@using BlazorGrpcWebApp.Shared.Services.Static
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAppSettingsService AppSettingsService
 @inject IArmyGrpcService ArmyGrpcService
@@ -108,9 +109,9 @@
         <MudElement HtmlTag="div" Style="display:flex; flex-direction:column; align-items: flex-start; justify-content:center;">
             <Animate Animation="Animations.FadeIn" DurationMs="500">
             <MudContainer Style="display:flex; justify-content:center;">
-                <MudCard  Style="border-radius: 6px; border: 1px solid #21262d; height:235px; width: 302px; position: relative">
+                <MudCard  Style="border-radius: 6px; border: 1px solid #21262d; height:235px; width: 350px; position: relative">
                     <MudImage Src="https://github.githubassets.com/images/modules/dashboard/universe22/bg.jpg" 
-                              Width="302" 
+                              Width="350" 
                               Height="235" 
                               Elevation="-1" 
                               Class="rounded"/>
@@ -127,7 +128,7 @@
                             </div>
                             <br/>
                             <MudText Style="font-size:small; font-weight:bold">Let's build from here</MudText>
-                            <MudText Style="font-size:small">
+                            <MudText Style="font-size:small; text-align: justify; text-justify: inter-word;">
                                 Join the global developer event for cloud, security, community, and AI.
                                 Register today and get a 20% off early bird discount.
                             </MudText>
@@ -145,7 +146,7 @@
             { 
                 <MudText Style="font-size:small; margin-left: -140px; font-weight: bold">Latest activities</MudText>
                 <Animate Animation="Animations.FadeIn" DurationMs="500">
-                <MudTimeline TimelinePosition="TimelinePosition.Left">
+                <MudTimeline TimelinePosition="TimelinePosition.Left" Style="max-width: 360px">
                     @foreach (var activity in LastActivities!)
                     {
                         <MudTimelineItem Size="Size.Small" Color="Color.Dark">
@@ -154,8 +155,8 @@
                                     <MudText Align="Align.Start" Style="font-size:small; color:#88949E" GutterBottom="true">
                                         @CalcuteTime(activity.ExecutionDate)
                                     </MudText>
-                                    <MudText Align="Align.Start" Style="font-size:small;">
-                                        @ActivitiesDictionary.LastActivityDic.GetValueOrDefault(activity.LastActivity).
+                                    <MudText Align="Align.Start" Style="font-size:small; text-align: justify; text-justify: inter-word;">
+                                        @UserActivityInfoService.GetUserLastActivityInfo(activity)
                                     </MudText>
                                 </MudPaper>
                             </ItemContent>
@@ -213,6 +214,9 @@
         padding-top: 0;
         padding-bottom: 0;
     }
+    .mud-timeline-vertical .mud-timeline-item {
+        padding-bottom: 15px;
+    }
     .mud-timeline-vertical.mud-timeline-position-start::before {
         top: 40px;
         height: 80%;
@@ -225,6 +229,7 @@
         padding-top: 10px;
     }
 </style>
+
 @code
 {
     private string ArmySearchString { get; set; } = string.Empty;

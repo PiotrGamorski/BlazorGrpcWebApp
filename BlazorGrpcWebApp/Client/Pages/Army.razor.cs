@@ -41,7 +41,7 @@ namespace BlazorGrpcWebApp.Client.Pages
             PopulateArmyUnits(UserUnitsDtos);
             StateHasChanged();
 
-            await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 6);
+            await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 5);
             StateHasChanged();
 
             await SetFooterPaddingTop();
