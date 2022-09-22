@@ -38,10 +38,39 @@ namespace BlazorGrpcWebApp.Server.Services.ControllersServices
                     result.Add(_mapper.Map<UserLastActivityDto>(item));
                 }
 
+                if (result != null && result.Count == 0)
+                {
+                    result = await GetUserLastAuthActivites(userId);
+                }
+
                 return result;
             }
 
-            return null;
+            return new List<UserLastActivityDto>();
+        }
+
+        private async Task<List<UserLastActivityDto>?> GetUserLastAuthActivites(int userId)
+        { 
+            var userLastAuthActivities = await _dataContext.UserLastActivities
+                .Where(a => a.UserId == userId)
+                .Where(a => a.LastActivity.ActivityType == Activity.Register || a.LastActivity.ActivityType == Activity.Login)
+                .Include(a => a.LastActivity)
+                .OrderByDescending(a => a.ExecutionDate)
+                .ToListAsync();
+
+            if (userLastAuthActivities != null && userLastAuthActivities.Count > 0)
+            {
+                var result = new List<UserLastActivityDto>();
+                foreach (var item in userLastAuthActivities)
+                {
+                    result.Add(_mapper.Map<UserLastActivityDto>(item));
+                }
+
+                return result;
+            }
+            
+
+            return new List<UserLastActivityDto>();
         }
     }
 }
