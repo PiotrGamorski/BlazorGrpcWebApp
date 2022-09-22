@@ -17,7 +17,6 @@ namespace BlazorGrpcWebApp.Client.Pages
         private int authUserId;
         private string? ImgPath;
         private IJSObjectReference? module;
-        private string? res;
         public string? FooterPaddingTop { get; set; } = "0px";
         private IList<UserUnitDto>? UserUnitsDtos { get; set; }
         private IList<ArmyUnit>? ArmyUnits { get; set; }
