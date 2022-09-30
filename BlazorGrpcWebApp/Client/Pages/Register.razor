@@ -303,7 +303,9 @@
     protected override async Task OnInitializedAsync()
     {
         if (!string.IsNullOrEmpty(CommonData.EmailAddress))
+        {
             userRegister.Email = CommonData.EmailAddress;
+        }
 
         useGrpc = bool.Parse(AppSettings.GetValueFromPagesSec("Register"));
 
@@ -323,17 +325,19 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!string.IsNullOrEmpty(CommonData.EmailAddress))
-        {
-            TurnOnAdorment(emailRef, "Validate-Email");
-        }
-
+        
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Register.razor.js");
             if (module != null)
             { 
                 await module.InvokeAsync<string>("TurnOffAutoComplete");
+            }
+
+
+            if (!string.IsNullOrEmpty(CommonData.EmailAddress))
+            {
+                await emailRef!.Validate();
             }
         }
     }
