@@ -9,6 +9,7 @@
 @inject IUnitService UnitService
 @inject IToastService ToastService
 @inject IGrpcUserUnitService GrpcUserUnitService
+@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
 <MudText Typo="Typo.h4">Build</MudText>
@@ -20,18 +21,17 @@
                 Select hero class and build your unit.
             </MudText>
             <div style="padding-left:10px; padding-right: 10px">
-            <MudSelect T="int" 
-                       Variant="Variant.Outlined" 
-                       AnchorOrigin="Origin.BottomCenter"
-                       @bind-Value="@selectedUnitId"
-                       ToStringFunc="@(new Func<int, string>(ConvertToBuildItem))">
-                @foreach(var unit in UnitService.Units)
-                {
-                    <MudSelectItem Value="unit.Id"/>            
-                }
-            </MudSelect>
+                <MudSelect T="int" 
+                           Variant="Variant.Outlined" 
+                           AnchorOrigin="Origin.BottomCenter"
+                           @bind-Value="@selectedUnitId"
+                           ToStringFunc="@(new Func<int, string>(ConvertToBuildItem))">
+                    @foreach(var unit in UnitService.Units)
+                    {
+                        <MudSelectItem Value="unit.Id"/>            
+                    }
+                </MudSelect>
             </div>
-
             <br/>
             <br/>
             <MudButton @onclick="BuildUnit" 
@@ -42,7 +42,7 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
-
+<div id="UnitSelectThreeJSContainer">THREE JS</div>
 
 @code {
     private int authUserId;
@@ -60,6 +60,14 @@
 
         await UnitService.LoadUnitsAsync();
         //await UnitService.DoGetUnits(2000);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("UnitSelect.load");
+        }
     }
 
     private string ConvertToBuildItem(int unitId)

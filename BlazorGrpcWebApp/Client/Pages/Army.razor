@@ -84,16 +84,18 @@
                     </MudTd>
                  </RowTemplate>
                  <PagerContent>
-                    <MudTablePager Style="color: #88949E; font-size: small" PageSizeOptions="new int[] {10, 15, 20}"/>
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Secondary"
-                               OnClick="async () => await ShowReviveArmyDialog()">
-                        <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
-                            <MudIcon Icon="@Icons.Filled.LocalHospital"
-                                     Style="margin-right: 3px"/>
-                        </MudTooltip>        
-                        <MudText Style="text-transform: none; font-size:small">Revive Army</MudText>         
-                    </MudButton>    
+                    <div style="width: 100%; display:flex; align-items: center; justify-content:space-between">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Style="margin-left: 10px; margin-bottom: 10px;"
+                                   OnClick="async () => await ShowReviveArmyDialog()">
+                            <MudTooltip Placement="Placement.Left" Text="Heals all units with random hit points.">
+                                <MudIcon Icon="@Icons.Filled.LocalHospital" Style="margin-right: 3px"/>
+                            </MudTooltip>        
+                            <MudText Style="text-transform: none; font-size:small">Revive Army</MudText>         
+                        </MudButton>
+                        <MudTablePager Style="color: #88949E; font-size: small" PageSizeOptions="new int[] {10, 15, 20}" />
+                    </div>
                  </PagerContent>
              </MudTable>
              </Animate>
@@ -127,7 +129,7 @@
                                         <div style="margin-left: 55px">
                                             <MudIconButton Icon="@Icons.Filled.Close" 
                                                    Size="Size.Small"
-                                                   OnClick="() => isPopoverClosed = true"/>
+                                                   OnClick="async () => { isPopoverClosed = true; }"/>
                                         </div>
                                     </div>
                                     <br/>
@@ -223,7 +225,7 @@
         padding-bottom: 15px;
     }
     .mud-timeline-vertical.mud-timeline-position-start::before {
-        top: 40px;
+        top: 43px;
         height: 80%;
     }
     .mud-select .mud-select-input .mud-input-slot {

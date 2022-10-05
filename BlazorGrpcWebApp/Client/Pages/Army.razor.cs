@@ -7,7 +7,6 @@ using MudBlazor;
 using BlazorGrpcWebApp.Client.Authentication;
 using System.Security.Claims;
 using Microsoft.JSInterop;
-using BlazorGrpcWebApp.Shared.Enums;
 
 namespace BlazorGrpcWebApp.Client.Pages
 {
@@ -38,11 +37,7 @@ namespace BlazorGrpcWebApp.Client.Pages
                 UserUnitsDtos = await GetUserUnitsWithRest();
 
             PopulateArmyUnits(UserUnitsDtos);
-            StateHasChanged();
-
             await GetUserLastActivities(authUserId, BlazorGrpcWebApp.Shared.Enums.Page.Army, 5);
-            StateHasChanged();
-
             await SetFooterPaddingTop();
             StateHasChanged();
         }
@@ -166,7 +161,6 @@ namespace BlazorGrpcWebApp.Client.Pages
 
             return "Over a year ago";
         }
-
         private async Task SetFooterPaddingTop()
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/Pages/Army.razor.js");
