@@ -42,7 +42,8 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
-<div id="UnitSelectThreeJSContainer">THREE JS</div>
+<div id="BuildThreeJSContainer" style="height: 400px">THREE JS</div>
+<button @onclick="ExecuteThreeJS">Run ThreeJS</button>
 
 @code {
     private int authUserId;
@@ -66,8 +67,13 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("UnitSelect.load");
+            await ExecuteThreeJS();
         }
+    }
+
+    private async Task ExecuteThreeJS()
+    { 
+        await JSRuntime.InvokeVoidAsync("JSLib.LoadScene");
     }
 
     private string ConvertToBuildItem(int unitId)
